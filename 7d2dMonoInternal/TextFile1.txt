@@ -1,0 +1,12 @@
+﻿IF "$(Configuration)" == "Release_NOUE" (
+    copy "$(TargetPath)" "..\Release\$(TargetFileName)"
+) 
+IF "$(Configuration)" == "Release_UE" (
+    copy "$(TargetPath)" "..\Release\$(TargetFileName)"
+) 
+IF "$(Configuration)" == "Debug" (
+    copy "$(TargetPath)" "..\..\AnyCPU\Debug\$(TargetFileName)"
+) 
+IF NOT "$(Configuration)" == "Debug" (
+    rd /s /q "$(ProjectDir)obj" 
+)
