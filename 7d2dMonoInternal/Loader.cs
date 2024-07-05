@@ -15,14 +15,14 @@ namespace SevenDTDMono
         public static int index = 1;
 
        
-        public static AssemblyHelper assemblyHelper; // Add a member variable
+        public static AssemblyHelper AssemblyHelper; // Add a member variable
 
         public static void Load()
         {
             gameObject = new UnityEngine.GameObject();
 #if RELEASE_UE || DEBUG
-            assemblyHelper = new AssemblyHelper();
-            assemblyHelper.TryLoad();
+            AssemblyHelper = new AssemblyHelper();
+            AssemblyHelper.TryLoad();
 #endif
             gameObject.AddComponent<Objects>();
             gameObject.AddComponent<NewMenu>();
@@ -39,10 +39,11 @@ namespace SevenDTDMono
             InitializeUnityExplorer();
 #endif
             UnityEngine.Object.DontDestroyOnLoad(gameObject);
+            var settingsInstance = Settings.Instance;
         }
         public static void InitializeUnityExplorer()
         {
-            if (assemblyHelper.AreAllAssembliesLoaded() == true && Settings.ASMloaded == false)
+            if (AssemblyHelper.AreAllAssembliesLoaded() == true && Settings.ASMloaded == false)
             {
                 Settings.ASMloaded=true;
 

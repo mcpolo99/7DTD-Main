@@ -323,6 +323,7 @@
     <Compile Include="Features\Render\Render.cs" />
     <None Include="Directory.Build.props" />
     <None Include="FileName.cs" />
+    <Compile Include="GuiLayoutExtended\GUIButtons.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\AssemblyHelper.cs" />
     <Compile Include="Utils\ASMCHECK.cs" />
@@ -337,7 +338,7 @@
     <Compile Include="Utils\Objects.cs" />
     <Compile Include="UI\SceneDebugger.cs" />
     <Compile Include="Utils\Setting.cs" />
-    <Compile Include="Utils\Settings.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Utils\ToggleColor.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -346,6 +347,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Features\Buffs\Cbuffs.XML" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

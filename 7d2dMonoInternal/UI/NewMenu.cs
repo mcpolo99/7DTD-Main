@@ -301,6 +301,15 @@ namespace SevenDTDMono
                                     CGUILayout.RButton("Ignored By AI", "_ignoreByAI");
                                     CGUILayout.Button("Creative/Debug Mode", RB, "CmDm");
                                     CGUILayout.SButton("Name Scramble2", "_nameScramble");
+                                    CGUILayout.Button("sda", () =>
+                                    {
+                                        Settings.Instance.Speed = !Settings.Instance.Speed;
+                                    });
+                                    GuiLayoutExtended.NewGUILayout.BoolButton("TEstSpeed NameOF", nameof(Settings.Instance.Speed));
+
+                                    //GuiLayoutExtended.NewGUILayout.ButtonBoolToggle("TestToggleBool", Settings.Instance.Speed);
+                                    Settings.Instance.CreativeMode = GuiLayoutExtended.NewGUILayout.ButtonBoolToggle("Toggle CreativeMode", Settings.Instance.CreativeMode);
+
                                 }
 
 

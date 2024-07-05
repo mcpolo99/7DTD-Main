@@ -8,9 +8,57 @@ using UnityEngine.UI;
 namespace SevenDTDMono
 {
      
+
+
     public class Settings: MonoBehaviour
     {
+    
+        private static Settings _instance;
+        public static Settings Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new GameObject("Settings").AddComponent<Settings>();
+                    DontDestroyOnLoad(_instance.gameObject);
+                }
+                return _instance;
+            }
+        }
+        private void Awake()
+        {
+            if (_instance == null)
+            {
+                _instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (_instance != this)
+            {
+                Destroy(gameObject);
+            }
+        }
+
+
+        public bool Speed { get; set; }
+        public bool CreativeMode { get; set; }
+        public bool FovCircle { get; set; }
+
+        public bool AssemblyLoaded { get; set; }
+
+
+
+
+
+
+
+
+
+
+
+
         public static Dictionary<string, bool> BD = new Dictionary<string, bool>();
+
 
         #region BOOLS undefined
         // Add more settings/options to your cheat!
