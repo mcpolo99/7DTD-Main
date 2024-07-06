@@ -9,7 +9,7 @@ using SevenDTDMono;
 using System.Runtime.InteropServices;
 using System.Collections;
 //using HarmonyLib;
-using S = SevenDTDMono.Settings;
+using S = SevenDTDMono.NewSettings;
 using static Setting;
 
 
@@ -294,6 +294,7 @@ namespace SevenDTDMono
                 }
                 else if (GameManager.Instance.World == null)
                 {
+                    NewSettings.Instance.GameStarted=true;
                     SB["IsGameMainMenu"] = true;
                     SB["IsGameStarted"] = false;
                     //foreach (string key in S.BD.Keys.ToList()) // ToList creates a copy of the keys so that you can modify the dictionary while iterating.

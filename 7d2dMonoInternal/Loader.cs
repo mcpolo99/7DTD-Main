@@ -10,7 +10,7 @@ namespace SevenDTDMono
     public class Loader
     {
         internal static UnityEngine.GameObject gameObject;
-        public static string baseName = "GameObject";
+        public static string baseName = "7DTD----MENU";
         public static string newObjectName = baseName;
         public static int index = 1;
 
@@ -24,10 +24,11 @@ namespace SevenDTDMono
             AssemblyHelper = new AssemblyHelper();
             AssemblyHelper.TryLoad();
 #endif
+            gameObject.name = baseName;
             gameObject.AddComponent<Objects>();
             gameObject.AddComponent<NewMenu>();
             gameObject.AddComponent<Cheat>();
-            gameObject.AddComponent<Settings>();
+            gameObject.AddComponent<NewSettings>();
             gameObject.AddComponent<ESP>();
             gameObject.AddComponent<Visuals>();
             gameObject.AddComponent<Aimbot>();
@@ -39,13 +40,13 @@ namespace SevenDTDMono
             InitializeUnityExplorer();
 #endif
             UnityEngine.Object.DontDestroyOnLoad(gameObject);
-            var settingsInstance = Settings.Instance;
+            var settingsInstance = NewSettings.Instance;
         }
         public static void InitializeUnityExplorer()
         {
-            if (AssemblyHelper.AreAllAssembliesLoaded() == true && Settings.ASMloaded == false)
+            if (AssemblyHelper.AreAllAssembliesLoaded() == true && NewSettings.Instance.AssemblyLoaded == false)
             {
-                Settings.ASMloaded=true;
+                NewSettings.Instance.AssemblyLoaded = true;
 
 #if RELEASE_UE || DEBUG
                 UnityExplorer.ExplorerStandalone.CreateInstance();

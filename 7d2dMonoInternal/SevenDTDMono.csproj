@@ -323,11 +323,19 @@
     <Compile Include="Features\Render\Render.cs" />
     <None Include="Directory.Build.props" />
     <None Include="FileName.cs" />
+    <Compile Include="GuiLayoutExtended\FoldableMenu.cs" />
+    <Compile Include="GuiLayoutExtended\GUIBeginVertical.cs" />
     <Compile Include="GuiLayoutExtended\GUIButtons.cs" />
+    <Compile Include="GuiLayoutExtended\GUIBeginHorizontal.cs" />
+    <Compile Include="GuiLayoutExtended\GUIDropDown.cs" />
+    <Compile Include="GuiLayoutExtended\GUIGeneral.cs" />
+    <Compile Include="GuiLayoutExtended\GUIScroll.cs" />
+    <Compile Include="GuiLayoutExtended\GUIToggles.cs" />
+    <Compile Include="GuiLayoutExtended\GUIUnsorted.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\AssemblyHelper.cs" />
     <Compile Include="Utils\ASMCHECK.cs" />
-    <Compile Include="UI\GUILayoutExtensions.cs" />
+    <Compile Include="GuiLayoutExtended\GUILayoutExtensions.cs" />
     <Compile Include="Utils\ESPUtils.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="UI\Menu.cs" />
@@ -338,7 +346,7 @@
     <Compile Include="Utils\Objects.cs" />
     <Compile Include="UI\SceneDebugger.cs" />
     <Compile Include="Utils\Setting.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="NewSettings.cs" />
     <Compile Include="Utils\ToggleColor.cs" />
   </ItemGroup>
   <ItemGroup>

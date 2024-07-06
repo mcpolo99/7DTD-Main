@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using Eutl = SevenDTDMono.ESPUtils;
 using O = SevenDTDMono.Objects;
-using SETT = SevenDTDMono.Settings;
+using SETT = SevenDTDMono.NewSettings;
 
 namespace SevenDTDMono
 {

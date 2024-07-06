@@ -101,7 +101,7 @@ class Setting
         {
             foreach (string key in ResetBools)
             {
-                if (RB.ContainsKey(key) == true)
+                if (RB.ContainsKey(key) == true )
                 {
                     RB[key] = false;
                 }

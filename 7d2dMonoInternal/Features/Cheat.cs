@@ -1,26 +1,14 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using SETT = SevenDTDMono.Settings;
+using SETT = SevenDTDMono.NewSettings;
 using static Setting;
 using Eutl = SevenDTDMono.ESPUtils;
 using O = SevenDTDMono.Objects; // here we declare O as it was SevenDTDMono.Objects
 using System.Collections.Generic;
-using Platform;
 using System.Linq;
-
-using System.IO;
-
-using System.Reflection;
-using UnityEngine.UIElements;
-//using HarmonyLib;
-using SevenDTDMono.Interface;
-using UnityEngine.UI;
-using SevenDTDMono.Utils;
-using System.Web;
 using static PassiveEffect;
-using static NetPackageMeasure;
-using System.Security.Principal;
+using SevenDTDMono.GuiLayoutExtended;
 
 //using SevenDTDMono.Objects;
 
@@ -319,7 +307,7 @@ namespace SevenDTDMono
             bool toggleState = PVETState[effect];
 
             // Display the toggle button and update the toggle state in the dictionary.
-            bool buttonPressed = CGUILayout.Button(effect.ToString(), GUILayout.MaxWidth(150));
+            bool buttonPressed = NewGUILayout.Button(effect.ToString(), GUILayout.MaxWidth(150));
             PVETState[effect] = buttonPressed;
 
             // If the button is pressed, set the input text field to the same string as the button text
@@ -352,9 +340,9 @@ namespace SevenDTDMono
                     }
 
                     bool toggleState = MenuDropTState[zmIID];
-                    CGUILayout.DropDownForMethods(zmIID, () =>
+                    NewGUILayout.DropDownForMethods(zmIID, () =>
                     {
-                        CGUILayout.BeginHorizontal(() =>
+                        NewGUILayout.BeginHorizontal(() =>
                         {
                             if (GUILayout.Button("Teleport"))
                             {
@@ -404,9 +392,9 @@ namespace SevenDTDMono
                     }
 
                     bool toggleState = MenuDropTState[PIdentity];
-                    CGUILayout.DropDownForMethods(PIdentity, () =>
+                    NewGUILayout.DropDownForMethods(PIdentity, () =>
                     {
-                        CGUILayout.BeginHorizontal(() => 
+                        NewGUILayout.BeginHorizontal(() => 
                         {
                             //CGUILayout.Button("whatever", Color.yellow, Color.blue);
                             if (GUILayout.Button("Teleport"))
@@ -479,7 +467,7 @@ namespace SevenDTDMono
 
 
                     bool state = MenuDropTState[stype];
-                    CGUILayout.DropDownForMethods("Progression Type: " +stype, () =>
+                    NewGUILayout.DropDownForMethods("Progression Type: " +stype, () =>
                     {
                         foreach (ProgressionValue PGV in values)
                         {
@@ -492,7 +480,7 @@ namespace SevenDTDMono
                             //bool state = TogBL[id];
                             //CGUILayout.DropDownForMethods(id, () =>
                             //{
-                                CGUILayout.BeginHorizontal(() =>
+                            NewGUILayout.BeginHorizontal(() =>
                                 {
                                     GUILayout.Label(id);
                                     if (GUILayout.Button("+1", GUILayout.MaxWidth(50)))
@@ -656,9 +644,9 @@ namespace SevenDTDMono
             PassiveEffects[] rightColumnEffects = filteredEffects.Skip(halfAmount).ToArray();
 
             //bool toggleState = passiveToggleStates[effect];
-            CGUILayout.BeginHorizontal(() =>
+            NewGUILayout.BeginHorizontal(() =>
             {
-                CGUILayout.BeginVertical(() =>
+                NewGUILayout.BeginVertical(() =>
                 {
                     // Display the buttons in the left column
                     foreach (PassiveEffects effect in leftColumnEffects)
@@ -667,7 +655,7 @@ namespace SevenDTDMono
                         DisplayToggleButton(effect);
                     }
                 });
-                CGUILayout.BeginVertical(() =>
+                NewGUILayout.BeginVertical(() =>
                 {
                     // Display the buttons in the right column
                     foreach (PassiveEffects effect in rightColumnEffects)

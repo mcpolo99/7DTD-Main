@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using O = SevenDTDMono.Objects;
-using SETT = SevenDTDMono.Settings;
+using SETT = SevenDTDMono.NewSettings;
 using Eutl= SevenDTDMono.ESPUtils;
 
 namespace SevenDTDMono
@@ -48,7 +48,7 @@ namespace SevenDTDMono
 
 
             if (SETT.crosshair) //crosshair Function
-             {
+            {
                 // Constantly redefining these vectors so that you can change your resolution and the crosshair will still be in the middle.
                 Vector2 lineHorizontalStart = new Vector2(Screen.width / 2 - crosshairScale, Screen.height / 2);
                 Vector2 lineHorizontalEnd = new Vector2(Screen.width / 2 + crosshairScale, Screen.height / 2);

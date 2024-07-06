@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using O = SevenDTDMono.Objects;
-using SETT = SevenDTDMono.Settings;
+using NS = SevenDTDMono.NewSettings;
+using SETT = SevenDTDMono.NewSettings;
 using static Setting;
 using SevenDTDMono.Utils;
+using SevenDTDMono.GuiLayoutExtended;
 using UnityEngine.UIElements;
 using DynamicMusic;
 using UniLinq;
@@ -24,22 +26,37 @@ using System.Reflection;
 using System.Xml.Linq;
 using System.Collections.Concurrent;
 using static UnityEngine.GridBrushBase;
+using UnityExplorer;
 
 namespace SevenDTDMono
 {
     public class NewMenu : MonoBehaviour
     {
 
+        public static Dictionary<string,object> Settings => NewSettings.Instance.SettingsDictionary;
+        private static bool GetBool(string key)
+        {
+            if (Settings.TryGetValue(key, out object value) && value is bool boolValue)
+            {
+                return boolValue;
+            }
+            return false; // Return default value or handle as needed
+        }
+
+        private static Vector2 GetZeroVector2(string key)
+        {
+            if (Settings.TryGetValue(key, out object value) && value is Vector2 vector2)
+            {
+                return vector2;
+            }
+            return Vector2.zero;
+        }
 
 
         #region Private bools
 
         private bool drawMenu = true;
-        private bool foldout1 = false;
-        private bool foldout2 = false;
-        private bool foldout3 = false;
-        private bool foldout4 = false;
-        private bool foldout5 = false;
+
 
         private bool FoldPlayer = false;
         private bool FoldZombie = false;
@@ -76,11 +93,11 @@ namespace SevenDTDMono
         private Vector2 scrollPGV;
 
         private Vector2 ScrollMenu3 = Vector2.zero;
-        private Vector2 scrollBuffBTN = Vector2.zero;
+  //      private Vector2 scrollBuffBTN = Vector2.zero;
 
-        private Vector2 ScrollMenu2 = Vector2.zero;
-        private Vector2 ScrollMenu1 = Vector2.zero;
-        private Vector2 ScrollMenu0 = Vector2.zero;
+//        private Vector2 ScrollMenu2 = Vector2.zero;
+        //private Vector2 ScrollMenu1 = Vector2.zero;
+        //private Vector2 ScrollMenu0 = Vector2.zero;
         private Vector2 test;
 
         //public ToggleColors toggleColors;
@@ -88,6 +105,8 @@ namespace SevenDTDMono
         private GUIStyle defBoxStyle;
         GUIStyle centeredLabelStyle;
         #endregion
+
+
 
         #region Random
         private float floatValue = 0.0f;
@@ -104,7 +123,7 @@ namespace SevenDTDMono
         //public Dictionary<string, bool> ToggleStates = new Dictionary<string, bool>();
 
 
-        ConcurrentDictionary<object, Boolean> ToggleBools = new ConcurrentDictionary<object, Boolean>();
+        //ConcurrentDictionary<object, Boolean> ToggleBools = new ConcurrentDictionary<object, Boolean>();
 
 
         void OnDestroy() 
@@ -120,17 +139,42 @@ namespace SevenDTDMono
             windowRect = new Rect(10f, 400f, 400f, 500f);
             GUI.color = Color.white;
 
-
-
             Debug.LogWarning("THIS IS Start New!!!!");
 
-        }
+            NS.Instance.ListForReset.Add("sda");
+            //NS.Instance.SettingsDictionary.Add("IsGameStarted",false);
+            Settings.Add("IsGameStarted", false);
 
+
+
+            Settings.Add("scrollPlayer", new Vector2());
+            Settings.Add("ScrollMenu0", Vector2.zero);
+            Settings.Add("scrollBuffMenu", Vector2.zero);
+            Settings.Add("FoldZombie",false);
+
+
+        }
+        //public static Dictionary<string, Vector2> SV21= new Dictionary<string, Vector2>
+        //{
+        //    { "scrollPlayer", new Vector2() },
+        //    { "scrollBuff", new Vector2() },
+        //    { "scrollCBuff", new Vector2() },
+        //    { "scrollZombie", new Vector2() },
+        //    { "scrollPassive", new Vector2() },
+        //    { "scrollPGV", new Vector2() },
+        //    { "scrollKill", new Vector2() },
+
+        //    { "ScrollMenu0", Vector2.zero },
+        //    { "ScrollMenu1", Vector2.zero },
+        //    { "ScrollMenu2", Vector2.zero },
+        //    { "ScrollMenu3", Vector2.zero },
+        //    { "ScrollMenu4", Vector2.zero },
+        //    { "ScrollMenu5", Vector2.zero },
+        //    { "scrollBuffBTN", Vector2.zero }
+        //};
         // Update is called once per frame
         void Update()
         {
-
-
             if (!Input.anyKey || !Input.anyKeyDown)
             {
                 return;
@@ -140,26 +184,21 @@ namespace SevenDTDMono
             {
                 drawMenu = !drawMenu;
             }
-            if (SETT.selfDestruct)
+            if (Input.GetKeyDown(KeyCode.Delete))
             {
-                SETT.selfDestruct = false; //set bool to false so we can inject again
+                //SETT.selfDestruct = false; //set bool to false so we can inject again
                 Destroy(Loader.gameObject); // destroys our game object we injected
+                //ObjectDestroyer.DestroyObjectByName("ExplorerBehaviour");
+                ObjectDestroyer.DestroyObjectByName("7DTD----MENU");
             }
-            if (SETT.aimbot==true)
-            {
-
-
-            }
-
-
-
         }
 
 
         private void OnGUI()
         {
+
             GUIStyle customStyle = new GUIStyle(GUI.skin.window);
-            if (SB["IsGameStarted"] ==true)
+            if (GetBool("IsGameStarted")==true)
             {
 
                 customStyle.normal.textColor = Color.green;
@@ -249,18 +288,18 @@ namespace SevenDTDMono
             //else
             {
                 windowRect.height = 500;
-                _group = CGUILayout.Toolbar4(_group, CheatsString, GUI.skin.box); //creating the group for switch comand    
+                _group = NewGUILayout.Toolbar4(_group, CheatsString, GUI.skin.box); //creating the group for switch comand    
                 switch (_group)
                 {
-                    case 0://switch to menu0
-                        Menu0();
-                        break;
-                    case 1://switch to menu1
-                        Menu1();
-                        break;
-                    case 2://switch to menu2
-                        Menu2();
-                        break;
+                    //case 0://switch to menu0
+                    //    Menu0();
+                    //    break;
+                    //case 1://switch to menu1
+                    //    Menu1();
+                    //    break;
+                    //case 2://switch to menu2
+                    //    Menu2();
+                    //    break;
 
                     case 3: //add more for more menu
                             //Log.Out("opening Menu3");
@@ -281,59 +320,65 @@ namespace SevenDTDMono
             //CGUILayout.BeginVertical(() => { });
             //CGUILayout.BeginHorizontal(() => { });
 
-            CGUILayout.BeginHorizontal(() =>
+            NewGUILayout.BeginHorizontal(() =>
             {
-                CGUILayout.BeginVertical(GUI.skin.box, () =>
+                NewGUILayout.BeginVertical(GUI.skin.box, () =>
                 {
-                    SV2["ScrollMenu0"]= GUILayout.BeginScrollView(SV2["ScrollMenu0"]);
+
+
+                    Settings["ScrollMenu0"] = GUILayout.BeginScrollView(GetZeroVector2("ScrollMenu0"));
                     {
-                        CGUILayout.BeginHorizontal(() =>
+                        NewGUILayout.BeginHorizontal(() =>
                         {
-                            CGUILayout.BeginVertical(() =>
+                            NewGUILayout.BeginVertical(() =>
                             {
-                                CGUILayout.Button("Add skillpoints", Cheat.skillpoints);
-                                CGUILayout.Button("Kill Self", Cheat.KillSelf);
-                                CGUILayout.Button("Level Up", Cheat.levelup);
-                                CGUILayout.Button("Get my ID", Cheat.Getplayer);
+                                NewGUILayout.Button("Add skillpoints", Cheat.skillpoints);
+                                NewGUILayout.Button("Kill Self", Cheat.KillSelf);
+                                NewGUILayout.Button("Level Up", Cheat.levelup);
+                                NewGUILayout.Button("Get my ID", Cheat.Getplayer);
 
                                 if (SB.Count > 1)
                                 {
-                                    CGUILayout.RButton("Ignored By AI", "_ignoreByAI");
-                                    CGUILayout.Button("Creative/Debug Mode", RB, "CmDm");
-                                    CGUILayout.SButton("Name Scramble2", "_nameScramble");
-                                    CGUILayout.Button("sda", () =>
+                                    NewGUILayout.DictButton("IGNORE", "_BoolIGNORE");
+                                    NewGUILayout.RButton("Ignored By AI", "_ignoreByAI");
+                                    NewGUILayout.Button("Creative/Debug Mode", RB, "CmDm");
+                                    NewGUILayout.SButton("Name Scramble2", "_nameScramble");
+                                    NewGUILayout.Button("sda", () =>
                                     {
-                                        Settings.Instance.Speed = !Settings.Instance.Speed;
+                                        NewSettings.Instance.Speed = !NewSettings.Instance.Speed;
                                     });
-                                    GuiLayoutExtended.NewGUILayout.BoolButton("TEstSpeed NameOF", nameof(Settings.Instance.Speed));
+                                    NewGUILayout.BoolButton("TEstSpeed NameOF", nameof(NewSettings.Instance.Speed));
 
                                     //GuiLayoutExtended.NewGUILayout.ButtonBoolToggle("TestToggleBool", Settings.Instance.Speed);
-                                    Settings.Instance.CreativeMode = GuiLayoutExtended.NewGUILayout.ButtonBoolToggle("Toggle CreativeMode", Settings.Instance.CreativeMode);
+
+
+                                    //THIS WORKS
+                                    NewSettings.Instance.CreativeMode = GuiLayoutExtended.NewGUILayout.ButtonBoolToggle("Toggle CreativeMode", NewSettings.Instance.CreativeMode);
 
                                 }
 
 
                             });
-                            CGUILayout.BeginVertical(() =>
+                            NewGUILayout.BeginVertical(() =>
                             {
-                                if (CGUILayout.Button($"Teleport To Marker "))
+                                if (NewGUILayout.Button($"Teleport To Marker "))
                                 {
 
                                     O.ELP.TeleportToPosition(new Vector3(O.ELP.markerPosition.ToVector3().x, O.ELP.markerPosition.ToVector3().y+2, O.ELP.markerPosition.ToVector3().z));
                                 }
 
-                                CGUILayout.Button("Instant Quest", RB,"_QuestComplete");
-                                CGUILayout.Button("Instant Craft",RB, "_instantCraft");
-                                CGUILayout.Button("Instant scrap", RB, "_instantScrap");
-                                CGUILayout.Button("Instant smelt", RB, "_instantSmelt");
-                                CGUILayout.Button("Loop LAST Quest Rewards",RB,"_LOQuestRewards");
-                                CGUILayout.RButton("Trader Open 24/7", "_EtraderOpen");
+                                NewGUILayout.Button("Instant Quest", RB,"_QuestComplete");
+                                NewGUILayout.Button("Instant Craft",RB, "_instantCraft");
+                                NewGUILayout.Button("Instant scrap", RB, "_instantScrap");
+                                NewGUILayout.Button("Instant smelt", RB, "_instantSmelt");
+                                NewGUILayout.Button("Loop LAST Quest Rewards",RB,"_LOQuestRewards");
+                                NewGUILayout.RButton("Trader Open 24/7", "_EtraderOpen");
 
 
-                                CGUILayout.BeginHorizontal(() => {
+                                NewGUILayout.BeginHorizontal(() => {
                                     _itemcount = GUILayout.TextField(_itemcount, 10, GUILayout.MaxWidth(50));
 
-                                    if (CGUILayout.Button(" Set holding item"))
+                                    if (NewGUILayout.Button(" Set holding item"))
                                     {
                                         try
                                         {
@@ -372,25 +417,25 @@ namespace SevenDTDMono
         }
         private void Menu1() //Toggles and modifiers
         {
-            CGUILayout.BeginHorizontal(GUI.skin.box, () => {
-                CGUILayout.BeginVertical(() => {
-                    SETT.crosshair = GUILayout.Toggle(SETT.crosshair, "Crosshair");
-                    SETT.fovCircle = GUILayout.Toggle(SETT.fovCircle, "Draw FOV");
-                    SETT.playerBox = GUILayout.Toggle(SETT.playerBox, "Player Box");
-                    SETT.playerName = GUILayout.Toggle(SETT.playerName, "Player Name");
-                    SETT.playerCornerBox = GUILayout.Toggle(SETT.playerCornerBox, "Player Corner Box");
-                    SETT.chams = GUILayout.Toggle(SETT.chams, "Chams");
-                    SETT.playerHealth = GUILayout.Toggle(SETT.playerHealth, "Player Health");
+            NewGUILayout.BeginHorizontal(GUI.skin.box, () => {
+                NewGUILayout.BeginVertical(() => {
+                    //SETT.crosshair = GUILayout.Toggle(SETT.crosshair, "Crosshair");
+                    //SETT.fovCircle = GUILayout.Toggle(SETT.fovCircle, "Draw FOV");
+                    //SETT.playerBox = GUILayout.Toggle(SETT.playerBox, "Player Box");
+                    //SETT.playerName = GUILayout.Toggle(SETT.playerName, "Player Name");
+                    //SETT.playerCornerBox = GUILayout.Toggle(SETT.playerCornerBox, "Player Corner Box");
+                    //SETT.chams = GUILayout.Toggle(SETT.chams, "Chams");
+                    //SETT.playerHealth = GUILayout.Toggle(SETT.playerHealth, "Player Health");
                 });
-                CGUILayout.BeginVertical(() => {
-                    SETT.zombieBox = GUILayout.Toggle(SETT.zombieBox, "Zombie Box");
-                    SETT.zombieName = GUILayout.Toggle(SETT.zombieName, "Zombie Name");
-                    SETT.zombieHealth = GUILayout.Toggle(SETT.zombieHealth, "Zombie Health");
-                    SETT.zombieCornerBox = GUILayout.Toggle(SETT.zombieCornerBox, "Zombie Corner Box");
-                    SETT.noWeaponBob = GUILayout.Toggle(SETT.noWeaponBob, "No Weapon Bob");
+                NewGUILayout.BeginVertical(() => {
+                    //SETT.zombieBox = GUILayout.Toggle(SETT.zombieBox, "Zombie Box");
+                    //SETT.zombieName = GUILayout.Toggle(SETT.zombieName, "Zombie Name");
+                    //SETT.zombieHealth = GUILayout.Toggle(SETT.zombieHealth, "Zombie Health");
+                    //SETT.zombieCornerBox = GUILayout.Toggle(SETT.zombieCornerBox, "Zombie Corner Box");
+                    //SETT.noWeaponBob = GUILayout.Toggle(SETT.noWeaponBob, "No Weapon Bob");
                 });
             });
-            CGUILayout.BeginVertical(GUI.skin.box, () =>
+            NewGUILayout.BeginVertical(GUI.skin.box, () =>
             {
                 GUIStyle Labelstyle = new GUIStyle(GUI.skin.label);
                 Labelstyle.alignment = TextAnchor.LowerCenter;
@@ -398,16 +443,16 @@ namespace SevenDTDMono
                 Labelstyle.padding = new RectOffset(0, 0, -4, 0);
 
 
-                CGUILayout.BeginHorizontal(() => { GUILayout.Label("Modifiers"); });
-                CGUILayout.BeginVertical(() =>
+                NewGUILayout.BeginHorizontal(() => { GUILayout.Label("Modifiers"); });
+                NewGUILayout.BeginVertical(() =>
                 {
                     //GUILayout.Space(10);
-                    CGUILayout.HorizontalScrollbarWithLabel("Attacks/minute", ref SETT._FL_APM,500f);
-                    CGUILayout.HorizontalScrollbarWithLabel("Jump Strength", ref SETT._FL_jmp, 5f);
-                    CGUILayout.HorizontalScrollbarWithLabel("Harvest Dubbler", ref SETT._FL_harvest, 20f);
-                    CGUILayout.HorizontalScrollbarWithLabel("Sprint Speed", ref SETT._FL_run, 25f);
-                    CGUILayout.HorizontalScrollbarWithLabel("Kill DMG xM", ref SETT._FL_killdmg, 1000f);
-                    CGUILayout.HorizontalScrollbarWithLabel("Block DMG", ref SETT._FL_blokdmg, 10000f);
+                    NewGUILayout.HorizontalScrollbarWithLabel("Attacks/minute", ref SETT._FL_APM,500f);
+                    NewGUILayout.HorizontalScrollbarWithLabel("Jump Strength", ref SETT._FL_jmp, 5f);
+                    NewGUILayout.HorizontalScrollbarWithLabel("Harvest Dubbler", ref SETT._FL_harvest, 20f);
+                    NewGUILayout.HorizontalScrollbarWithLabel("Sprint Speed", ref SETT._FL_run, 25f);
+                    NewGUILayout.HorizontalScrollbarWithLabel("Kill DMG xM", ref SETT._FL_killdmg, 1000f);
+                    NewGUILayout.HorizontalScrollbarWithLabel("Block DMG", ref SETT._FL_blokdmg, 10000f);
 
                     //CGUILayout.BeginHorizontal(() =>
                     //{
@@ -419,26 +464,26 @@ namespace SevenDTDMono
                     //    GUILayout.Label(SETT._FL_APM.ToString("F1"), Labelstyle, GUILayout.MaxWidth(40));
                     //});
                 });
-                CGUILayout.BeginVertical(GUI.skin.box ,() =>
+                NewGUILayout.BeginVertical(GUI.skin.box ,() =>
                 {
-                    SV2["scrollBuffBTN"] = GUILayout.BeginScrollView(SV2["scrollBuffBTN"], GUILayout.MaxHeight(170));//GUILayout.MaxWidth(250f), GUILayout.Width(250f),GUILayout.Height(50f)
+                    Settings["scrollBuffMenu"] = GUILayout.BeginScrollView(GetZeroVector2("scrollBuffMenu"), GUILayout.MaxHeight(170));//GUILayout.MaxWidth(250f), GUILayout.Width(250f),GUILayout.Height(50f)
                     {
-                        CGUILayout.BeginHorizontal(() =>
+                        NewGUILayout.BeginHorizontal(() =>
                         {
-                            CGUILayout.BeginVertical(() =>
+                            NewGUILayout.BeginVertical(() =>
                             {
 
 
-                                CGUILayout.RButton( "Block DMG", "_BL_Blockdmg");//button toggle bool
-                                CGUILayout.RButton("Kill DMG" , "_BL_Kill");//button toggle bool
-                                CGUILayout.RButton("Harvest Dubbler", "_BL_Harvest");//button toggle bool
+                                NewGUILayout.RButton( "Block DMG", "_BL_Blockdmg");//button toggle bool
+                                NewGUILayout.RButton("Kill DMG" , "_BL_Kill");//button toggle bool
+                                NewGUILayout.RButton("Harvest Dubbler", "_BL_Harvest");//button toggle bool
 
                             });
-                            CGUILayout.BeginVertical(() =>
+                            NewGUILayout.BeginVertical(() =>
                             {
-                                CGUILayout.RButton( "Sprint Speed", "_BL_Run");//button toggle bool
-                                CGUILayout.RButton( "Jump Strength", "_BL_Jmp");//button toggle bool
-                                CGUILayout.RButton( "Attacks / minute", "_BL_APM");//button toggle bool
+                                NewGUILayout.RButton( "Sprint Speed", "_BL_Run");//button toggle bool
+                                NewGUILayout.RButton( "Jump Strength", "_BL_Jmp");//button toggle bool
+                                NewGUILayout.RButton( "Attacks / minute", "_BL_APM");//button toggle bool
 
 
 
@@ -456,30 +501,30 @@ namespace SevenDTDMono
         }
         private void Menu2() //Buffs And stuff
         {
-            CGUILayout.BeginHorizontal(defBoxStyle, () =>
+            NewGUILayout.BeginHorizontal(defBoxStyle, () =>
             {
                 SV2["ScrollMenu2"] = GUILayout.BeginScrollView(SV2["ScrollMenu2"]);
                 {
-                    CGUILayout.BeginHorizontal(() =>
+                    NewGUILayout.BeginHorizontal(() =>
                     {
-                        CGUILayout.BeginVertical("buffs", defBoxStyle, () =>
+                        NewGUILayout.BeginVertical("buffs", defBoxStyle, () =>
                         {
                             GUILayout.Space(20f);
-                            CGUILayout.BeginVertical(() =>
+                            NewGUILayout.BeginVertical(() =>
                             {
-                                CGUILayout.BeginVertical(() =>
+                                NewGUILayout.BeginVertical(() =>
                                 {
                                     SV2["scrollBuffBTN"] = GUILayout.BeginScrollView(SV2["scrollBuffBTN"], GUILayout.MinHeight(80));//GUILayout.MaxWidth(250f), GUILayout.Width(250f),GUILayout.Height(50f)
                                     {
-                                        CGUILayout.BeginHorizontal(() =>
+                                        NewGUILayout.BeginHorizontal(() =>
                                         {
-                                            CGUILayout.BeginVertical(() =>
+                                            NewGUILayout.BeginVertical(() =>
                                             {
                                                 //CGUILayout.Button("Set NOBad buff", ref SETT._NoBadBuff);
                                                 //CGUILayout.Button("Set good buff", ref SETT._addgoodbuff);
-                                                CGUILayout.Button("Remove All Active Buffs", Cheat.RemoveAllBuff);//Cheat.RemoveBadBuff()
-                                               
-                                                CGUILayout.Button("Clear CheatBuff", Cheat.ClearCheatBuff);//Cheat.custombuff();
+                                                NewGUILayout.Button("Remove All Active Buffs", Cheat.RemoveAllBuff);//Cheat.RemoveBadBuff()
+
+                                                NewGUILayout.Button("Clear CheatBuff", Cheat.ClearCheatBuff);//Cheat.custombuff();
                                               
                                    
                                                 //CGUILayout.Button(ref ToggleStates, "NoBadBuff");
@@ -502,10 +547,10 @@ namespace SevenDTDMono
                                                 //CGUILayout.Button(ref SETT._BL_Harvest, "Dubbel Harvest");//button toggle bool
                                                 //GUILayout.Label("rigth", centeredLabelStyle);
                                             });
-                                            CGUILayout.BeginVertical(() =>
+                                            NewGUILayout.BeginVertical(() =>
                                             {
-                                                CGUILayout.Button("Add CheatBuff to P", Cheat.AddCheatBuff);//Cheat.custombuff();
-                                                CGUILayout.Button("Add Effect Group", Cheat.AddEffectGroup);//Cheat.custombuff();
+                                                NewGUILayout.Button("Add CheatBuff to P", Cheat.AddCheatBuff);//Cheat.custombuff();
+                                                NewGUILayout.Button("Add Effect Group", Cheat.AddEffectGroup);//Cheat.custombuff();
                                                 //CGUILayout.Button("");
                                                 //CGUILayout.Button("NoBadBuff", ref ToggleStates);
                                                 //if (CGUILayout.Button("Print Buffs To Logfile"))
@@ -552,9 +597,9 @@ namespace SevenDTDMono
                                     }
                                     GUILayout.EndScrollView();
                                 });
-                                CGUILayout.BeginHorizontal(customBoxStyleGreen);
+                                NewGUILayout.BeginHorizontal(customBoxStyleGreen);
 
-                                FoldCBuff = CGUILayout.FoldableMenuHorizontal(FoldCBuff, "Custom Buffs", () => {
+                                FoldCBuff = NewGUILayout.FoldableMenuHorizontal(FoldCBuff, "Custom Buffs", () => {
                                     scrollCBuff = GUILayout.BeginScrollView(scrollCBuff,GUILayout.MinHeight(100));//GUILayout.MaxWidth(250f), GUILayout.Width(250f),GUILayout.Height(50f)
                                     {
                                         Cheat.GetListCBuffs(O.ELP, O._listCbuffs);
@@ -562,29 +607,29 @@ namespace SevenDTDMono
                                     GUILayout.EndScrollView();
                                 }, 300f);
 
-                                CGUILayout.BeginHorizontal(customBoxStyleGreen);
+                                NewGUILayout.BeginHorizontal(customBoxStyleGreen);
 
 
 
-                                CGUILayout.BeginVertical(GUI.skin.box, () =>
+                                NewGUILayout.BeginVertical(GUI.skin.box, () =>
                                 {
-                                    CGUILayout.BeginVertical(() =>
+                                    NewGUILayout.BeginVertical(() =>
                                     {
                                        
-                                        FoldPassive = CGUILayout.FoldableMenuHorizontal(FoldPassive, "Passive Effects", () => {
+                                        FoldPassive = NewGUILayout.FoldableMenuHorizontal(FoldPassive, "Passive Effects", () => {
 
 
-                                            CGUILayout.BeginHorizontal(() => {
+                                            NewGUILayout.BeginHorizontal(() => {
                                                 Cheat.inputPassiveEffects = GUILayout.TextField(Cheat.inputPassiveEffects, 50);
                                                 inputPassive = ValueModifierTypesToString(ValueModifierTypesIndex); // Set text field with the button's current value
                                                 inputFloat = GUILayout.TextField(inputFloat, 10, GUILayout.MaxWidth(25));
-                                                if (CGUILayout.Button("", ref ValueModifierTypesIndex, GUILayout.MaxWidth(100)))
+                                                if (NewGUILayout.Button("", ref ValueModifierTypesIndex, GUILayout.MaxWidth(100)))
                                                 {
                                                     ValueModifierTypes selectedType = (ValueModifierTypes)ValueModifierTypesIndex;
                                                     //Debug.Log("Selected Enum: " + selectedType);
 
                                                 }
-                                                if (CGUILayout.Button("ADD", GUILayout.MaxWidth(40)))
+                                                if (NewGUILayout.Button("ADD", GUILayout.MaxWidth(40)))
                                                 {
                                                     try
                                                     {
@@ -612,7 +657,7 @@ namespace SevenDTDMono
                                                     //inputPassive = selectedType.ToString();
                                                 }
                                             });
-                                            CGUILayout.BeginHorizontal(() => {
+                                            NewGUILayout.BeginHorizontal(() => {
                                                 GUILayout.Label("Passive Search");
                                                 passiveSearch = GUILayout.TextField(passiveSearch, GUILayout.MaxWidth(225f), GUILayout.Height(20f));
                                             });
@@ -632,10 +677,10 @@ namespace SevenDTDMono
 
 
 
-                                CGUILayout.BeginHorizontal(customBoxStyleGreen);
-                                SB1["FoldBuff"] = CGUILayout.FoldableMenuHorizontal(SB1["FoldBuff"], "Scroll All Buffs", () => {
+                                NewGUILayout.BeginHorizontal(customBoxStyleGreen);
+                                SB1["FoldBuff"] = NewGUILayout.FoldableMenuHorizontal(SB1["FoldBuff"], "Scroll All Buffs", () => {
 
-                                    CGUILayout.BeginHorizontal(() => {
+                                    NewGUILayout.BeginHorizontal(() => {
                                         GUILayout.Label("Search for buff");
                                         buffSearch = GUILayout.TextField(buffSearch, GUILayout.MaxWidth(225f), GUILayout.Height(20f));
                                     });
@@ -646,15 +691,15 @@ namespace SevenDTDMono
                                     }
                                     GUILayout.EndScrollView();
                                 }, 300f);
-                                CGUILayout.BeginHorizontal(customBoxStyleGreen);
-                                SB1["FoldPGV"] = CGUILayout.FoldableMenuHorizontal(SB1["FoldPGV"], "Scroll Perks", () =>
+                                NewGUILayout.BeginHorizontal(customBoxStyleGreen);
+                                SB1["FoldPGV"] = NewGUILayout.FoldableMenuHorizontal(SB1["FoldPGV"], "Scroll Perks", () =>
                                 {
 
-                                    CGUILayout.BeginHorizontal(() => {
+                                    NewGUILayout.BeginHorizontal(() => {
                                         GUILayout.Label("Search for Perk");
                                         PGVSearch = GUILayout.TextField(PGVSearch, GUILayout.MaxWidth(225f), GUILayout.Height(20f));
                                     });
-                                    CGUILayout.BeginHorizontal(customBoxStyleGreen);
+                                    NewGUILayout.BeginHorizontal(customBoxStyleGreen);
                                     SV2["scrollPGV"] = GUILayout.BeginScrollView(SV2["scrollPGV"], GUILayout.MinHeight(250f), GUILayout.MaxHeight(450f));//GUILayout.MaxWidth(250f), GUILayout.Width(250f),, GUILayout.Height(200f)
                                     {
                                         //Cheat.ListButtonPlayer();
@@ -664,7 +709,7 @@ namespace SevenDTDMono
                                     }
                                     GUILayout.EndScrollView();
                                 }, 300f);
-                                CGUILayout.BeginHorizontal(customBoxStyleGreen);
+                                NewGUILayout.BeginHorizontal(customBoxStyleGreen);
                             });
                         });
                     });
@@ -676,83 +721,105 @@ namespace SevenDTDMono
         } //Buffs an  stuff
         private void Menu3()//some crap
         {
-            CGUILayout.BeginVertical(GUI.skin.box, () =>
+            NewGUILayout.BeginVertical(GUI.skin.box, () =>
             {
-                ScrollMenu3 = GUILayout.BeginScrollView(ScrollMenu3);
-                {
 
-                    CGUILayout.BeginHorizontal(customBoxStyleGreen);
-                    //scrollZombie = GUILayout.BeginScrollView(scrollZombie, GUILayout.MinHeight(100f), GUILayout.MaxHeight(400f));//GUILayout.MaxWidth(250f), GUILayout.Width(250f),, GUILayout.Height(200f)
-                    //{
-                    //    LISTDROPPDOWNMENU();
-                    //    //Cheat.GetList(lastBuffAdded, O.ELP, O.buffClasses);
-                    //}
+                NewGUILayout.BeginScrollView("ScrollMenu3", () => {
 
-                    SB1["FoldZombie"] = CGUILayout.FoldableMenuHorizontal(SB1["FoldZombie"], "Scroll Zombies", () =>
-                    {  // Content to show when the foldout is open for Foldable Menu 1
-                       // Add your UI elements here...
+                    NewGUILayout.BeginHorizontal(customBoxStyleGreen); //***************************************************************
 
+                    NewGUILayout.DictFoldMenuHorizontal("TestMenu1", "TestMenu1", () =>
+                    {
+                        NewGUILayout.DictButton("Test1", "_BoolTest1");
+                        NewGUILayout.DictButton("Test2", "_BoolTest2");
+                        NewGUILayout.DictButton("Test2", "_BoolTest2");
+                        NewGUILayout.DictButton("Test2", "_BoolTest2");
 
-                        CGUILayout.BeginHorizontal(customBoxStyleGreen);
-                        SV2["scrollZombie"] = GUILayout.BeginScrollView(SV2["scrollZombie"], GUILayout.MinHeight(250f), GUILayout.MaxHeight(350f));//GUILayout.MaxWidth(250f), GUILayout.Width(250f),, GUILayout.Height(200f)
+                    }, 300f, GUILayout.MinHeight(200f));
+
+                    NewGUILayout.BeginHorizontal(customBoxStyleGreen); //***************************************************************
+
+                    NewGUILayout.DictFoldMenuHorizontal("TestMenu3", "TestMenu3", () =>
+                    {
+                        NewGUILayout.BeginVertical(GUI.skin.box, () =>
                         {
-                            CGUILayout.BeginVertical(GUI.skin.box, () =>
-                            {
-                                //Cheat.GetList(lastzombieadded, O.ELP, O.zombieList);
-                                //LISTDROPPDOWNMENU();
-                                Cheat.ListZombie1();
+                            NewGUILayout.BeginScrollView("TestScroll1", () => {
+                                NewGUILayout.DictButton("Test5", "_BoolTest5");
+                                NewGUILayout.DictButton("Test6", "_BoolTest6");
+                                NewGUILayout.DictButton("Test7", "_BoolTest7");
+                                NewGUILayout.DictButton("Test8", "_BoolTest8");
+                                NewGUILayout.DictButton("Test9", "_BoolTest9");
+                                NewGUILayout.DictButton("Test10", "_BoolTest10");
+                                NewGUILayout.DictButton("Test11", "_BoolTest11");
+                                NewGUILayout.DictButton("Test12", "_BoolTest12");
+                                NewGUILayout.DictButton("Test13", "_BoolTest13");
+                                NewGUILayout.DictButton("Test14", "_BoolTest14");
+                                NewGUILayout.DictButton("Test15", "_BoolTest15");
+                                NewGUILayout.DictButton("Test16", "_BoolTest16");
+                                NewGUILayout.DictButton("Test17", "_BoolTest17");
+                                NewGUILayout.DictButton("Test18", "_BoolTest18");
 
                             });
-                        }
-                        GUILayout.EndScrollView();
+                        });
+                    }, 300f, GUILayout.MinHeight(200f));
 
+                    NewGUILayout.BeginHorizontal(customBoxStyleGreen); //***************************************************************
 
-                    }, 300f,GUILayout.MinHeight(200f));
-
-
-                    CGUILayout.BeginHorizontal(customBoxStyleGreen);
-                    SB1["FoldPlayer"] = CGUILayout.FoldableMenuHorizontal(SB1["FoldPlayer"], "Scroll Players", () =>
+                    NewGUILayout.DictFoldMenuHorizontal("Scroll Zombies", "FoldZombie", () =>
                     {
-                        CGUILayout.BeginHorizontal(customBoxStyleGreen);
-                        SV2["scrollPlayer"]  = GUILayout.BeginScrollView(SV2["scrollPlayer"], GUILayout.MinHeight(250f), GUILayout.MaxHeight(450f));//GUILayout.MaxWidth(250f), GUILayout.Width(250f),, GUILayout.Height(200f)
-                        {
-                            //Cheat.ListButtonPlayer();
-                            Cheat.ListPlayer1();
-                            //LISTDROPPDOWNMENU();
-                            //Cheat.GetList(lastBuffAdded, O.ELP, O.buffClasses);
-                        }
-                        GUILayout.EndScrollView();
-                    }, 300f);
-                    CGUILayout.BeginHorizontal(customBoxStyleGreen);
 
-
-
-                    SB1["foldout5"] = CGUILayout.FoldableMenuHorizontal(SB1["foldout5"], "Foldable Menu 5", () =>
-                    {
-                        CGUILayout.BeginVertical(GUI.skin.box, () =>
-                        {
-
-
-                            CGUILayout.BeginHorizontal(customBoxStyleGreen, () =>
+                        NewGUILayout.BeginScrollView("scrollZombie", () => {
+                            NewGUILayout.BeginVertical(GUI.skin.box, () =>
                             {
-                                CGUILayout.BeginVertical(GUI.skin.box, () =>
+                                Cheat.ListZombie1();
+                            });
+                        }, GUILayout.MinHeight(250f), GUILayout.MaxHeight(350f));
+
+                    }, 300f, GUILayout.MinHeight(200f));
+
+                    NewGUILayout.BeginHorizontal(customBoxStyleGreen); //***************************************************************
+
+                    NewGUILayout.DictFoldMenuHorizontal("Scroll Players", "FoldPlayer", () =>
+                    {
+
+                        NewGUILayout.BeginScrollView("scrollPlayer", () => {
+                            NewGUILayout.BeginVertical(GUI.skin.box, () =>
+                            {
+                                Cheat.ListPlayer1();
+                            });
+                        }, GUILayout.MinHeight(250f), GUILayout.MaxHeight(350f));
+
+                    }, 300f, GUILayout.MinHeight(200f));
+
+                    NewGUILayout.BeginHorizontal(customBoxStyleGreen); //***************************************************************
+
+                    NewGUILayout.DictFoldMenuHorizontal("Foldable Menu 5", "foldout5", () =>
+                    {
+
+                        NewGUILayout.BeginVertical(GUI.skin.box, () =>
+                        {
+
+
+                            NewGUILayout.BeginHorizontal(customBoxStyleGreen, () =>
+                            {
+                                NewGUILayout.BeginVertical(GUI.skin.box, () =>
                                 {
 
 
                                     GUILayout.Label("EXPERIMENTAL ", centeredLabelStyle);
-                                    SETT.aimbot = GUILayout.Toggle(SETT.aimbot, "Aimbot (L-alt)");
-                                    SETT.magicBullet = GUILayout.Toggle(SETT.magicBullet, "Magic Bullet(L-alt");
+                                    //SETT.aimbot = GUILayout.Toggle(SETT.aimbot, "Aimbot (L-alt)");
+                                    //SETT.magicBullet = GUILayout.Toggle(SETT.magicBullet, "Magic Bullet(L-alt");
 
                                 });
-                                CGUILayout.BeginVertical(customBoxStyleGreen, () =>
+                                NewGUILayout.BeginVertical(customBoxStyleGreen, () =>
                                 {
                                     GUILayout.Label("L4 Content for Menu ", centeredLabelStyle);
 
-                                    if (CGUILayout.Button($"Log PGVC To file"))
+                                    if (NewGUILayout.Button($"Log PGVC To file"))
                                     {
                                         O.LogprogclassClassesToFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "_listProgressionClass.txt"));
                                     }
-                                    if (CGUILayout.Button("´Log Buffs To file"))
+                                    if (NewGUILayout.Button("´Log Buffs To file"))
                                     {
                                         Extras.LogAvailableBuffNames(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "BuffsList.txt"));
                                     }
@@ -760,16 +827,13 @@ namespace SevenDTDMono
                                 });
 
                             });
-                        });
-                    }, 300f);
-                    CGUILayout.BeginHorizontal(customBoxStyleGreen);
+                        }); ;
 
+                    }, 300f, GUILayout.MinHeight(200f));
 
+                    NewGUILayout.BeginHorizontal(customBoxStyleGreen);
+                }, GUILayout.MinHeight(250f), GUILayout.MaxHeight(350f));
 
-
-
-                }
-                GUILayout.EndScrollView();
             });
             GUI.DragWindow();
         }

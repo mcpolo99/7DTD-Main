@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using SETT = SevenDTDMono.Settings;
+using SETT = SevenDTDMono.NewSettings;
 using Eutl = SevenDTDMono.ESPUtils;
 using O = SevenDTDMono.Objects;
 
