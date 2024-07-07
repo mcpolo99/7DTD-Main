@@ -269,5 +269,6 @@ namespace SevenDTDMono.GuiLayoutExtended
 
             return toggle; // Return the toggle state
         }
+
     }
 }

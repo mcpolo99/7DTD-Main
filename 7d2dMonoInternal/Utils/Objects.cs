@@ -56,6 +56,8 @@ namespace SevenDTDMono
         #endregion
 
 
+        public static Dictionary<string, object> Settings => NewSettings.Instance.SettingsDictionary;
+
         //EntityPlayerLocal.xmitInventory
 
 
@@ -135,7 +137,11 @@ namespace SevenDTDMono
             //Init();
 
 
-            Debug.LogWarning("THIS IS Start OBJ!!!!");
+
+
+            Settings.Add("bool_IsGameStarted", false);
+
+            Debug.LogWarning("Objects onStart()!!!!");
         }
 
 
@@ -143,11 +149,13 @@ namespace SevenDTDMono
         void Update()
         {
             updateCount += 1;
+
+            /*
             if (SB.Count <= 0 || RB.Count <= 0 || SB1.Count <= 0)
             {
-                initBools();
+                //initBools();
             }
-            else 
+            else
             {
 
                 SB["IsVarsLoaded"] = VSB.Values.All(b => b);
@@ -257,7 +265,7 @@ namespace SevenDTDMono
 
             }
 
-
+            */
 
 
 
@@ -284,29 +292,29 @@ namespace SevenDTDMono
         void FixedUpdate()
         {
             fixedUpdateCount += 1;
-            if (SB.Count > 1)
+            if (Settings.Count > 1)
             {
                 if (GameManager.Instance.World != null)
                 {
-                    SB["hasStartedOnce"] = true;
-                    SB["IsGameStarted"] = true;    
-                    SB["IsGameMainMenu"] = false;
+                    Settings["hasStartedOnce"] = true;
+                    Settings["bool_IsGameStarted"] = true;
+                    Settings["IsGameMainMenu"] = false;
                 }
                 else if (GameManager.Instance.World == null)
                 {
-                    NewSettings.Instance.GameStarted=true;
-                    SB["IsGameMainMenu"] = true;
-                    SB["IsGameStarted"] = false;
+                    NewSettings.Instance.GameStarted = true;
+                    Settings["IsGameMainMenu"] = true;
+                    Settings["bool_IsGameStarted"] = false;
                     //foreach (string key in S.BD.Keys.ToList()) // ToList creates a copy of the keys so that you can modify the dictionary while iterating.
                     //{
                     //    S.BD[key] = false;
                     //}
 
-                    if (SB["hasStartedOnce"] == true && SB["IsGameMainMenu"] == true)
+                    if ((bool)Settings["hasStartedOnce"]  && (bool)Settings["IsGameMainMenu"])
                     {
-                        SB["BoolReset"] = true;
+                        Settings["BoolReset"] = true;
                         initReset();
-                        SB["hasStartedOnce"] = false;
+                        Settings["hasStartedOnce"] = false;
                     }
 
 
@@ -445,7 +453,7 @@ namespace SevenDTDMono
             fontSize.normal.textColor = Color.green;
             GUI.Label(new Rect(10, 50, 200, 50), "Update(FPS): " + updateUpdateCountPerSecond.ToString(), fontSize);
             GUI.Label(new Rect(10, 70, 200, 50), "FixedUpdate: " + updateFixedUpdateCountPerSecond.ToString(), fontSize);
-        }
+        } 
         void OnDisable()
         {
             Debug.LogWarning("THIS IS ON Disable OBJ!!!!");
@@ -465,217 +473,3 @@ namespace SevenDTDMono
     }
 
 }
-
-
-
-
-
-/*
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
-            if (!Settings.Istarted)
-            {
-                //Log.Out($"{Time.time}");
-                if (Time.time >= Cachestart)
-                {
-                    Log.Out($"Setting = {Settings.Istarted} chache= {Cachestart}  Time = {Time.time}");
-
-                    //Log.Out("inside while");
-                    if (_gameManager == null) //  if We dont have a gammanger lets init it
-                    {
-                        //Log.Out("_gamemanager was null");
-                        _gameManager = FindObjectOfType<GameManager>();
-                        //Log.Out($"Gamemanager {_gameManager} is now present");
-                    }
-
-                    else
-                    {
-                        Log.Out("After else now _gameManger= " + _gameManager);
-                        // Only perform the check if it hasn't been done already
-                        if (_gameManager.gameStateManager.IsGameStarted() != false)
-                        {
-                            Log.Out($"Debug World Isstarted? =  : " + Settings.Istarted);
-                            Settings.Istarted = true; //sets our bool to true
-
-                        }
-                        else
-                        {
-                            // Conditions are not met, log the current status and wait for one minute before checking again
-                            Log.Out($"Debug World Isstarted? =  : " + _gameManager.gameStateManager.IsGameStarted());
-                            Log.Out($"Debug Settings.Istarted: {Settings.Istarted}");
-
-                            // Wait for one minute before checking again
-                            //yield return new WaitForSeconds(60f);
-                        }
-                    }
-
-                    Log.Out($"Setting = {Settings.Istarted} Ticknow = {Time.time} oldchache= {Cachestart}");
-                    Cachestart = Time.time + 10f;
-                    Log.Out($"Setting = {Settings.Istarted} Ticknow = {Time.time} Newchache= {Cachestart}");
-                    if (Settings.Istarted==true) 
-                    { 
-                        Cachestart= Time.time+120; // 2 minutes
-                    }
-                }
-            }
-            
-
-*IEnumerator CheckOncePerMinute()//old updateloop
-        {
-            //when game is not started 
-            while (!Settings.IsGameStarted) //if not true
-            {
-                yield return new WaitForSeconds(60f);
-                if (Time.time >= Cachestart)
-                {
-
-                    //Log.Out("inside while");
-                    if (_gameManager == null)
-                    {
-                        //Log.Out("_gamemanager was null");
-                        _gameManager = FindObjectOfType<GameManager>();
-                        //Log.Out($"Gamemanager {_gameManager} is now present");
-                    }
-
-                    else
-                    {
-                        Log.Out("After else now _gameManger= " + _gameManager);
-                        // Only perform the check if it hasn't been done already
-                        if (_gameManager.gameStateManager.IsGameStarted() != false)
-                        {
-                            Log.Out($"Debug World Isstarted? =  : " + Settings.IsGameStarted);
-                            Settings.IsGameStarted = true;
-
-                        }
-                        else
-                        {
-                            // Conditions are not met, log the current status and wait for one minute before checking again
-                            Log.Out($"Debug World Isstarted? =  : " + _gameManager.gameStateManager.IsGameStarted());
-                            Log.Out($"Debug Settings.Istarted: {Settings.IsGameStarted}");
-
-                            // Wait for one minute before checking again
-                            
-                        }
-                    }
-
-                    Cachestart = Time.time + 2000f;
-                    Log.Out(Cachestart.ToString());
-                }
-          
-            }
-        }
- *   public static List<string> GetAvailableBuffNames()
-        {
-            SortedDictionary<string, BuffClass> sortedDictionary = new SortedDictionary<string, BuffClass>(BuffManager.Buffs, StringComparer.OrdinalIgnoreCase);
-            List<string> buffNames = new List<string>();
-
-            foreach (KeyValuePair<string, BuffClass> keyValuePair in sortedDictionary)
-            {
-                if (keyValuePair.Key.Equals(keyValuePair.Value.LocalizedName))
-                {
-                    buffNames.Add(keyValuePair.Key);
-                }
-                else
-                {
-                    buffNames.Add(keyValuePair.Key);
-                }
-
-            }
-
-            return buffNames;
-        }
- *    public static List<BuffClass> GetAvailableBuffClasses() // gets the buffclasses??
-        { 
-            // Clear the list to ensure it's up-to-date.
-            _listBuffClass.Clear();
-            //buffClasses.
-            if (BuffManager.Buffs != null)
-            {
-
-                BuffManager.Buffs.OfType<BuffClass>();
-                foreach (var buffEntry in BuffManager.Buffs)
-                {
-                    //buffEntry.Value.Effects.EffectGroups.
-                    _listBuffClass.Add(buffEntry.Value);
-
-                    if (buffEntry.Value.Equals(BuffManager.Buffs.Last().Value))
-                    {
-                        // Do something specific for the last buff class (if needed)
-                        // ...
-
-                        // Stop the loop after adding the last buff class
-                        //break;
-                    }
-                    LogBuffClassesToFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "Test.txt"));
-
-                }
-            }
-            _listBuffClass.Sort((buff1, buff2) => string.Compare(buff1.Name, buff2.Name));
-
-            return _listBuffClass;
-        }
- *  public static void LogPRogressondict(string filePath, Dictionary<string,ProgressionClass> list )
-        {
-            try
-            {
-                using (StreamWriter writer = new StreamWriter(filePath))
-                {
-                    writer.WriteLine("name,key,type");
-
-                    foreach (var prog in list)
-                    {
-
-                        string str1 = prog.Value.Name;
-                        string str2 = prog.Key;
-                        string str3 = prog.Value.Type.ToString();
-
-
-                        //writer.WriteLine($"{EscapeForCsv(buffClass.Name)},{buffClass.DamageType},{EscapeForCsv(buffClass.NameTag.ToString())}");
-                        writer.WriteLine($"{EscapeForCsv(str1)},{EscapeForCsv(str2)},{EscapeForCsv(str3)}");
-                    }
-                }
-
-                Console.WriteLine("progressionclasses as been logged");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error occurred while logging buff classes: {ex.Message}");
-            }
-        }
- *    private static void SetupData()
-        {
-            foreach (KeyValuePair<string, ProgressionClass> keyValuePair in Progression.ProgressionClasses)
-            {
-                string name = keyValuePair.Value.Name;
-                if (!ProgressionValues.Contains(name))
-                {
-                    ProgressionValue progressionValue = new ProgressionValue(name)
-                    {
-                        Level = keyValuePair.Value.MinLevel,
-                        CostForNextLevel = keyValuePair.Value.CalculatedCostForLevel(1 + 1)
-                    };
-                    ProgressionValues.Add(name, progressionValue);
-                }
-            }
-            ProgressionValueQuickList.Clear();
-            foreach (KeyValuePair<int, ProgressionValue> keyValuePair2 in ProgressionValues.Dict)
-            {
-                ProgressionValueQuickList.Add(keyValuePair2.Value);
-            }
-            eventList.Clear();
-            for (int i = 0; i < ProgressionValueQuickList.Count; i++)
-            {
-                ProgressionClass progressionClass = ProgressionValueQuickList[i].ProgressionClass;
-                if (progressionClass.HasEvents())
-                {
-                    eventList.Add(progressionClass);
-                }
-            }
-        }
- */

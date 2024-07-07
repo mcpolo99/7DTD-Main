@@ -11,15 +11,42 @@ namespace SevenDTDMono.GuiLayoutExtended
     {
         public static float HorizontalScrollbarWithLabel(string label, ref float Modifier, float rightMaxValue)
         {
+
+
             GUIStyle Labelstyle = new GUIStyle(GUI.skin.label);
             Labelstyle.alignment = TextAnchor.LowerCenter;
             Labelstyle.fontSize = 13;
             Labelstyle.padding = new RectOffset(0, 0, -4, 0);
 
+
+
             GUILayout.BeginHorizontal();
             GUILayout.Label(label, Labelstyle, GUILayout.MaxWidth(100));
             //GUILayout.Label("Attacks/minute", Labelstyle, GUILayout.MaxWidth(60));
             Modifier = GUILayout.HorizontalScrollbar(Modifier, 0f, 0f, rightMaxValue);
+            GUILayout.Label(Modifier.ToString("F1"), Labelstyle, GUILayout.MaxWidth(40));
+            GUILayout.EndHorizontal();
+
+            return Modifier;
+        }
+        public static float HorizontalScrollbarWithLabel(string label, string floatKey, float rightMaxValue)
+        {
+            NewSettings.CheckDictionaryForKey(floatKey, 0.5f);
+            float Modifier = NewSettings.Get<float>(floatKey);
+
+
+            GUIStyle Labelstyle = new GUIStyle(GUI.skin.label);
+            Labelstyle.alignment = TextAnchor.LowerCenter;
+            Labelstyle.fontSize = 13;
+            Labelstyle.padding = new RectOffset(0, 0, -4, 0);
+
+            
+
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(label, Labelstyle, GUILayout.MaxWidth(100));
+            //GUILayout.Label("Attacks/minute", Labelstyle, GUILayout.MaxWidth(60));
+            Modifier = GUILayout.HorizontalScrollbar(Modifier, 1f, 0f, rightMaxValue);
             GUILayout.Label(Modifier.ToString("F1"), Labelstyle, GUILayout.MaxWidth(40));
             GUILayout.EndHorizontal();
 

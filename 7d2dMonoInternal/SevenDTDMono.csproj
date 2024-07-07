@@ -323,7 +323,7 @@
     <Compile Include="Features\Render\Render.cs" />
     <None Include="Directory.Build.props" />
     <None Include="FileName.cs" />
-    <Compile Include="GuiLayoutExtended\FoldableMenu.cs" />
+    <Compile Include="GuiLayoutExtended\GUIFoldableMenu.cs" />
     <Compile Include="GuiLayoutExtended\GUIBeginVertical.cs" />
     <Compile Include="GuiLayoutExtended\GUIButtons.cs" />
     <Compile Include="GuiLayoutExtended\GUIBeginHorizontal.cs" />
@@ -336,6 +336,7 @@
     <Compile Include="Utils\AssemblyHelper.cs" />
     <Compile Include="Utils\ASMCHECK.cs" />
     <Compile Include="GuiLayoutExtended\GUILayoutExtensions.cs" />
+    <Compile Include="Utils\DirectoryObserver.cs" />
     <Compile Include="Utils\ESPUtils.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="UI\Menu.cs" />
