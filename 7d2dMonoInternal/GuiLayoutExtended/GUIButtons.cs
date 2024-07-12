@@ -287,7 +287,28 @@ namespace SevenDTDMono.GuiLayoutExtended
 
             if (isClicked)
             {
-                toggle = !toggle; // Toggle the bool value when the button is clicked
+                //toggle = !toggle; // Toggle the bool value when the button is clicked
+
+                if (onClickAction != null)
+                {
+                    onClickAction.Invoke();
+                }
+            }
+
+            return isClicked;
+        }
+        public static bool BButton(string label, bool toggle, Action onClickAction = null, params GUILayoutOption[] options)
+        {
+            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+            buttonStyle.normal.textColor = toggle ? Active : Inactive;
+            buttonStyle.active.textColor = Active;
+            buttonStyle.hover.textColor = Hover;
+
+            bool isClicked = GUILayout.Button(label, buttonStyle, options);
+
+            if (isClicked)
+            {
+               
 
                 if (onClickAction != null)
                 {

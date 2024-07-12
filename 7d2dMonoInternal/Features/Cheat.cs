@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using static PassiveEffect;
 using SevenDTDMono.GuiLayoutExtended;
+using SevenDTDMono;
 
 //using SevenDTDMono.Objects;
 
@@ -17,8 +18,6 @@ namespace SevenDTDMono
 {
     public class Cheat : MonoBehaviour
     {
-
-     
 
 
         #region Unity
@@ -98,7 +97,8 @@ namespace SevenDTDMono
         //public static Color _col = Color.blue;
         public  static string inputPassiveEffects = "none";
         public  static string inputFloat = "1";
-        private static Dictionary<string, object> Settings => NewSettings.Instance.SettingsDictionary;
+        private static Dictionary<string, object> Settings => NewSettings.Instance.SettingsDictionary; //get instance of SettingsDictionary
+        private static EntityPlayerLocal Player => NewSettings.EntityLocalPlayer;  //get instance of Player. 
 
         #endregion
         //--------------------------------------------------------------------------------------------------------
@@ -107,67 +107,61 @@ namespace SevenDTDMono
 
         #region finished cheats
         //toggle
-        public static void CmDm(bool boolean) //Creative and DEbug - Toggle
-        {
 
-            GameStats.Set(EnumGameStats.ShowSpawnWindow, boolean); // sets the GameStat to the value of CmDm
-            GameStats.Set(EnumGameStats.IsCreativeMenuEnabled, boolean);
-            GamePrefs.Set(EnumGamePrefs.DebugMenuEnabled, boolean);
-        }
-        public static Transform parentTransform;
-        public static void editMode() //Creative and DEbug - Toggle
-        {
-            //GameStats.Set(EnumGameStats.ShowAllPlayersOnMap, SETT._isEditmode); // sets the GameStat to the value of CmDm
-            //GameStats.Set(EnumGameStats.ShowSpawnWindow, SETT._isEditmode);
-        }
+
+
 
         //Trigger
-        public static void skillpoints()//add skillpoints - Trigger once
+        public static void SkillPoints()//add skillpoints - Trigger once
         {
-            if (O.ELP)
+            if (Player)
             {
-                Progression prog = O.ELP.Progression;
+                Progression prog = Player.Progression;
                 prog.SkillPoints += 10;
-                Log.Out($"Skillpoints added by 10is now {prog.SkillPoints}");
+                Log.Out($"Skillpoints added by 10, is now {prog.SkillPoints}");
             }
         }
         public static void KillSelf()
         {
-
-            O.ELP.DamageEntity(new DamageSource(EnumDamageSource.Internal, EnumDamageTypes.Suicide), 99999, false, 1f);
-            SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Gave 99999 damage to entity ");
-        }
-        public static void levelup()//up one level-Trigger once
-        {
-            if (O.ELP) //this cheat first checks if Local player is existing
+            if (Player)
             {
-                //yeeh  ther esure will be
-
-
-
-                Progression prog = O.ELP.Progression;
-                prog.AddLevelExp(prog.ExpToNextLevel);
-               
-
+                Player.DamageEntity(new DamageSource(EnumDamageSource.Internal, EnumDamageTypes.Suicide), 99999, false, 1f);
+                SingletonMonoBehaviour<SdtdConsole>.Instance.Output("Gave 99999 damage to entity ");
             }
         }
-        public static void Getplayer()//add skillpoints - Trigger once
+        public static void LevelUp()//up one level-Trigger once
         {
-            string num = O.ELP.name.ToString();
+            if (Player) //this cheat first checks if Local player is existing
+            {
+                Progression prog = Player.Progression;
+                prog.AddLevelExp(prog.ExpToNextLevel);
+            }
+        }
+        public static void GetPlayerId()//add skillpoints - Trigger once
+        {
+            string num = Player.name.ToString();
             Debug.LogError($"player ID: {num}");
         }
+        
+        
+        
+        
+        
+        
+        
         public static void ClearCheatBuff()
         {
             Debug.LogWarning("Clearing CheatBuff");
+
             O._minEffectController.EffectGroups[0].PassiveEffects.Clear();
             O._minEffectController.PassivesIndex.Clear();
         }
         public static void RemoveAllBuff()
         {
-            List<BuffValue> activeBuffs = O.ELP.Buffs.ActiveBuffs;
+            List<BuffValue> activeBuffs = Player.Buffs.ActiveBuffs;
             foreach (BuffValue buff in activeBuffs)
             {
-                O.ELP.Buffs.RemoveBuff(buff.BuffName);
+                Player.Buffs.RemoveBuff(buff.BuffName);
 
                 if (ButtonTState.ContainsKey(buff.BuffName))
                 {
@@ -181,9 +175,9 @@ namespace SevenDTDMono
 
             string _type = "SETT.cmDm";
 
-            if (O.ELP)
+            if (Player)
             {
-                _value = O.ELP.DebugNameInfo;
+                _value = Player.DebugNameInfo;
 
             }
 
@@ -201,10 +195,9 @@ namespace SevenDTDMono
         //voids
         public static void CheatPassiveEffect(bool toggle, PassiveEffects passive, float modifier, ValueModifierTypes valueModifierTypes)
         {
-            NewSettings.CheckDictionaryForKey("bool_BlockDamage",false);
+            
 
-
-            if (O.ELP && (bool)Settings["bool_IsGameStarted"] == true)
+            if (O.ELP && NewSettings.GameManager.gameStateManager.bGameStarted == true)
             {
                 if (toggle == true)
                 {
@@ -584,53 +577,57 @@ namespace SevenDTDMono
             }
 
         }
-        public static void GetList(bool _bool, EntityPlayerLocal entityLocalPlayer, List<BuffClass> ListOFClass, string searchText)
-        {
-            if (ListOFClass != null)
 
 
-                if (entityLocalPlayer != null || ListOFClass != null)
-                {
-                    if (ListOFClass.Count > 0)
-                    {
-                        foreach (BuffClass buffClass in ListOFClass)
-                        {
-                            if (searchText == "" || buffClass.Name.Contains(searchText)) //case sensitve  . Possible ignore case buffClass.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0
-                            {
-                                // se GUILayout.Button to create a button for each buff name
-                                if (GUILayout.Button(buffClass.Name))
-                                {
-                                    entityLocalPlayer.Buffs.AddBuff(buffClass.Name, -1, true, false, false, 99999f);
-                                    Debug.LogWarning($"{buffClass.Name} Added to player {O.ELP.gameObject.name}");
-                                    //Logic when the button is clicked
-                                }
-                                if (_bool)
-                                {
-                                    break;
-                                }
-                            }
-                        }
+        //public static void GetList(bool _bool, EntityPlayerLocal entityLocalPlayer, List<BuffClass> ListOFClass, string searchText)
+        //{
+        //    if (ListOFClass != null)
+        //        if (entityLocalPlayer != null || ListOFClass != null)
+        //        {
+        //            if (ListOFClass.Count > 0)
+        //            {
+        //                foreach (BuffClass buffClass in ListOFClass)
+        //                {
+        //                    if (searchText == "" || buffClass.Name.Contains(searchText)) //case sensitve  . Possible ignore case buffClass.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0
+        //                    {
+        //                        // se GUILayout.Button to create a button for each buff name
+        //                        if (GUILayout.Button(buffClass.Name))
+        //                        {
+        //                            entityLocalPlayer.Buffs.AddBuff(buffClass.Name, -1, true, false, false, 99999f);
+        //                            Debug.LogWarning($"{buffClass.Name} Added to player {O.ELP.gameObject.name}");
+        //                            //Logic when the button is clicked
+        //                        }
+        //                        if (_bool)
+        //                        {
+        //                            break;
+        //                        }
+        //                    }
+        //                }
 
-                    }
-                    else
-                    {
-                        GUILayout.Label("No buffs found.");
+        //            }
+        //            else
+        //            {
+        //                GUILayout.Label("No buffs found.");
 
-                    }
+        //            }
 
-                }
-                else
-                {
-                    if (ListOFClass == null)
-                    {
-                        //ListOFClass = O.GetAvailableBuffClasses();
-                    }
+        //        }
+        //        else
+        //        {
+        //            if (ListOFClass == null)
+        //            {
+        //                //ListOFClass = O.GetAvailableBuffClasses();
+        //            }
 
 
-                    GUILayout.Label("Not ingame");
-                }
+        //            GUILayout.Label("Not ingame");
+        //        }
 
-        }
+        //}
+        
+        
+       
+        
         public static void GetListPassiveEffects(string searchText) //should make a chache for this one to lower cpu usage
         {
 
@@ -691,36 +688,80 @@ namespace SevenDTDMono
         private void Update()
         {
             
-            if ((bool)Settings["bool_IsGameStarted"] == true)
+            if ((bool)Settings[nameof(GameStateManager.bGameStarted)] == true && Player)
             {
+                
                 //CheatPassiveEffect(RB["_BL_Blockdmg"], PassiveEffects.BlockDamage, SETT._FL_blokdmg, ValueModifierTypes.perc_add);
-                CheatPassiveEffect(NewSettings.GetBool("bool_BlockDamage"), PassiveEffects.BlockDamage, NewSettings.FloatBlockDamageMultiplier, ValueModifierTypes.perc_add);
+              //  CheatPassiveEffect(NewSettings.GetBool(nameof(PassiveEffects.BlockDamage)), PassiveEffects.BlockDamage, NewSettings.FloatBlockDamageMultiplier, ValueModifierTypes.perc_add);
                 //CheatPassiveEffect(RB["_BL_Kill"], PassiveEffects.EntityDamage, SETT._FL_killdmg, ValueModifierTypes.perc_add);
                 //CheatPassiveEffect(RB["_BL_Harvest"], PassiveEffects.HarvestCount, SETT._FL_harvest, ValueModifierTypes.perc_add);
                 //CheatPassiveEffect(RB["_BL_Jmp"], PassiveEffects.JumpStrength, SETT._FL_jmp, ValueModifierTypes.base_set);
                 //CheatPassiveEffect(RB["_BL_APM"], PassiveEffects.AttacksPerMinute, SETT._FL_APM, ValueModifierTypes.base_set);
                 //CheatPassiveEffect(RB["_BL_Run"], PassiveEffects.RunSpeed, SETT._FL_run, ValueModifierTypes.base_set);
-                //CheatPassiveEffect(RB["_instantScrap"], PassiveEffects.ScrappingTime, 0f, ValueModifierTypes.base_set);
+                CheatPassiveEffect((bool)Settings[nameof(PassiveEffects.ScrappingTime)], PassiveEffects.ScrappingTime, 0f, ValueModifierTypes.base_set);
                 //CheatPassiveEffect(RB["_instantCraft"], PassiveEffects.CraftingTime, 0f, ValueModifierTypes.base_set);
                 //CheatPassiveEffect(RB["_instantSmelt"], PassiveEffects.CraftingSmeltTime, 0f, ValueModifierTypes.base_set);
                 //CheatPassiveEffect(RB["_infDurability"], PassiveEffects.DegradationPerUse, 0f, ValueModifierTypes.base_set);
 
-                ////////if ((bool)Settings["bool_LoopQuestRewards"] == true) { LoopLASTQuestRewards(); };
-                ////////if ((bool)Settings["bool_instantQuest"] == true) { InstantQuestFinish(); };
-                ////////if ((bool)Settings["bool_traderOpen"] == true) { Trader(); };
+                if ((bool)Settings[nameof(Quest.QuestState.Completed)] == true )
+                {
+                    if (Player.QuestJournal.quests.Count > 0)
+                    {
+                        int lastIndex = Player.QuestJournal.quests.Count - 1;
+
+                        Quest lastQuest = Player.QuestJournal.quests[lastIndex];
+
+                        if (lastQuest.CurrentState == Quest.QuestState.Completed)
+                        {
+                            lastQuest.CurrentState = Quest.QuestState.ReadyForTurnIn;
+                            Debug.LogWarning($" {lastQuest.ID} is ready for turn in");
+                        }
+                    }
+                    else
+                    {
+                        // The list is empty, handle this case accordingly
+                    }
+                };
+
+                if ((bool)Settings[nameof(Quest.QuestState.InProgress)] == true)
+                {
+                    foreach (Quest quest in Player.QuestJournal.quests)
+                    {
+
+
+                        //QuestClass.Category == "Challenge"
+                        if ((quest.Tracked == true || quest.Active == true) && quest.CurrentState == Quest.QuestState.InProgress)
+                        {
+                            quest.CurrentState = Quest.QuestState.ReadyForTurnIn;
+                        }
+                    }
+                };
+
+                if ((bool)Settings[nameof(EntityTrader)] == true)
+                {
+                    if (O.Etrader != null && Player)
+                    {
+                        //if (O.Etrader.aiClosestPlayer.ToString().ToLower() == O.ELP.name.ToString().ToLower())
+                        //{
+                        O.Etrader.IsDancing = true;
+                        ulong OCTime = 0;
+                        O.Etrader.TraderInfo.CloseTime = OCTime;
+                        O.Etrader.TraderInfo.OpenTime = OCTime;
+
+                        //}
+
+                    }
+                    else if (O.Etrader == null)
+                    {
+
+                        Settings[nameof(EntityTrader)] = false;
+                    }
+                };
 
 
                
 
-                //if ((SETT._ignoreByAI || !SETT._ignoreByAI)&&O.ELP)
-                //{
-                //    O.ELP.SetIgnoredByAI(SETT._ignoreByAI);
-                //};
-
-                ////////if (((bool)Settings["bool_IgnoreByAi"] || !(bool)Settings["bool_IgnoreByAi"]) && O.ELP)
-                ////////{
-                ////////    O.ELP.SetIgnoredByAI((bool)Settings["bool_IgnoreByAi"]);
-                ////////};
+   
 
                 //if (SETT.noWeaponBob && O.ELP) // When noWeaponBob is active enable 
                 //{
@@ -735,32 +776,32 @@ namespace SevenDTDMono
                 //    }
                 //}//no weapon bob
 
-                if (Input.GetKeyDown(KeyCode.O)) //infinity ammo ???
-                {
-                    if (!O.ELP)
-                    {
-                        return;
-                    }
+                //////if (Input.GetKeyDown(KeyCode.O)) //infinity ammo ???
+                //////{
+                //////    if (!O.ELP)
+                //////    {
+                //////        return;
+                //////    }
 
-                    Inventory inventory = O.ELP.inventory;
+                //////    Inventory inventory = O.ELP.inventory;
 
-                    if (inventory != null)
-                    {
-                        ItemActionAttack gun = inventory.GetHoldingGun();
+                //////    if (inventory != null)
+                //////    {
+                //////        ItemActionAttack gun = inventory.GetHoldingGun();
 
-                        if (gun != null)
-                        {
-                            gun.InfiniteAmmo = !gun.InfiniteAmmo;
+                //////        if (gun != null)
+                //////        {
+                //////            gun.InfiniteAmmo = !gun.InfiniteAmmo;
                            
-                        }
-                    }
-                }//infinity ammo
+                //////        }
+                //////    }
+                //////}//infinity ammo
 
-                if (Input.GetKeyDown(KeyCode.F9)) //checks if the key is being pressed. if it does execute F9 is empty in game
-                {
-                    // we can put cheat here
+                //////if (Input.GetKeyDown(KeyCode.F9)) //checks if the key is being pressed. if it does execute F9 is empty in game
+                //////{
+                //////    // we can put cheat here
          
-                }
+                //////}
 
 
                 ////////if ((bool)Settings["bool_CreativeMode"] || !(bool)Settings["bool_CreativeMode"]) //Toggle for ingame Creative and Debug Working like a sharm
@@ -882,22 +923,19 @@ namespace SevenDTDMono
         }
         public static void LoopLASTQuestRewards()
         {
-            if (RB["_LOQuestRewards"] == true && O.ELP)
+            if ((bool)Settings[nameof(Quest.QuestState.Completed)] == true && Player)
             {
-                if (O.ELP.QuestJournal.quests.Count > 0)
+                if (Player.QuestJournal.quests.Count > 0)
                 {
-                    int lastIndex = O.ELP.QuestJournal.quests.Count - 1;
+                    int lastIndex = Player.QuestJournal.quests.Count - 1;
            
-                    Quest lastQuest = O.ELP.QuestJournal.quests[lastIndex];
+                    Quest lastQuest = Player.QuestJournal.quests[lastIndex];
 
                     if (lastQuest.CurrentState == Quest.QuestState.Completed )
                     {
                         lastQuest.CurrentState = Quest.QuestState.ReadyForTurnIn;
                         Debug.LogWarning($" {lastQuest.ID} is ready for turn in");
                     }
-
-
-
                 }
                 else
                 {

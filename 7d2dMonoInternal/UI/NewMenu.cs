@@ -35,6 +35,8 @@ namespace SevenDTDMono
 
         public static Dictionary<string,object> Settings => NewSettings.Instance.SettingsDictionary;
         private static NewSettings SettingsInstance => NewSettings.Instance;
+        private static EntityPlayerLocal player => NewSettings.EntityLocalPlayer;
+        private static List<string> ResetList => NewSettings.ResetVariableList;
 
 
         private static Vector2 GetZeroVector2(string key)
@@ -145,7 +147,7 @@ namespace SevenDTDMono
         {
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.window);
-            if ((bool)Settings["bool_IsGameStarted"])
+            if ((bool)Settings[nameof(GameStateManager.bGameStarted)])
             {
 
                 customStyle.normal.textColor = Color.green;
@@ -276,34 +278,52 @@ namespace SevenDTDMono
                         {
                             NewGUILayout.BeginVertical(() =>
                             {
-                                NewGUILayout.Button("Add skillpoints", Cheat.skillpoints);
+                                NewGUILayout.DictButton("Name Scramble2", "bool_nameScramble");
+
+                                
+                                
+                                
+                                
+                                
+                                //********************* FINISHED REMAKE***************************
+                                NewGUILayout.Button("Level Up", Cheat.LevelUp);
+                                NewGUILayout.Button("Get and log my ID", Cheat.GetPlayerId);
+                                NewGUILayout.Button("Add skillpoints", Cheat.SkillPoints);
                                 NewGUILayout.Button("Kill Self", Cheat.KillSelf);
-                                NewGUILayout.Button("Level Up", Cheat.levelup);
-                                NewGUILayout.Button("Get and log my ID", Cheat.Getplayer);
-
-                                if (Settings.Count > 1)
+                                NewGUILayout.DictButton("Ignore By AI", nameof(player.isIgnoredByAI), () =>
+                                    {
+                                        if (player)
+                                        {
+                                            bool bool1 = (bool)Settings[nameof(player.isIgnoredByAI)];
+                                            player.SetIgnoredByAI(bool1);
+                                            NewSettings.AddReset(nameof(player.isIgnoredByAI));
+                                        }
+                                    }); 
+                                NewGUILayout.DictButton("Debug Menu Enable", nameof(EnumGamePrefs.DebugMenuEnabled), () =>
+                                    {
+                                        if (player)
+                                        {
+                                            bool bool1 = (bool)Settings[nameof(EnumGamePrefs.DebugMenuEnabled)];
+                                            GamePrefs.Set(EnumGamePrefs.DebugMenuEnabled, bool1);
+                                            GamePrefs.Set(EnumGamePrefs.DebugPanelsEnabled, bool1);
+                                            GamePrefs.Set(EnumGamePrefs.DebugStopEnemiesMoving, bool1);
+                                            NewSettings.AddReset(nameof(EnumGamePrefs.DebugMenuEnabled));
+                                        }
+                                    });
+                                NewGUILayout.DictButton("Creative", nameof(EnumGameStats.IsCreativeMenuEnabled), () =>
                                 {
-                                    NewGUILayout.DictButton("Ignore", "bool_IgnoreByAi");
-                                    NewGUILayout.DictButton("Creative", "bool_CreativeMode");
-                                    NewGUILayout.ButtonToggle("Creative2", "bool_CreativeMode", () => { Cheat.CmDm(true); }, () => { Cheat.CmDm(false); });
-                                    NewGUILayout.DictButton("Debug Mode", "bool_DebugMode");
-                  
-                                    //NewGUILayout.RButton("Ignored By AI", "_ignoreByAI");
-                                    //NewGUILayout.Button("Creative/Debug Mode", RB, "CmDm");
-                                    NewGUILayout.DictButton("Name Scramble2", "bool_nameScramble");
-                                    //NewGUILayout.Button("sda", () =>
-                                    //{
-                                    //    NewSettings.Instance.Speed = !NewSettings.Instance.Speed;
-                                    //});
-                                    //NewGUILayout.BoolButton("TEstSpeed NameOF", nameof(NewSettings.Instance.Speed));
+                                    GameStats.Set(EnumGameStats.IsCreativeMenuEnabled, (bool)Settings[nameof(EnumGameStats.IsCreativeMenuEnabled)]);
+                                });
+                                NewGUILayout.DictButton("Show All Players On Map", nameof(EnumGameStats.ShowAllPlayersOnMap), () =>
+                                {
+                                    if (player)
+                                    {
+                                        bool bool1 = (bool)Settings[nameof(EnumGameStats.ShowAllPlayersOnMap)];
+                                        GameStats.Set(EnumGameStats.ShowAllPlayersOnMap, bool1);
+                                        NewSettings.AddReset(nameof(EnumGameStats.ShowAllPlayersOnMap));
+                                    }
+                                });
 
-                                    //GuiLayoutExtended.NewGUILayout.ButtonBoolToggle("TestToggleBool", Settings.Instance.Speed);
-
-
-                                    //THIS WORKS
-                                    //NewSettings.Instance.CreativeMode = GuiLayoutExtended.NewGUILayout.ButtonBoolToggle("Toggle CreativeMode", NewSettings.Instance.CreativeMode);
-
-                                }
 
 
                             });
@@ -311,16 +331,21 @@ namespace SevenDTDMono
                             {
                                 if (NewGUILayout.Button($"Teleport To Marker "))
                                 {
-
-                                    O.ELP.TeleportToPosition(new Vector3(O.ELP.markerPosition.ToVector3().x, O.ELP.markerPosition.ToVector3().y + 2, O.ELP.markerPosition.ToVector3().z));
+                                    if (player)
+                                    {
+                                        player.TeleportToPosition(new Vector3(O.ELP.markerPosition.ToVector3().x, O.ELP.markerPosition.ToVector3().y + 2, O.ELP.markerPosition.ToVector3().z));
+                                    }
                                 }
 
-                                NewGUILayout.DictButton("Instant Quest", "bool_instantQuest");
+                  
+
+                                NewGUILayout.DictButton("Instant Quest", nameof(Quest.QuestState.InProgress));
                                 NewGUILayout.DictButton("Instant Craft", "bool_instantCraft");
-                                NewGUILayout.DictButton("Instant Scrap", "bool_instantScrap");
+                                NewGUILayout.DictButton("Instant Scrap", nameof(PassiveEffects.ScrappingTime));
                                 NewGUILayout.DictButton("Instant Smelt", "bool_instantSmelt");
-                                NewGUILayout.DictButton("Loop LAST Quest Rewards", "bool_LoopQuestRewards");
-                                NewGUILayout.DictButton("Trader Open 24/7", "bool_traderOpen");
+                                NewGUILayout.DictButton("Loop LAST Quest Rewards", nameof(Quest.QuestState.Completed));
+                                NewGUILayout.DictButton("Trader Open 24/7", nameof(EntityTrader));
+                               
 
                                 //NewGUILayout.Button("Instant Quest", RB, "_QuestComplete");
                                 //NewGUILayout.Button("Instant Craft", RB, "_instantCraft");
@@ -328,6 +353,13 @@ namespace SevenDTDMono
                                 //NewGUILayout.Button("Instant smelt", RB, "_instantSmelt");
                                 //NewGUILayout.Button("Loop LAST Quest Rewards", RB, "_LOQuestRewards");
                                 //NewGUILayout.RButton("Trader Open 24/7", "_EtraderOpen");
+
+                                if (NewGUILayout.Button("log started"))
+                                {
+                                    Debug.LogWarning($"{NewSettings.GameManager.gameStateManager.bGameStarted}");
+                                }
+
+
 
 
                                 NewGUILayout.BeginHorizontal(() => {
@@ -338,23 +370,22 @@ namespace SevenDTDMono
                                         try
                                         {
                                             int intvalue = int.Parse(_itemcount);
-                                            if (O.ELP.inventory.holdingItemStack.count >= 1)
+                                            if (player.inventory.holdingItemStack.count >= 1)
                                             {
-
-                                                //O.ELP.inventory.holdingCount;
-                                                O.ELP.inventory.holdingItemStack.count = intvalue;
-                                                //O.ELP.inventory.TryStackItem();
-                                                Debug.LogWarning($"{O.ELP.inventory.holdingItem.Name} set to {intvalue}");
+                                                player.inventory.holdingItemStack.count = intvalue;
+               
+                                                Debug.LogWarning($"{player.inventory.holdingItem.Name} set to {intvalue}");
                                             }
                                             else
                                             {
-                                                Debug.LogWarning($"{O.ELP.inventory.holdingItem.Name} Could not be set to {intvalue}");
-
+                                                Debug.LogWarning($"{player.inventory.holdingItem.Name} Could not be set to {intvalue}");
                                             }
                                         }
-                                        catch
+                                        catch (Exception e)
                                         {
+                                            Debug.LogError(e);
                                         }
+                                      
                                     }
 
 
@@ -421,7 +452,7 @@ namespace SevenDTDMono
                         {
                             NewGUILayout.BeginVertical(() =>
                             {
-                                NewGUILayout.DictButton("Block DMG", "bool_BlockDamage");
+                                NewGUILayout.DictButton("Enable Block DMG", nameof(PassiveEffects.BlockDamage));
                                 NewGUILayout.DictButton("Kill DMG", "bool_KillDamage");
                                 NewGUILayout.DictButton("Harvest Dubbler", "bool_Harvest");
                             });
@@ -459,7 +490,7 @@ namespace SevenDTDMono
                                             NewGUILayout.BeginVertical(() =>
                                             {
  
-                                                NewGUILayout.Button("Remove All Active Buffs", Cheat.RemoveAllBuff);//Cheat.RemoveBadBuff()
+                                                NewGUILayout.Button("Remove All Active Buffs", Cheat.RemoveAllBuff);//Cheat.RemoveBadBuff() //OK
                                                 NewGUILayout.Button("Clear CheatBuff", Cheat.ClearCheatBuff);//Cheat.custombuff();
 
                                             });
@@ -536,7 +567,7 @@ namespace SevenDTDMono
                                             });
                                             NewGUILayout.BeginScrollView("vector2_scrollPassive", () => {
 
-                                                //Cheat.GetListPassiveEffects(passiveSearch);
+                                                Cheat.GetListPassiveEffects(passiveSearch);
                                             }, GUILayout.MinHeight(100));
                                         }, 300f);
                                     });

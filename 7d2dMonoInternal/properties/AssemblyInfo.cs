@@ -15,7 +15,7 @@ using System.Windows;
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("1.1.2.159")]
+[assembly: AssemblyVersion("1.1.2.179")]
 
 #if DEBUG
 [assembly: AssemblyTitle("Debug")]
@@ -33,6 +33,26 @@ using System.Windows;
 [assembly: AssemblyTitle("UE")]
 [assembly: AssemblyConfiguration("UE")]
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

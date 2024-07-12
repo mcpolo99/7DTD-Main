@@ -8,6 +8,7 @@ using UnityEngine;
 using SevenDTDMono;
 using System.Runtime.InteropServices;
 using System.Collections;
+using UniverseLib;
 //using HarmonyLib;
 using S = SevenDTDMono.NewSettings;
 using static Setting;
@@ -20,9 +21,41 @@ namespace SevenDTDMono
 
     public class Objects : MonoBehaviour
     {
-       
+        private static Objects _instance;
+        public static Objects Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    //GameObject obj = GameObject.Find("7DTD----MENU");
+                    //if (obj != null)
+                    //{
+                    //    Debug.LogWarning($"Object with name '{"7DTD----MENU"}' not found.");
+                    //    obj.AddComponent<NewSettings>();
+                    //}
+                    //_instance = new GameObject("Settings").AddComponent<NewSettings>();
+                    //_instance = new GameObject("Settings").AddComponent<NewSettings>();
+                    _instance = GameObject.Find("7DTD----MENU").gameObject.GetComponent<Objects>();
+                    DontDestroyOnLoad(_instance.gameObject);
+                }
+                return _instance;
+            }
+        }
+        public static Dictionary<string, object> Settings => NewSettings.Instance.SettingsDictionary;
+        private static GameManager GameManager => NewSettings.GameManager;
 
-        public static List<EntityZombie> _listZombies = new List<EntityZombie>();
+
+
+
+        public static EntityPlayerLocal EntityPlayerLocal => _entityPlayerLocal;
+        private static EntityPlayerLocal _entityPlayerLocal;
+
+        private static List<EntityZombie> _listZombies = new List<EntityZombie>();
+        public static List<EntityZombie> ListZombie => _listZombies;
+
+
+
         public static List<EntityEnemy> _listEntityEnemy = new List<EntityEnemy>();
         public static List<EntityItem> _listEntityItem = new List<EntityItem>();
         public static List<BuffClass> _listBuffClass = new List<BuffClass>();
@@ -35,9 +68,9 @@ namespace SevenDTDMono
         public static MinEffectController _minEffectController = new MinEffectController();
         public static MinEffectController _minEC = new MinEffectController();
         public static BuffClass CheatBuff;
-        public static GameManager _gameManager = FindObjectOfType<GameManager>();
+        public static EntityPlayerLocal ELP;
         public static EntityTrader Etrader;
-        public static EntityPlayerLocal ELP; // this is the class we know player is inside. But now we need to assign ELP in this case to the actuall player
+        
         public static XUiM_PlayerInventory _playerinv; //null ???
         public static TileEntity tileEntity;
         public static WorldBase _worldbase;
@@ -56,7 +89,7 @@ namespace SevenDTDMono
         #endregion
 
 
-        public static Dictionary<string, object> Settings => NewSettings.Instance.SettingsDictionary;
+        
 
         //EntityPlayerLocal.xmitInventory
 
@@ -132,14 +165,11 @@ namespace SevenDTDMono
             lastCacheItems = Time.time + 1000f;
             Cachestart = Time.time + 10f; //time now + 10 sec
 
-            _minEC.EffectGroups = _minEffectController.EffectGroups;
-            _minEC.PassivesIndex = _minEffectController.PassivesIndex;
+            //_minEC.EffectGroups = _minEffectController.EffectGroups;
+            //_minEC.PassivesIndex = _minEffectController.PassivesIndex;
             //Init();
 
-
-
-
-            Settings.Add("bool_IsGameStarted", false);
+            Settings.Add(nameof(GameStateManager.bGameStarted), false);
 
             Debug.LogWarning("Objects onStart()!!!!");
         }
@@ -272,19 +302,19 @@ namespace SevenDTDMono
             if (Time.time >= lastCachePlayer) // i dont remember why we need to use a loop to chach the player but it was from argons source code!
             {
                 ELP = FindObjectOfType<EntityPlayerLocal>(); // FindObjectOfType is a unity function to find the gameobject of desired Class so we assing our variable ELP(of class EntityPlayerLocal) to the games EntityPlayerLocal. Now we can use ELP as EntityPlayerLocal to whatever we want
-                Etrader = FindObjectOfType<EntityTrader>();
+                //Etrader = FindObjectOfType<EntityTrader>();
                 lastCachePlayer = Time.time + 5f; // cahing player each timn now + 5 sec. so 5 secound ahead
             }
             else if (Time.time >= lastCacheZombies)
             {
-                _listZombies = FindObjectsOfType<EntityZombie>().ToList();
-                _listEntityEnemy = FindObjectsOfType<EntityEnemy>().ToList();
+                //_listZombies = FindObjectsOfType<EntityZombie>().ToList();
+                //_listEntityEnemy = FindObjectsOfType<EntityEnemy>().ToList();
 
                 lastCacheZombies = Time.time + 3f;
             }
             else if (Time.time >= lastCacheItems)
             {
-                _listEntityItem = FindObjectsOfType<EntityItem>().ToList();
+                //_listEntityItem = FindObjectsOfType<EntityItem>().ToList();
                 lastCacheItems = Time.time + 4f;
             }
         }
@@ -297,44 +327,39 @@ namespace SevenDTDMono
                 if (GameManager.Instance.World != null)
                 {
                     Settings["hasStartedOnce"] = true;
-                    Settings["bool_IsGameStarted"] = true;
+                    Settings[nameof(GameStateManager.bGameStarted)] = true;
                     Settings["IsGameMainMenu"] = false;
                 }
                 else if (GameManager.Instance.World == null)
                 {
                     NewSettings.Instance.GameStarted = true;
                     Settings["IsGameMainMenu"] = true;
-                    Settings["bool_IsGameStarted"] = false;
+                    Settings[nameof(GameStateManager.bGameStarted)] = false;
+
+
+
                     //foreach (string key in S.BD.Keys.ToList()) // ToList creates a copy of the keys so that you can modify the dictionary while iterating.
                     //{
                     //    S.BD[key] = false;
                     //}
 
-                    if ((bool)Settings["hasStartedOnce"]  && (bool)Settings["IsGameMainMenu"])
-                    {
-                        Settings["BoolReset"] = true;
-                        initReset();
-                        Settings["hasStartedOnce"] = false;
-                    }
+                    //if ((bool)Settings["hasStartedOnce"]  && (bool)Settings["IsGameMainMenu"])
+                    //{
+                    //    Settings["BoolReset"] = true;
+                    //    initReset();
+                    //    Settings["hasStartedOnce"] = false;
+                    //}
 
 
                 }
-            }
-            //if (GameManager.Instance.World != null)
-            //{
-            //    Settings.IsGameStarted = true;
 
-            //}
-            //else if(GameManager.Instance.World == null) 
-            //{
-            //    Settings.IsGameStarted = false;
-            //    Settings.IsVarsLoaded = false;
-            //    foreach (string key in S.BD.Keys.ToList()) // ToList creates a copy of the keys so that you can modify the dictionary while iterating.
-            //    {
-            //        S.BD[key] = false;
-            //    }
-            //}
-            //Log.Out("THIS IS  FixedUpdate!!!!", LogType.Error);
+                if (GameManager.Instance.IsQuitting)
+                {
+
+                }
+
+
+            }
         }
 
 
@@ -361,7 +386,8 @@ namespace SevenDTDMono
                 return new List<EntityPlayer>();
             }
         }
-     
+
+
         private static void Log_listBuffClass(string filePath)
         {
             try
@@ -451,8 +477,8 @@ namespace SevenDTDMono
             GUIStyle fontSize = new GUIStyle(GUI.skin.GetStyle("label"));
             fontSize.fontSize = 15;
             fontSize.normal.textColor = Color.green;
-            GUI.Label(new Rect(10, 50, 200, 50), "Update(FPS): " + updateUpdateCountPerSecond.ToString(), fontSize);
-            GUI.Label(new Rect(10, 70, 200, 50), "FixedUpdate: " + updateFixedUpdateCountPerSecond.ToString(), fontSize);
+            //GUI.Label(new Rect(10, 50, 200, 50), "Counter: " + NewSettings.GameManager.fps.Counter, fontSize);
+            //GUI.Label(new Rect(10, 70, 200, 50), "Frames: " + NewSettings.GameManager.fps.frames, fontSize);
         } 
         void OnDisable()
         {

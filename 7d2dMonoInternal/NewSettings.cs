@@ -12,7 +12,21 @@ namespace SevenDTDMono
 {
     public class NewSettings: MonoBehaviour
     {
-    
+        private static readonly GameManager _gameManager = FindObjectOfType<GameManager>();
+        public static GameManager GameManager => _gameManager;
+        public static EntityPlayerLocal EntityLocalPlayer => GameManager.myEntityPlayerLocal;
+
+
+        public static List<string> ResetVariableList = new List<string>();
+
+        public static void AddReset(string variable)
+        {
+            if (!ResetVariableList.Contains(variable))
+            {
+                ResetVariableList.Add(variable);
+            }
+        }
+
         private static NewSettings _instance;
         public static NewSettings Instance
         {
@@ -175,9 +189,6 @@ namespace SevenDTDMono
 
 
 
-     
-
-
 
 
 
@@ -221,7 +232,6 @@ namespace SevenDTDMono
 
         internal static bool drawDebug = false;
         internal static bool selfDestruct = false;
-        public static bool IsGameStarted; //when we are loaded into the gameworld
         public static bool IsVarsLoaded; //buffs and stuff to be loaded and stuff
                                          //public static bool IsGameStartMenu; //
 
