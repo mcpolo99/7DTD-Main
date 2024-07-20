@@ -5,6 +5,7 @@ using System.Reflection;
 using UnityEngine;
 
 
+
 namespace SevenDTDMono
 {
     public class Loader
@@ -20,21 +21,25 @@ namespace SevenDTDMono
         public static void Load()
         {
             gameObject = new UnityEngine.GameObject();
-#if RELEASE_UE || DEBUG
+
+
+    #if RELEASE_UE || DEBUG
             AssemblyHelper = new AssemblyHelper();
             AssemblyHelper.TryLoad();
-#endif
+    #endif
+
+
             gameObject.name = baseName;
             gameObject.AddComponent<Objects>();
             gameObject.AddComponent<NewMenu>();
-            gameObject.AddComponent<Cheat>();
+            gameObject.AddComponent<Features.Cheat>();
             gameObject.AddComponent<NewSettings>();
-            gameObject.AddComponent<ESP>();
-            gameObject.AddComponent<Visuals>();
-            gameObject.AddComponent<Aimbot>();
-            gameObject.AddComponent<Render>();
-            gameObject.AddComponent<SceneDebugger>();
-            gameObject.AddComponent<CBuffs>();
+            //gameObject.AddComponent<ESP>();
+            //gameObject.AddComponent<Visuals>();
+            //gameObject.AddComponent<Aimbot>();
+            //gameObject.AddComponent<Render>();
+            //gameObject.AddComponent<SceneDebugger>();
+            //gameObject.AddComponent<CBuffs>();
             //gameObject.AddComponent<EasterEggManager>();          
 #if RELEASE_UE || DEBUG
             InitializeUnityExplorer();

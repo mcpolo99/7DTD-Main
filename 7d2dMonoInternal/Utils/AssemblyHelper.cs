@@ -2,16 +2,17 @@
 using SevenDTDMono;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-public class AssemblyHelper : IDisposable
+public class AssemblyHelper //: IDisposable
 {
-    private AppDomain assemblyDomain;
-    private List<Assembly> loadedAssembliesList = new List<Assembly>();
-    private static Dictionary<string, Assembly> loadedAssemblies = new Dictionary<string, Assembly>();
-    private static List<string> assembliesToLoad = new List<string>
+    private readonly AppDomain AssemblyDomain;
+    //private readonly List<Assembly> _loadedAssembliesList = new List<Assembly>();
+    private static readonly Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>();
+    private static readonly List<string> AssembliesToLoad = new List<string>
     {
         //"SevenDTDMono.dll",
         "0Harmony",
@@ -23,23 +24,29 @@ public class AssemblyHelper : IDisposable
 
     public AssemblyHelper()
     {
-        assemblyDomain = AppDomain.CreateDomain("AssemblyDomain");
+        AssemblyDomain = AppDomain.CreateDomain("AssemblyDomain");
     }
 
+
+    /// <summary>
+    /// Loop list of assemblies to load and Loads the reference Assemblies for use with Unity Explorer
+    /// </summary>
     public void TryLoad()
     {
-        if (assembliesToLoad != null)
+        if (AssembliesToLoad != null)
         {
-            foreach (string assemblyName in assembliesToLoad)
+            foreach (string assemblyName in AssembliesToLoad)
             {
                 LoadAssembly(assemblyName);
-                
             }
-
-
         }
     }
 
+
+    /// <summary>
+    /// Load a assembly into current appdomain.
+    /// </summary>
+    /// <param name="assemblyName"> Name of assembly to be loaded</param>
     private static void LoadAssembly(string assemblyName)
     {
         if (IsAssemblyLoaded(assemblyName))
@@ -52,7 +59,7 @@ public class AssemblyHelper : IDisposable
             if (File.Exists(assemblyPath))
             {
                 Assembly assembly = Assembly.LoadFrom(assemblyPath);
-                loadedAssemblies[assemblyName] = assembly;
+                LoadedAssemblies[assemblyName] = assembly;
                 Log.Out($"{assemblyName} has been loaded.");
 
             }
@@ -63,28 +70,14 @@ public class AssemblyHelper : IDisposable
             }
         }
     }
-    public void LoadAndExecuteAssembly(string assemblyPath)
-    {
-        Assembly assembly = assemblyDomain.Load(AssemblyName.GetAssemblyName(assemblyPath));
-        loadedAssembliesList.Add(assembly);
-        // Execute the assembly's entry point or other methods as needed
-        // ...
-    }
 
-    public void UnloadAssembly(string assemblyName)
-    {
-        Assembly assemblyToUnload = loadedAssembliesList.Find(assembly => assembly.GetName().Name.Equals(assemblyName));
-        if (assemblyToUnload != null)
-        {
-            AppDomain.Unload(assemblyDomain);
-            assemblyDomain = AppDomain.CreateDomain("AssemblyDomain");
-            loadedAssembliesList.Remove(assemblyToUnload);
-        }
-    }
-
+    /// <summary>
+    /// Checks if all assemblies has been loaded! 
+    /// </summary>
+    /// <returns></returns>
     public bool AreAllAssembliesLoaded()
     {
-        foreach (string assemblyName in assembliesToLoad)
+        foreach (string assemblyName in AssembliesToLoad)
         {
             if (!IsAssemblyLoaded(assemblyName))
             {
@@ -94,22 +87,57 @@ public class AssemblyHelper : IDisposable
         return true;
     }
 
-    public void Dispose()
-    {
-        foreach (Assembly assembly in loadedAssembliesList)
-        {
-            AppDomain.Unload(assemblyDomain);
-        }
-        assemblyDomain = null;
-    }
+    /// <summary>
+    /// Checks if single assembly has ben loaded
+    /// </summary>
+    /// <param name="assemblyName">Name of assembly to check</param>
+    /// <returns></returns>
     private static bool IsAssemblyLoaded(string assemblyName)
     {
-        return loadedAssemblies.ContainsKey(assemblyName);
+        return LoadedAssemblies.ContainsKey(assemblyName);
     }
-    public bool IsAssemblyLoaded1(string assemblyName)
-    {
-        return loadedAssembliesList.Exists(assembly => assembly.GetName().Name.Equals(assemblyName));
-    }
+
+
+
+
+
+    //public void LoadAndExecuteAssembly(string assemblyPath)
+    //{
+    //    Assembly assembly = assemblyDomain.Load(AssemblyName.GetAssemblyName(assemblyPath));
+    //    _loadedAssembliesList.Add(assembly);
+    //    // Execute the assembly's entry point or other methods as needed
+    //    // ...
+    //}
+
+    //public void UnloadAssembly(string assemblyName)
+    //{
+    //    Assembly assemblyToUnload = _loadedAssembliesList.Find(assembly => assembly.GetName().Name.Equals(assemblyName));
+    //    if (assemblyToUnload != null)
+    //    {
+    //        AppDomain.Unload(assemblyDomain);
+    //        assemblyDomain = AppDomain.CreateDomain("AssemblyDomain");
+    //        _loadedAssembliesList.Remove(assemblyToUnload);
+    //    }
+    //}
+
+    //public void Dispose()
+    //{
+    //    foreach (Assembly assembly in _loadedAssembliesList)
+    //    {
+    //        AppDomain.Unload(assemblyDomain);
+    //    }
+    //    assemblyDomain = null;
+    //}
+
+
+
+    //    public bool IsAssemblyLoaded1(string assemblyName)
+    //    {
+    //        return _loadedAssembliesList.Exists(assembly => assembly.GetName().Name.Equals(assemblyName));
+    //    }
+
+
+
 }
 
 public class ObjectDestroyer : MonoBehaviour

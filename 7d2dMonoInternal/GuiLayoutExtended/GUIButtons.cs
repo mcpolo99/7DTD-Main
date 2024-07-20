@@ -13,6 +13,246 @@ namespace SevenDTDMono.GuiLayoutExtended
    
     public partial class NewGUILayout
     {
+        /// <summary>
+        /// Kind of the most basic and default button, used something like this :
+        /// if (NewGUILayout.Button($"Teleport To Marker ")
+        /// {
+        ///     Actions To Execute
+        /// }
+        /// </summary>
+        /// <param name="label">Display Label on the button</param>
+        /// <param name="options">GUI Layout Option</param>
+        /// <returns></returns>
+        public static bool Button(string label, params GUILayoutOption[] options)
+        {
+            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+            buttonStyle.normal.textColor = Inactive;
+            buttonStyle.active.textColor = Active;
+            buttonStyle.hover.textColor = Hover;
+
+            bool isClicked = GUILayout.Button(label, buttonStyle, options);
+            return isClicked;
+        }
+
+        /// <summary>
+        /// A Normal button WITH inputActions ()=>{} or method() that just will trigger our input Actions!
+        /// </summary>
+        /// <param name="label">Display Label on the button </param>
+        /// <param name="onClickAction">Input actions to execute</param>
+        /// <param name="options">GUI Layout Option</param>
+        /// <returns></returns>
+        public static bool Button(string label, Action onClickAction, params GUILayoutOption[] options)
+        {
+            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+            buttonStyle.normal.textColor = Inactive;
+            buttonStyle.active.textColor = Active;
+            buttonStyle.hover.textColor = Hover;
+
+            bool isClicked = GUILayout.Button(label, buttonStyle, options);
+
+            if (isClicked && onClickAction != null)
+            {
+                onClickAction.Invoke();
+            }
+
+            return isClicked;
+        }
+
+        /// <summary>
+        ///A button to Change the apperance of the button, Pretty much a Toggle button. 
+        /// 
+        /// </summary>
+        /// <param name="label">Display Label on the button </param>
+        /// <param name="boolToggle">Boolean value to display if button has toggled on or off</param>
+        /// <param name="onClickAction"> Input actions to execute </param>
+        /// <param name="options">GUI Layout Option</param>
+        /// <returns></returns>
+        public static bool Button(string label, bool boolToggle, Action onClickAction = null, params GUILayoutOption[] options)
+        {
+            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+            buttonStyle.normal.textColor = boolToggle ? Active : Inactive;
+            buttonStyle.active.textColor = Active;
+            buttonStyle.hover.textColor = Hover;
+
+            bool isClicked = GUILayout.Button(label, buttonStyle, options); //will return true if button gets clicked
+
+            if (isClicked)
+            {
+                // Invoke additional action if provided
+                onClickAction?.Invoke();
+            }
+
+            return isClicked;
+        }
+
+
+
+
+        /// <summary>
+        /// This button can contain also a Style to customize some values.
+        /// </summary>
+        /// <param name="label">Display Label on the button </param>
+        /// <param name="boolToggle"> Dictionary bool reference</param>
+        /// <param name="style"> Uniqe style </param>
+        /// <param name="onClickAction">Input actions to execute </param>
+        /// <param name="options">GUI Layout Option</param>
+        /// <returns></returns>
+        public static bool Button(string label, bool boolToggle, GUIStyle style, Action onClickAction = null, params GUILayoutOption[] options)
+        {
+
+            style.normal.textColor = boolToggle ? Active : Inactive;
+            style.active.textColor = Active;
+            style.hover.textColor = Hover;
+
+
+            bool isClicked = GUILayout.Button(label, style, options); //will return true if button gets clicked
+
+            if (isClicked)
+            {
+                // Invoke additional action if provided
+                onClickAction?.Invoke();
+            }
+
+            return isClicked;
+        }
+
+
+
+
+
+
+
+        /// <summary>
+        ///ButtonTriggerAction is for keeping a "toggle" in a dictionary in case we want to do some checks to later disable what the
+        /// button has triggered! 
+        /// 
+        /// </summary>
+        /// <param name="label">Display Label on the button </param>
+        /// <param name="stringBoolKey"> Name of Dictionary bool key</param>
+        /// <param name="onClickAction">Input actions to execute </param>
+        /// <param name="options">GUI Layout Option</param>
+        /// <returns></returns>
+        /// 
+        public static bool ButtonTriggerAction(string label, string stringBoolKey, Action onClickAction = null, params GUILayoutOption[] options)
+        {
+            #region DictionaryCheck
+            // Check if the key exists in the dictionary
+            if (!Settings.ContainsKey(stringBoolKey))
+            {
+                // Add the key with a default value of false if it does not exist
+                Settings[stringBoolKey] = false;
+                //NewSettings.AddSetting(boolKey, false);
+            }
+            // Ensure the value associated with the key is a bool
+            if (!(Settings[stringBoolKey] is bool))
+            {
+                Debug.LogError($"Key '{stringBoolKey}' is not a boolean.");
+                return false;
+            }
+            #endregion
+
+            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+            buttonStyle.normal.textColor = Inactive;
+            buttonStyle.active.textColor = Active;
+            buttonStyle.hover.textColor = Hover;
+
+            bool isClicked = GUILayout.Button(label, buttonStyle, options);
+
+            if (isClicked)
+            {
+                // Invoke additional action if provided
+                onClickAction?.Invoke();
+            }
+            return isClicked;
+        }
+
+
+        /// <summary>
+        /// 111
+        /// </summary>
+        /// <param name="label"> Display Label on the button </param>
+        /// <param name="stringBoolKey">Name of Dictionary bool key</param>
+        /// <param name="onClickAction">Input actions to execute </param>
+        /// <param name="options">GUI Layout Option</param>
+        /// <returns></returns>
+        public static bool ButtonToggleDictionary(string label, string stringBoolKey, Action onClickAction = null, params GUILayoutOption[] options)
+        {
+            #region DictionaryCheck
+            // Check if the key exists in the dictionary
+            if (!Settings.ContainsKey(stringBoolKey))
+            {
+                // Add the key with a default value of false if it does not exist
+                Settings[stringBoolKey] = false;
+                //NewSettings.AddSetting(boolKey, false);
+            }
+            // Ensure the value associated with the key is a bool
+            if (!(Settings[stringBoolKey] is bool))
+            {
+                Debug.LogError($"Key '{stringBoolKey}' is not a boolean.");
+                return false;
+            }
+            #endregion
+
+            // Create the toggle button using the current value
+            bool isClicked = NewGUILayout.Button(label, (bool)Settings[stringBoolKey], null, options); //returns true if button is clicked
+
+            // Toggle the value if the button is clicked BUT the issue is when the onclick action is passed to the button!! we run it twice!!
+            if (isClicked)
+            {
+                // Toggle the bool value when the button is clicked
+                Settings[stringBoolKey] = !(bool)Settings[stringBoolKey];
+
+                // Invoke additional action if provided
+                onClickAction?.Invoke();
+            }
+            return (bool)Settings[stringBoolKey];
+        }
+        /// <summary>
+        /// Do not remember why i have this one
+        /// </summary>
+        /// <param name="label">Display Label on the button </param>
+        /// <param name="stringBoolKey">Name of Dictionary bool key</param>
+        /// <param name="style">GUIStyle </param>
+        /// <param name="onClickAction">Input actions to execute </param>
+        /// <param name="options">GUI Layout Option</param>
+        /// <returns></returns>
+        public static bool ButtonToggleDictionary(string label, string stringBoolKey, GUIStyle style, Action onClickAction = null, params GUILayoutOption[] options)
+        {
+            #region DictionaryCheck
+            // Check if the key exists in the dictionary
+            if (!Settings.ContainsKey(stringBoolKey))
+            {
+                // Add the key with a default value of false if it does not exist
+                Settings[stringBoolKey] = false;
+                //NewSettings.AddSetting(boolKey, false);
+            }
+            // Ensure the value associated with the key is a bool
+            if (!(Settings[stringBoolKey] is bool))
+            {
+                Debug.LogError($"Key '{stringBoolKey}' is not a boolean.");
+                return false;
+            }
+            #endregion
+
+            // Create the toggle button using the current value
+            bool isClicked = NewGUILayout.Button(label, (bool)Settings[stringBoolKey], style, null, options); //returns true if button is clicked
+
+            // Toggle the value if the button is clicked BUT the issue is when the onclick action is passed to the button!! we run it twice!!
+            if (isClicked)
+            {
+                // Toggle the bool value when the button is clicked
+                Settings[stringBoolKey] = !(bool)Settings[stringBoolKey];
+
+                // Invoke additional action if provided
+                onClickAction?.Invoke();
+            }
+            return (bool)Settings[stringBoolKey];
+        }
+
+
+
+
+
 
         public static bool ButtonBoolToggle(string buttonText, bool boolValue)
         {
@@ -211,33 +451,11 @@ namespace SevenDTDMono.GuiLayoutExtended
             bool isClicked = GUILayout.Button(label, buttonStyle, options);
             return isClicked;
         }
-        public static bool Button(string label, params GUILayoutOption[] options)
-        {
-            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
-            buttonStyle.normal.textColor = Inactive;
-            buttonStyle.active.textColor = Active;
-            buttonStyle.hover.textColor = Hover;
 
-            bool isClicked = GUILayout.Button(label, buttonStyle, options);
-            return isClicked;
-        }
 
-        public static bool Button(string label, Action onClickAction, params GUILayoutOption[] options)
-        {
-            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
-            buttonStyle.normal.textColor = Inactive;
-            buttonStyle.active.textColor = Active;
-            buttonStyle.hover.textColor = Hover;
 
-            bool isClicked = GUILayout.Button(label, buttonStyle, options);
 
-            if (isClicked && onClickAction != null)
-            {
-                onClickAction.Invoke();
-            }
 
-            return isClicked;
-        }
         public static bool Button(string label, Action onClickAction, ref bool toggle, params GUILayoutOption[] options)
         {
             GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
@@ -276,27 +494,15 @@ namespace SevenDTDMono.GuiLayoutExtended
 
             return isClicked;
         }
-        public static bool Button(string label, bool toggle, Action onClickAction = null, params GUILayoutOption[] options)
-        {
-            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
-            buttonStyle.normal.textColor = toggle ? Active : Inactive;
-            buttonStyle.active.textColor = Active;
-            buttonStyle.hover.textColor = Hover;
 
-            bool isClicked = GUILayout.Button(label, buttonStyle, options);
 
-            if (isClicked)
-            {
-                //toggle = !toggle; // Toggle the bool value when the button is clicked
 
-                if (onClickAction != null)
-                {
-                    onClickAction.Invoke();
-                }
-            }
 
-            return isClicked;
-        }
+
+
+
+
+
         public static bool BButton(string label, bool toggle, Action onClickAction = null, params GUILayoutOption[] options)
         {
             GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
@@ -344,44 +550,26 @@ namespace SevenDTDMono.GuiLayoutExtended
             }
             return RB[boolKey];
         }
-        
-        
-        
-        
-        
-        public static bool DictButton(string label, string boolKey, Action onClickAction = null, params GUILayoutOption[] options)
-        {
-            #region DictionaryCheck
-            // Check if the key exists in the dictionary
-            if (!NewSettings.Instance.SettingsDictionary.ContainsKey(boolKey))
-            {
-                // Add the key with a default value of false if it does not exist
-                NewSettings.Instance.SettingsDictionary[boolKey] = false;
-                //NewSettings.AddSetting(boolKey, false);
-            }
-            // Ensure the value associated with the key is a bool
-            if (!(NewSettings.Instance.SettingsDictionary[boolKey] is bool))
-            {
-                Debug.LogError($"Key '{boolKey}' is not a boolean.");
-                return false;
-            }
-            #endregion
 
-            // Retrieve the current value
-            bool toggle = (bool)NewSettings.Instance.SettingsDictionary[boolKey];
 
-            // Create the toggle button using the current value
-            bool isClicked = NewGUILayout.Button(label, (bool)NewSettings.Instance.SettingsDictionary[boolKey], onClickAction, options);
 
-            // Toggle the value if the button is clicked
-            if (isClicked)
-            {
-                NewSettings.Instance.SettingsDictionary[boolKey] = !toggle; // Toggle the bool value when the button is clicked
-                // Invoke additional action if provided
-                onClickAction?.Invoke();
-            }
-            return !toggle;
-        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         public static bool ButtonTrigger(string label, string boolKey, Action onClickAction = null, params GUILayoutOption[] options)
         {
@@ -434,7 +622,7 @@ namespace SevenDTDMono.GuiLayoutExtended
             //}
             //#endregion
 
-            NewSettings.CheckDictionaryForKey(boolKey,false);
+            //NewSettings.CheckDictionaryForKey(boolKey,false);
            // CheckDictionaryForKey(boolKey,false);
 
 

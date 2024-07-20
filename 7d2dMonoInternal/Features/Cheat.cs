@@ -9,14 +9,13 @@ using System.Collections.Generic;
 using System.Linq;
 using static PassiveEffect;
 using SevenDTDMono.GuiLayoutExtended;
-using SevenDTDMono;
 
 //using SevenDTDMono.Objects;
 
 
-namespace SevenDTDMono
+namespace SevenDTDMono.Features
 {
-    public class Cheat : MonoBehaviour
+    public partial class Cheat : MonoBehaviour
     {
 
 
@@ -98,8 +97,14 @@ namespace SevenDTDMono
         public  static string inputPassiveEffects = "none";
         public  static string inputFloat = "1";
         private static Dictionary<string, object> Settings => NewSettings.Instance.SettingsDictionary; //get instance of SettingsDictionary
+        private static Dictionary<string, object> TempSettings => NewSettings.Instance.TempDictionary; //get instance of SettingsDictionary
         private static EntityPlayerLocal Player => NewSettings.EntityLocalPlayer;  //get instance of Player. 
-
+        private static GameManager GameManager => NewSettings.GameManager; //Get instance of GameManager
+        private static EntityTrader Trader => NewSettings.EntityTrader;
+         
+        
+        
+        
         #endregion
         //--------------------------------------------------------------------------------------------------------
 
@@ -142,33 +147,35 @@ namespace SevenDTDMono
             string num = Player.name.ToString();
             Debug.LogError($"player ID: {num}");
         }
-        
-        
-        
-        
-        
-        
-        
-        public static void ClearCheatBuff()
-        {
-            Debug.LogWarning("Clearing CheatBuff");
 
-            O._minEffectController.EffectGroups[0].PassiveEffects.Clear();
-            O._minEffectController.PassivesIndex.Clear();
-        }
-        public static void RemoveAllBuff()
+        
+        public static void OpenTrader()
         {
-            List<BuffValue> activeBuffs = Player.Buffs.ActiveBuffs;
-            foreach (BuffValue buff in activeBuffs)
+            if (Trader != null && Player && Trader.aiClosestPlayer == Player)
             {
-                Player.Buffs.RemoveBuff(buff.BuffName);
+                Trader.IsDancing = true;
+                ulong OCTime = 0;
+                Trader.TraderInfo.CloseTime = OCTime;
+                Trader.TraderInfo.OpenTime = OCTime;
 
-                if (ButtonTState.ContainsKey(buff.BuffName))
-                {
-                    ButtonTState[buff.BuffName] = false;
-                }
+                Settings[nameof(EntityTrader)] = true;
             }
+
+
+
+
+            //if ((bool)Settings[nameof(EntityTrader)] == true)
+            //    {
+            //        //Seems like this should only be triggered and not lopped. Looping this makes the game very laggy!!
+
+
+            //};
+
+
+
         }
+
+
         public static void SOMECONSOLEPRINTOUT()  //Creative and debug mode -- Trigger
         {
             string _value = null;
@@ -192,47 +199,43 @@ namespace SevenDTDMono
             Log.Out("BYYYYYYYYYYY");
 
         }
-        //voids
-        public static void CheatPassiveEffect(bool toggle, PassiveEffects passive, float modifier, ValueModifierTypes valueModifierTypes)
+     
+
+
+
+        //passive effects!
+
+        public static void AddPassiveEffectToPlayer(PassiveEffects passiveEffects, float modifier, ValueModifierTypes valueModifierTypes)
         {
-            
+  
+            string str = (bool)Settings[$"{passiveEffects}"] ? "Adding " : "Removing ";
 
-            if (O.ELP && NewSettings.GameManager.gameStateManager.bGameStarted == true)
+            Debug.LogWarning($"{str}{passiveEffects}");
+            if ((bool)Settings[$"{passiveEffects}"])
             {
-                if (toggle == true)
-                {
-                    AddPassive(passive, modifier, valueModifierTypes);
+                AddPassive(passiveEffects, modifier, valueModifierTypes);
+            }
+            if (!(bool)Settings[$"{passiveEffects}"])
+            {
+                RemovePassive(passiveEffects);
 
-                }
-                else if (toggle == false)
-                {
-                   RemovePassive(passive);
-                }
             }
         }
         private static void RemovePassive(PassiveEffects passiveEffects)
         {
-            var passiveEffectsList = O._minEffectController.EffectGroups[0].PassiveEffects;
+            var passiveEffectsList = MinEffectController.EffectGroups[0].PassiveEffects;
             for (int i = passiveEffectsList.Count - 1; i >= 0; i--)
             {
                 var effect = passiveEffectsList[i];
-                if (
-                    //effect.MatchAnyTags == newPassiveEffect.MatchAnyTags &&
-                    //effect.Modifier == newPassiveEffect.Modifier &&
-                    effect.Type == passiveEffects
-                    /*&&*/
-                    //effect.Values.SequenceEqual(newPassiveEffect.Values)
-                    ) //if the passive effect is found remove it else nothing
+                if (effect.Type == passiveEffects) //if the passive effect is found remove it, else nothing
                 {
                     passiveEffectsList.RemoveAt(i);
                 }
-                O._minEffectController.PassivesIndex.Remove(passiveEffects);
+                MinEffectController.PassivesIndex.Remove(passiveEffects);
             }
         }
         public static void AddPassive(PassiveEffects passiveEffects, float value, ValueModifierTypes valueModifierTypes)
         {
-
-
 
             /*valueModifierTypes
             Base_set - Sets to valu w eshoose
@@ -244,21 +247,19 @@ namespace SevenDTDMono
             count - No clue
             */
 
-
-
-            if (O.ELP.Buffs.HasBuff("CheatBuff") == false)
+            if (Player.Buffs.HasBuff(nameof(_cheatBuff)) == false)
             {
                 try 
                 {
-                    Log.Out($"{O.CheatBuff.Name} was not active, try adding");
-                    O.ELP.Buffs.AddBuff("CheatBuff");
+                    Log.Out($"{_cheatBuff.Name} was not active, try adding");
+                   Player.Buffs.AddBuff(nameof(_cheatBuff));
                 } catch
                 { 
                 }
             }
 
             List<PassiveEffect> pE1 = new List<PassiveEffect>();
-            MinEffectGroup effectGroup = O._minEffectController.EffectGroups[0];
+            MinEffectGroup effectGroup = MinEffectController.EffectGroups[0];
 
             PassiveEffect newPassiveEffect = new PassiveEffect
             {
@@ -269,10 +270,7 @@ namespace SevenDTDMono
                                                 // Set other properties if needed
             };//this is just the passive effects
 
-
-
-
-            var passiveEffectsList = O._minEffectController.EffectGroups[0].PassiveEffects;
+            var passiveEffectsList = MinEffectController.EffectGroups[0].PassiveEffects;
             for (int i = passiveEffectsList.Count - 1; i >= 0; i--)
             {
                 var effect = passiveEffectsList[i];
@@ -288,346 +286,13 @@ namespace SevenDTDMono
                 }
             }
 
-            O._minEffectController.PassivesIndex.Add(passiveEffects); // adds to MinEffectController.PassivesIndex MUST DO OTHERWISE NULL REFERENCE ERROR
+            MinEffectController.PassivesIndex.Add(passiveEffects); // adds to MinEffectController.PassivesIndex MUST DO OTHERWISE NULL REFERENCE ERROR
             //effectGroup.PassiveEffects.Add(newPassiveEffect);           // MinEffectController.MinEffectGroup.PassivesIndex __ This location just adds buffs on top if added multiple times
-            O._minEffectController.EffectGroups[0].PassiveEffects.Add(newPassiveEffect);           // MinEffectController.MinEffectGroup.PassivesIndex __ This location just adds buffs on top if added multiple times
-        }
-        //other 
-        private static void DisplayToggleButton(PassiveEffects effect)
-        {
-            // Get or set the toggle state in the dictionary.
-            if (!PVETState.ContainsKey(effect))
-            {
-                PVETState[effect] = false; // Set the initial state to false for new effects.
-            }
-            bool toggleState = PVETState[effect];
-
-            // Display the toggle button and update the toggle state in the dictionary.
-            bool buttonPressed = NewGUILayout.Button(effect.ToString(), GUILayout.MaxWidth(150));
-            PVETState[effect] = buttonPressed;
-
-            // If the button is pressed, set the input text field to the same string as the button text
-            if (buttonPressed)
-            {
-                inputPassiveEffects = effect.ToString();
-            }
-        }
-        #region Lists
-        public static void ListZombie1() ///////////////////////////////
-        {
-            if (O._listEntityEnemy.Count > 1)
-            {
-                foreach (EntityEnemy enemy in O._listEntityEnemy)
-                {
-                    if (!enemy || enemy == O.ELP || !enemy.IsAlive())
-                    {
-                        continue;
-                    }
-
-                    //string xm1 = zombie.entityFlags.ToString();
-                    //string ZM1= zombie.EntityName.ToString();
-                    string zombieIID = enemy.entityId.ToString();
-                    string zm = enemy.EntityName;
-                    string zmIID = zm + zombieIID;
-                    // Get or set the zombie's toggle state in the dictionary.
-                    if (!MenuDropTState.ContainsKey(zmIID))
-                    {
-                        MenuDropTState[zmIID] = false; // Set the initial state to false for new zombies.
-                    }
-
-                    bool toggleState = MenuDropTState[zmIID];
-                    NewGUILayout.DropDownForMethods(zmIID, () =>
-                    {
-                        NewGUILayout.BeginHorizontal(() =>
-                        {
-                            if (GUILayout.Button("Teleport"))
-                            {
-                                // Perform teleport action for the zombie.
-                                O.ELP.TeleportToPosition(enemy.GetPosition());
-                            }
-                            if (GUILayout.Button("Kill"))
-                            {
-
-                                // Perform kill action for the zombie.
-                                enemy.DamageEntity(new DamageSource(EnumDamageSource.Internal, EnumDamageTypes.Suicide), 99999, false, 1f);
-
-                            }
-                        });
-                    }, ref toggleState);
-                    MenuDropTState[zmIID] = toggleState;
-                }
-            }
-            else
-            {
-                GUILayout.Label("No zombies found.");
-            }
-        }
-        public static void ListPlayer1() ///////////////////////////////
-        {
-            if (O.PlayerList.Count > 1)
-            {
-                foreach (EntityPlayer player in O.PlayerList)
-                {
-                    if (!player || player == O.ELP || !player.IsAlive())
-                    {
-                        continue;
-                    }
-
-
-                    string PID = player.entityId.ToString();
-                    string PName = player.EntityName;
-                    string PIdentity = PName + PID;
-
-                    string playerName = player.EntityName.ToString()+player.entityId.ToString();
-                    string zm = player.EntityName.ToString();
-
-                    // Get or set the zombie's toggle state in the dictionary.
-                    if (!MenuDropTState.ContainsKey(PIdentity))
-                    {
-                        MenuDropTState[PIdentity] = false; // Set the initial state to false for new zombies.
-                    }
-
-                    bool toggleState = MenuDropTState[PIdentity];
-                    NewGUILayout.DropDownForMethods(PIdentity, () =>
-                    {
-                        NewGUILayout.BeginHorizontal(() => 
-                        {
-                            //CGUILayout.Button("whatever", Color.yellow, Color.blue);
-                            if (GUILayout.Button("Teleport"))
-                            {
-                                // Perform teleport action for the zombie.
-                                O.ELP.TeleportToPosition(player.GetPosition());
-                            }
-                            if (GUILayout.Button("Kill"))
-                            {
-                                // Perform kill action for the zombie.
-                                player.DamageEntity(new DamageSource(EnumDamageSource.Internal, EnumDamageTypes.Suicide), 99999, false, 1f);
-                            }//zombie.DamageEntity(new DamageSource(EnumDamageSource.Internal, EnumDamageTypes.Suicide), 99999, false, 1f);
-                        });
-      
-                    }, ref toggleState);
-
-                    // Update the toggle state in the dictionary.
-                    MenuDropTState[PIdentity] = toggleState;
-                }
-            }
-            else
-            {
-                GUILayout.Label("No Players found.");
-            }
-        }
-        
-
-
-
-        public static void MaxSkill() ///////////////////////////////
-        {
-            if (O._listProgressionValue.Count > 0)
-            {
-                foreach (ProgressionValue PGV in O._listProgressionValue)
-                {
-                    int lvl = PGV.Level;
-                    int max = PGV.ProgressionClass.MaxLevel;
-
-                    if (lvl < max)
-                    {
-                        PGV.Level = max;
-                    }
-                }
-            }
-        }
-        public static void ListPGV(string search) //////////Progression Value/////////////////////
-        {
-            if (O._listProgressionValue.Count > 0) 
-            {
-
-                var groupedValues = O._listProgressionValue.GroupBy(pgv => pgv.ProgressionClass.Type);
-                Dictionary<ProgressionType, List<ProgressionValue>> groupedValuesDict = groupedValues.ToDictionary(g => g.Key, g => g.ToList());
-
-                foreach (var kvp in groupedValuesDict)
-                {
-                    ProgressionType type = kvp.Key;
-                    List<ProgressionValue> values = kvp.Value;
-
-                    if (!string.IsNullOrEmpty(search))
-                    {
-                        values = values.Where(pgv => pgv.Name.Contains(search)).ToList();
-                    }
-
-                    string stype = type.ToString();
-
-                    if (!MenuDropTState.ContainsKey(stype))
-                    {
-                        MenuDropTState[stype] = false; // Set the initial state to false for the bool toggle
-                    }
-
-
-                    bool state = MenuDropTState[stype];
-                    NewGUILayout.DropDownForMethods("Progression Type: " +stype, () =>
-                    {
-                        foreach (ProgressionValue PGV in values)
-                        {
-                            string id = PGV.Name;
-                            //if (!TogBL.ContainsKey(id))
-                            //{
-                            //    TogBL[id] = false; // Set the initial state to false for the bool toggle
-                            //}
-
-                            //bool state = TogBL[id];
-                            //CGUILayout.DropDownForMethods(id, () =>
-                            //{
-                            NewGUILayout.BeginHorizontal(() =>
-                                {
-                                    GUILayout.Label(id);
-                                    if (GUILayout.Button("+1", GUILayout.MaxWidth(50)))
-                                    {
-                                        int lvl = PGV.Level;
-                                        int max = PGV.ProgressionClass.MaxLevel;
-                                        if (lvl < max)
-                                        {
-                                            PGV.Level++;
-                                        }
-                                    }
-                                    if (GUILayout.Button("MAX", GUILayout.MaxWidth(50)))
-                                    {
-                                        int max = PGV.ProgressionClass.MaxLevel;
-                                        PGV.Level = max;
-                                    }
-                                });
-                            //}, ref state);
-
-                            
-                        }
-                    }, ref state);
-                    MenuDropTState[stype] = state;
-                }
-                //if (CGUILayout.Button($"Max Skill"))
-                //{
-                //    MaxSkill();
-                //}
-
-            }
-        }
-        public static void GetListCBuffs(EntityPlayerLocal entityLocalPlayer, List<BuffClass> ListOFClass)
-        {
-            if (ListOFClass != null)
-            {
-                if (entityLocalPlayer != null || ListOFClass != null)
-                {
-                    if (ListOFClass.Count > 0)
-                    {
-                        foreach (BuffClass buffClass in ListOFClass)
-                        {
-                            string buffName = buffClass.Name;
-
-                            // Add the buff name to the _ToggleStates dictionary with a default value of false if it doesn't exist
-                            if (!ButtonTState.ContainsKey(buffName))
-                            {
-                                ButtonTState[buffName] = false;
-                            }
-
-                            // Use the boolean value from the _ToggleStates dictionary to determine the button's toggle state
-                            bool toggleState = ButtonTState[buffName];
-
-                            // Use GUILayout.Toggle to create a toggle button for each buff name
-                            // The toggle state is controlled by the _ToggleStates dictionary
-
-                            // Use GUILayout.Toggle to create a toggle button for each buff name
-                            // The toggle state is controlled by the _ToggleStates dictionary
-                            bool newToggleState = GUILayout.Toggle(toggleState, buffName);
-
-                            if (newToggleState != toggleState)
-                            {
-                                // If the toggle state changes, update the _ToggleStates dictionary with the new state
-                                ButtonTState[buffName] = newToggleState;
-
-                                if (newToggleState)
-                                {
-                                    // If the button is toggled on, add the buff to the player
-                                    entityLocalPlayer.Buffs.AddBuff(buffName);
-                                    //Debug.LogWarning($"{buffName} Added to player {O.ELP.gameObject.name}");
-                                }
-                                else
-                                {
-                                    // If the button is toggled off, remove the buff from the player
-                                    entityLocalPlayer.Buffs.RemoveBuff(buffName);
-                                    //Debug.LogWarning($"{buffName} Removed from player {O.ELP.gameObject.name}");
-                                }
-                            }
-                        }
-
-                    }
-                    else
-                    {
-                        GUILayout.Label("No buffs found.");
-
-                    }
-
-                }
-                else
-                {
-                    //if (ListOFClass == null)
-                    //{
-                    //    ListOFClass = O.GetAvailableBuffClasses();
-                    //}
-
-
-                    GUILayout.Label("Not ingame");
-                }
-            }
-
+            MinEffectController.EffectGroups[0].PassiveEffects.Add(newPassiveEffect);           // MinEffectController.MinEffectGroup.PassivesIndex __ This location just adds buffs on top if added multiple times
         }
 
 
-        //public static void GetList(bool _bool, EntityPlayerLocal entityLocalPlayer, List<BuffClass> ListOFClass, string searchText)
-        //{
-        //    if (ListOFClass != null)
-        //        if (entityLocalPlayer != null || ListOFClass != null)
-        //        {
-        //            if (ListOFClass.Count > 0)
-        //            {
-        //                foreach (BuffClass buffClass in ListOFClass)
-        //                {
-        //                    if (searchText == "" || buffClass.Name.Contains(searchText)) //case sensitve  . Possible ignore case buffClass.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0
-        //                    {
-        //                        // se GUILayout.Button to create a button for each buff name
-        //                        if (GUILayout.Button(buffClass.Name))
-        //                        {
-        //                            entityLocalPlayer.Buffs.AddBuff(buffClass.Name, -1, true, false, false, 99999f);
-        //                            Debug.LogWarning($"{buffClass.Name} Added to player {O.ELP.gameObject.name}");
-        //                            //Logic when the button is clicked
-        //                        }
-        //                        if (_bool)
-        //                        {
-        //                            break;
-        //                        }
-        //                    }
-        //                }
 
-        //            }
-        //            else
-        //            {
-        //                GUILayout.Label("No buffs found.");
-
-        //            }
-
-        //        }
-        //        else
-        //        {
-        //            if (ListOFClass == null)
-        //            {
-        //                //ListOFClass = O.GetAvailableBuffClasses();
-        //            }
-
-
-        //            GUILayout.Label("Not ingame");
-        //        }
-
-        //}
-        
-        
-       
-        
         public static void GetListPassiveEffects(string searchText) //should make a chache for this one to lower cpu usage
         {
 
@@ -666,291 +331,30 @@ namespace SevenDTDMono
                 });
             });
         }
-        #endregion
-
-
-
-
-        #endregion
-
-
-        public void OnHud()
+        private static void DisplayToggleButton(PassiveEffects effect)
         {
-
-        }
-        //--------------------------------------------------------------------------------------------------------
-        private void Start()
-        {
-
-            Debug.LogWarning("THIS IS Start CH!!!!");
-        }
-        //--------------------------------------------------------------------------------------------------------
-        private void Update()
-        {
-            
-            if ((bool)Settings[nameof(GameStateManager.bGameStarted)] == true && Player)
+            // Get or set the toggle state in the dictionary.
+            if (!PVETState.ContainsKey(effect))
             {
-                
-                //CheatPassiveEffect(RB["_BL_Blockdmg"], PassiveEffects.BlockDamage, SETT._FL_blokdmg, ValueModifierTypes.perc_add);
-              //  CheatPassiveEffect(NewSettings.GetBool(nameof(PassiveEffects.BlockDamage)), PassiveEffects.BlockDamage, NewSettings.FloatBlockDamageMultiplier, ValueModifierTypes.perc_add);
-                //CheatPassiveEffect(RB["_BL_Kill"], PassiveEffects.EntityDamage, SETT._FL_killdmg, ValueModifierTypes.perc_add);
-                //CheatPassiveEffect(RB["_BL_Harvest"], PassiveEffects.HarvestCount, SETT._FL_harvest, ValueModifierTypes.perc_add);
-                //CheatPassiveEffect(RB["_BL_Jmp"], PassiveEffects.JumpStrength, SETT._FL_jmp, ValueModifierTypes.base_set);
-                //CheatPassiveEffect(RB["_BL_APM"], PassiveEffects.AttacksPerMinute, SETT._FL_APM, ValueModifierTypes.base_set);
-                //CheatPassiveEffect(RB["_BL_Run"], PassiveEffects.RunSpeed, SETT._FL_run, ValueModifierTypes.base_set);
-                CheatPassiveEffect((bool)Settings[nameof(PassiveEffects.ScrappingTime)], PassiveEffects.ScrappingTime, 0f, ValueModifierTypes.base_set);
-                //CheatPassiveEffect(RB["_instantCraft"], PassiveEffects.CraftingTime, 0f, ValueModifierTypes.base_set);
-                //CheatPassiveEffect(RB["_instantSmelt"], PassiveEffects.CraftingSmeltTime, 0f, ValueModifierTypes.base_set);
-                //CheatPassiveEffect(RB["_infDurability"], PassiveEffects.DegradationPerUse, 0f, ValueModifierTypes.base_set);
-
-                if ((bool)Settings[nameof(Quest.QuestState.Completed)] == true )
-                {
-                    if (Player.QuestJournal.quests.Count > 0)
-                    {
-                        int lastIndex = Player.QuestJournal.quests.Count - 1;
-
-                        Quest lastQuest = Player.QuestJournal.quests[lastIndex];
-
-                        if (lastQuest.CurrentState == Quest.QuestState.Completed)
-                        {
-                            lastQuest.CurrentState = Quest.QuestState.ReadyForTurnIn;
-                            Debug.LogWarning($" {lastQuest.ID} is ready for turn in");
-                        }
-                    }
-                    else
-                    {
-                        // The list is empty, handle this case accordingly
-                    }
-                };
-
-                if ((bool)Settings[nameof(Quest.QuestState.InProgress)] == true)
-                {
-                    foreach (Quest quest in Player.QuestJournal.quests)
-                    {
-
-
-                        //QuestClass.Category == "Challenge"
-                        if ((quest.Tracked == true || quest.Active == true) && quest.CurrentState == Quest.QuestState.InProgress)
-                        {
-                            quest.CurrentState = Quest.QuestState.ReadyForTurnIn;
-                        }
-                    }
-                };
-
-                if ((bool)Settings[nameof(EntityTrader)] == true)
-                {
-                    if (O.Etrader != null && Player)
-                    {
-                        //if (O.Etrader.aiClosestPlayer.ToString().ToLower() == O.ELP.name.ToString().ToLower())
-                        //{
-                        O.Etrader.IsDancing = true;
-                        ulong OCTime = 0;
-                        O.Etrader.TraderInfo.CloseTime = OCTime;
-                        O.Etrader.TraderInfo.OpenTime = OCTime;
-
-                        //}
-
-                    }
-                    else if (O.Etrader == null)
-                    {
-
-                        Settings[nameof(EntityTrader)] = false;
-                    }
-                };
-
-
-               
-
-   
-
-                //if (SETT.noWeaponBob && O.ELP) // When noWeaponBob is active enable 
-                //{
-                //    vp_FPWeapon weapon = O.ELP.vp_FPWeapon;
-
-                //    if (weapon)
-                //    {
-                //        weapon.BobRate = Vector4.zero;
-                //        weapon.ShakeAmplitude = Vector3.zero;
-                //        weapon.RenderingFieldOfView = 120f;
-                //        weapon.StepForceScale = 0f;
-                //    }
-                //}//no weapon bob
-
-                //////if (Input.GetKeyDown(KeyCode.O)) //infinity ammo ???
-                //////{
-                //////    if (!O.ELP)
-                //////    {
-                //////        return;
-                //////    }
-
-                //////    Inventory inventory = O.ELP.inventory;
-
-                //////    if (inventory != null)
-                //////    {
-                //////        ItemActionAttack gun = inventory.GetHoldingGun();
-
-                //////        if (gun != null)
-                //////        {
-                //////            gun.InfiniteAmmo = !gun.InfiniteAmmo;
-                           
-                //////        }
-                //////    }
-                //////}//infinity ammo
-
-                //////if (Input.GetKeyDown(KeyCode.F9)) //checks if the key is being pressed. if it does execute F9 is empty in game
-                //////{
-                //////    // we can put cheat here
-         
-                //////}
-
-
-                ////////if ((bool)Settings["bool_CreativeMode"] || !(bool)Settings["bool_CreativeMode"]) //Toggle for ingame Creative and Debug Working like a sharm
-                ////////{
-                ////////    CmDm((bool)Settings["bool_CreativeMode"]);
-                ////////}
-                ////////if (RB["_isEditmode"] || !RB["_isEditmode"]) //Toggle for ingame Creative and Debug Working like a sharm
-                ////////{
-                ////////    editMode();
-                ////////}
+                PVETState[effect] = false; // Set the initial state to false for new effects.
             }
-           
+            bool toggleState = PVETState[effect];
 
-            //function that does not work 
-            /*
-            if (SB.Count > 1) 
+            // Display the toggle button and update the toggle state in the dictionary.
+            bool buttonPressed = NewGUILayout.Button(effect.ToString(), GUILayout.MaxWidth(150));
+            PVETState[effect] = buttonPressed;
+
+            // If the button is pressed, set the input text field to the same string as the button text
+            if (buttonPressed)
             {
-                if (SB["_nameScramble"] || !SB["_nameScramble"])
-                {
-                    //Log.Out($" sett name1 {SETT._nameScramble}");
-                    //Log.Out($" sett name {SETT._nameScramble}");
-                    //if (!SBO.ContainsKey("NSCAMBLE"))
-                    //{
-                    //    SBO["NSCAMBLE"] = false;
-                    //    SBO["NSCAMBLE1"] = false;// Set the initial state to false for the bool toggle
-                    //    //Log.Out($"nsc1 {TogBL["NSCAMBLE"]}");
-                    //    //Log.Out($"nsc2 {TogBL["NSCAMBLE1"]}");
-                    //}
-
-                    if (SB["_nameScramble"] == true)
-                    {
-                        //Log.Out($" sett name2  = {SETT._nameScramble}");
-                        //Log.Out($" nsc1.2 = {TogBL["NSCAMBLE"]}");
-                        if (O._gameManager.persistentLocalPlayer != null && RB["NSCRAM1"] != true)
-                        {
-                            //Log.Out($" sett name3 {SETT._nameScramble} and ");
-                            O._gameManager.persistentLocalPlayer.PlayerName = Extras.ScrambleString(O._gameManager.persistentLocalPlayer.PlayerName);
-                            O._gameManager.persistentLocalPlayer.PlayerName = Extras.ScrambleString(O._gameManager.persistentLocalPlayer.PlayerName);
-                            RB["NSCRAM1"] = true;
-                            //Log.Out($" sett name3 {SETT._nameScramble} and nsc1 {TogBL["NSCAMBLE"]}");
-                        }//
-                        if (O.ELP != null && RB["NSCRAM2"] == false)
-                        {
-                            //Log.Out($" sett name2 {SETT._nameScramble}");
-                            if (O.ELP.EntityName != null)
-                            {
-                                SS["Playername"] = O.ELP.EntityName;
-
-                                O.ELP.EntityName = Extras.ScrambleString(O.ELP.EntityName);
-                            }
-                            RB["NSCRAM2"] = true;
-                            //Log.Out($" sett name3 {SETT._nameScramble} and nsc1 {TogBL["NSCAMBLE1"]}");
-                        }
-
-
-                    }
-                    else if (SB["_nameScramble"] == false && RB["NSCRAM1"] == true && RB["NSCRAM2"] == true)
-                    {
-                        O.ELP.EntityName = SS["Playername"];
-                        O._gameManager.persistentLocalPlayer.PlayerName = SS["Playername"];
-                        RB["NSCRAM1"] = false;
-                        RB["NSCRAM2"] = false;
-                    }
-
-                }
-            }
-            
-            */
-
-
-        }
-
-        //--------------------------------------------------------------------------------------------------------
-        void OnGUI()
-        {
-        }
-        //--------------------------------------------------------------------------------------------------------
-
-        #region Toggles
-        //public static EntityAlive Entity;
-
-     
-        public static void Trader()
-        {
-            if (O.Etrader != null && O.ELP)
-            {
-                //if (O.Etrader.aiClosestPlayer.ToString().ToLower() == O.ELP.name.ToString().ToLower())
-                //{
-                    O.Etrader.IsDancing = true;
-                    ulong OCTime = 0;
-                    O.Etrader.TraderInfo.CloseTime = OCTime;
-                    O.Etrader.TraderInfo.OpenTime = OCTime;
-
-                //}
-
-            }
-            else if (O.Etrader == null) 
-            {
-
-                RB["_EtraderOpen"] = false;
-            }
-        }
-        public static void InstantQuestFinish()
-        {
-            if (RB["_QuestComplete"] == true && O.ELP)
-            {
-                foreach (Quest quest in O.ELP.QuestJournal.quests)
-                {
-
-
-                    //QuestClass.Category == "Challenge"
-                    if ((quest.Tracked==true||quest.Active==true) && quest.CurrentState == Quest.QuestState.InProgress) 
-                    {
-
-                        quest.CurrentState = Quest.QuestState.ReadyForTurnIn;
-                    }
-                }
-            }
-        }
-        public static void LoopLASTQuestRewards()
-        {
-            if ((bool)Settings[nameof(Quest.QuestState.Completed)] == true && Player)
-            {
-                if (Player.QuestJournal.quests.Count > 0)
-                {
-                    int lastIndex = Player.QuestJournal.quests.Count - 1;
-           
-                    Quest lastQuest = Player.QuestJournal.quests[lastIndex];
-
-                    if (lastQuest.CurrentState == Quest.QuestState.Completed )
-                    {
-                        lastQuest.CurrentState = Quest.QuestState.ReadyForTurnIn;
-                        Debug.LogWarning($" {lastQuest.ID} is ready for turn in");
-                    }
-                }
-                else
-                {
-                    // The list is empty, handle this case accordingly
-                }
+                inputPassiveEffects = effect.ToString();
             }
         }
 
-        #endregion
-
-
-        #region Methods
 
 
 
+        //BUFF RELATED
         public static void AddCheatBuff()
         {
             /*
@@ -1145,29 +549,29 @@ namespace SevenDTDMono
           
             //O.ELP.Buffs.AddBuff("testbuff");
             */
-            if (BuffManager.GetBuff(O.CheatBuff.Name) == null)
+            if (BuffManager.GetBuff(_cheatBuff.Name) == null)
             {
 
-                Log.Out($"Buff {O.CheatBuff} has ben added");
+                Log.Out($"Buff {_cheatBuff} has ben added");
 
-                O.ELP.Buffs.AddBuff(O.CheatBuff.Name);
-                Log.Out($"Buff {O.CheatBuff.Name} has ben added to{O.ELP.Buffs.ActiveBuffs.GetInternalArray()} ");
+                Player.Buffs.AddBuff(_cheatBuff.Name);
+                Log.Out($"Buff {_cheatBuff.Name} has ben added to{Player.Buffs.ActiveBuffs.GetInternalArray()} ");
             }
             else
             {
-                Debug.LogWarning($"Buff {O.CheatBuff.Name} was already added to the system");
-                if (O.ELP.Buffs.GetBuff(O.CheatBuff.Name) == null)
+                Debug.LogWarning($"Buff {_cheatBuff.Name} was already added to the system");
+                if (Player.Buffs.GetBuff(_cheatBuff.Name) == null)
                 {
 
-                    O.ELP.Buffs.AddBuff(O.CheatBuff.Name);
-                    Log.Out($"Buff {O.CheatBuff.Name} was Added to to Player again");
+                    Player.Buffs.AddBuff(_cheatBuff.Name);
+                    Log.Out($"Buff {_cheatBuff.Name} was Added to to Player again");
                 }
             }
         }
         public static void AddEffectGroup()
         {
             Debug.LogWarning("adding effectGroup");
-            O._minEffectController.EffectGroups = new List<MinEffectGroup>
+            MinEffectController.EffectGroups = new List<MinEffectGroup>
             {
 
                 new MinEffectGroup
@@ -1183,8 +587,742 @@ namespace SevenDTDMono
             };
             //O._minEffectController.PassivesIndex = new HashSet<PassiveEffects>();
         }
-     
+        public static void ClearCheatBuff()
+        {
+            Debug.LogWarning("Clearing CheatBuff");
+
+            MinEffectController.EffectGroups[0].PassiveEffects.Clear();
+            MinEffectController.PassivesIndex.Clear();
+        }
+        public static void RemoveAllBuff()
+        {
+            List<BuffValue> activeBuffs = Player.Buffs.ActiveBuffs;
+            foreach (BuffValue buff in activeBuffs)
+            {
+                Player.Buffs.RemoveBuff(buff.BuffName);
+
+                if (TempSettings.ContainsKey(buff.BuffName))
+                {
+                    TempSettings[buff.BuffName] = false;
+                }
+            }
+        }
+
+
+
+        //Lists Related!
+        public static void ListEntityZombie() ///////////////////////////////
+        {
+            if (NewSettings.EntityAlive.Count > 1)
+            {
+                foreach (EntityAlive entityAlive in NewSettings.EntityAlive)
+                {
+                    if (!entityAlive || entityAlive == Player || !entityAlive.IsAlive())
+                    {
+                        continue;
+                    }
+
+                    //string xm1 = zombie.entityFlags.ToString();
+                    //string ZM1= zombie.EntityName.ToString();
+                    string entityId = entityAlive.entityId.ToString();
+                    string entityName = entityAlive.EntityName;
+                    string entityIdentity = entityName + entityId;
+                    // Get or set the zombie's toggle state in the dictionary.
+                    if (!TempSettings.ContainsKey(entityIdentity))
+                    {
+                        TempSettings[entityIdentity] = false; // Set the initial state to false for new zombies.
+                    }
+
+                    bool toggleState = (bool)TempSettings[entityIdentity];
+                    NewGUILayout.DropDownForMethods(entityIdentity, () =>
+                    {
+                        NewGUILayout.BeginHorizontal(() =>
+                        {
+                            if (GUILayout.Button("Teleport To"))
+                            {
+                                // Perform teleport action for the zombie.
+                                Player.TeleportToPosition(entityAlive.GetPosition());
+                            }
+                            if (GUILayout.Button("Kill"))
+                            {
+
+                                // Perform kill action for the zombie.
+                                entityAlive.DamageEntity(new DamageSource(EnumDamageSource.Internal, EnumDamageTypes.Suicide), 99999, false, 1f);
+                                TempSettings.Remove(entityIdentity);
+                            }
+                        });
+                    }, ref toggleState);
+                    TempSettings[entityIdentity] = toggleState;
+                }
+            }
+            else
+            {
+                GUILayout.Label("No Entities found.");
+            }
+        }
+        public static void ListEntityPlayer() ///////////////////////////////
+        {
+            if (NewSettings.EntityPlayers.Count > 1)
+            {
+                foreach (EntityPlayer player in NewSettings.EntityPlayers)
+                {
+                    if (!player || player == Player || !player.IsAlive())
+                    {
+                        continue;
+                    }
+
+
+                    string entityId = player.entityId.ToString();
+                    string entityName = player.EntityName;
+                    string entityIdentity = entityName + entityId;
+
+                    //string playerName = player.EntityName.ToString()+player.entityId.ToString();
+                    //string zm = player.EntityName.ToString();
+
+                    // Get or set the zombie's toggle state in the dictionary.
+                    if (!TempSettings.ContainsKey(entityIdentity))
+                    {
+                        TempSettings[entityIdentity] = false; // Set the initial state to false for new zombies.
+                    }
+
+                    bool toggleState = MenuDropTState[entityIdentity];
+                    NewGUILayout.DropDownForMethods(entityIdentity, () =>
+                    {
+                        NewGUILayout.BeginHorizontal(() =>
+                        {
+                            //CGUILayout.Button("whatever", Color.yellow, Color.blue);
+                            if (GUILayout.Button("Teleport"))
+                            {
+                                // Perform teleport action for the zombie.
+                                Player.TeleportToPosition(player.GetPosition());
+                            }
+                            if (GUILayout.Button("Kill"))
+                            {
+                                // Perform kill action for the zombie.
+                                player.DamageEntity(new DamageSource(EnumDamageSource.Internal, EnumDamageTypes.Suicide), 99999, false, 1f);
+                                TempSettings.Remove(entityIdentity);
+                            }//zombie.DamageEntity(new DamageSource(EnumDamageSource.Internal, EnumDamageTypes.Suicide), 99999, false, 1f);
+                        });
+
+                    }, ref toggleState);
+
+                    // Update the toggle state in the dictionary.
+                    TempSettings[entityIdentity] = toggleState;
+                }
+            }
+            else
+            {
+                GUILayout.Label("No Players found.");
+            }
+        }
+
+
+
+
+
+
+
+        public static void ListZombie1() ///////////////////////////////
+        {
+            if (O._listEntityEnemy.Count > 1)
+            {
+                foreach (EntityEnemy enemy in O._listEntityEnemy)
+                {
+                    if (!enemy || enemy == Player || !enemy.IsAlive())
+                    {
+                        continue;
+                    }
+
+                    //string xm1 = zombie.entityFlags.ToString();
+                    //string ZM1= zombie.EntityName.ToString();
+                    string zombieIID = enemy.entityId.ToString();
+                    string zm = enemy.EntityName;
+                    string zmIID = zm + zombieIID;
+                    // Get or set the zombie's toggle state in the dictionary.
+                    if (!TempSettings.ContainsKey(zmIID))
+                    {
+                        TempSettings[zmIID] = false; // Set the initial state to false for new zombies.
+                    }
+
+                    bool toggleState = (bool)TempSettings[zmIID];
+                    NewGUILayout.DropDownForMethods(zmIID, () =>
+                    {
+                        NewGUILayout.BeginHorizontal(() =>
+                        {
+                            if (GUILayout.Button(" Teleport "))
+                            {
+                                // Perform teleport action for the zombie.
+                                Player.TeleportToPosition(enemy.GetPosition());
+                            }
+                            if (GUILayout.Button("Kill"))
+                            {
+
+                                // Perform kill action for the zombie.
+                                enemy.DamageEntity(new DamageSource(EnumDamageSource.Internal, EnumDamageTypes.Suicide), 99999, false, 1f);
+                                TempSettings.Remove(zmIID);
+                            }
+                        });
+                    }, ref toggleState);
+                    TempSettings[zmIID] = toggleState;
+                }
+            }
+            else
+            {
+                GUILayout.Label("No zombies found.");
+            }
+        }
+        
+        //Buffs and Progression 
+        public static void MaxSkill() ///////////////////////////////
+        {
+            if (O._listProgressionValue.Count > 0)
+            {
+                foreach (ProgressionValue PGV in O._listProgressionValue)
+                {
+                    int lvl = PGV.Level;
+                    int max = PGV.ProgressionClass.MaxLevel;
+
+                    if (lvl < max)
+                    {
+                        PGV.Level = max;
+                    }
+                }
+            }
+        }
+        public static void ListPGV(string search) //////////Progression Value/////////////////////
+        {
+            if (O._listProgressionValue.Count > 0) 
+            {
+
+                var groupedValues = O._listProgressionValue.GroupBy(pgv => pgv.ProgressionClass.Type);
+                Dictionary<ProgressionType, List<ProgressionValue>> groupedValuesDict = groupedValues.ToDictionary(g => g.Key, g => g.ToList());
+
+                foreach (var kvp in groupedValuesDict)
+                {
+                    ProgressionType type = kvp.Key;
+                    List<ProgressionValue> values = kvp.Value;
+
+                    if (!string.IsNullOrEmpty(search))
+                    {
+                        values = values.Where(pgv => pgv.Name.Contains(search)).ToList();
+                    }
+
+                    string stype = type.ToString();
+
+                    if (!MenuDropTState.ContainsKey(stype))
+                    {
+                        MenuDropTState[stype] = false; // Set the initial state to false for the bool toggle
+                    }
+
+
+                    bool state = MenuDropTState[stype];
+                    NewGUILayout.DropDownForMethods("Progression Type: " +stype, () =>
+                    {
+                        foreach (ProgressionValue PGV in values)
+                        {
+                            string id = PGV.Name;
+                            //if (!TogBL.ContainsKey(id))
+                            //{
+                            //    TogBL[id] = false; // Set the initial state to false for the bool toggle
+                            //}
+
+                            //bool state = TogBL[id];
+                            //CGUILayout.DropDownForMethods(id, () =>
+                            //{
+                            NewGUILayout.BeginHorizontal(() =>
+                                {
+                                    GUILayout.Label(id);
+                                    if (GUILayout.Button("+1", GUILayout.MaxWidth(50)))
+                                    {
+                                        int lvl = PGV.Level;
+                                        int max = PGV.ProgressionClass.MaxLevel;
+                                        if (lvl < max)
+                                        {
+                                            PGV.Level++;
+                                        }
+                                    }
+                                    if (GUILayout.Button("MAX", GUILayout.MaxWidth(50)))
+                                    {
+                                        int max = PGV.ProgressionClass.MaxLevel;
+                                        PGV.Level = max;
+                                    }
+                                });
+                            //}, ref state);
+
+                            
+                        }
+                    }, ref state);
+                    MenuDropTState[stype] = state;
+                }
+                //if (CGUILayout.Button($"Max Skill"))
+                //{
+                //    MaxSkill();
+                //}
+
+            }
+        }
+        public static void GetListCBuffs(EntityPlayerLocal entityLocalPlayer, List<BuffClass> ListOFClass)
+        {
+            if (ListOFClass != null)
+            {
+                if (entityLocalPlayer != null || ListOFClass != null)
+                {
+                    if (ListOFClass.Count > 0)
+                    {
+                        foreach (BuffClass buffClass in ListOFClass)
+                        {
+                            string buffName = buffClass.Name;
+
+                            // Add the buff name to the _ToggleStates dictionary with a default value of false if it doesn't exist
+                            if (!ButtonTState.ContainsKey(buffName))
+                            {
+                                ButtonTState[buffName] = false;
+                            }
+
+                            // Use the boolean value from the _ToggleStates dictionary to determine the button's toggle state
+                            bool toggleState = ButtonTState[buffName];
+
+                            // Use GUILayout.Toggle to create a toggle button for each buff name
+                            // The toggle state is controlled by the _ToggleStates dictionary
+
+                            // Use GUILayout.Toggle to create a toggle button for each buff name
+                            // The toggle state is controlled by the _ToggleStates dictionary
+                            bool newToggleState = GUILayout.Toggle(toggleState, buffName);
+
+                            if (newToggleState != toggleState)
+                            {
+                                // If the toggle state changes, update the _ToggleStates dictionary with the new state
+                                ButtonTState[buffName] = newToggleState;
+
+                                if (newToggleState)
+                                {
+                                    // If the button is toggled on, add the buff to the player
+                                    entityLocalPlayer.Buffs.AddBuff(buffName);
+                                    //Debug.LogWarning($"{buffName} Added to player {O.ELP.gameObject.name}");
+                                }
+                                else
+                                {
+                                    // If the button is toggled off, remove the buff from the player
+                                    entityLocalPlayer.Buffs.RemoveBuff(buffName);
+                                    //Debug.LogWarning($"{buffName} Removed from player {O.ELP.gameObject.name}");
+                                }
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        GUILayout.Label("No buffs found.");
+
+                    }
+
+                }
+                else
+                {
+                    //if (ListOFClass == null)
+                    //{
+                    //    ListOFClass = O.GetAvailableBuffClasses();
+                    //}
+
+
+                    GUILayout.Label("Not ingame");
+                }
+            }
+
+        }
+        
+        
+        
+        
+
+
+        //public static void GetList(bool _bool, EntityPlayerLocal entityLocalPlayer, List<BuffClass> ListOFClass, string searchText)
+        //{
+        //    if (ListOFClass != null)
+        //        if (entityLocalPlayer != null || ListOFClass != null)
+        //        {
+        //            if (ListOFClass.Count > 0)
+        //            {
+        //                foreach (BuffClass buffClass in ListOFClass)
+        //                {
+        //                    if (searchText == "" || buffClass.Name.Contains(searchText)) //case sensitve  . Possible ignore case buffClass.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0
+        //                    {
+        //                        // se GUILayout.Button to create a button for each buff name
+        //                        if (GUILayout.Button(buffClass.Name))
+        //                        {
+        //                            entityLocalPlayer.Buffs.AddBuff(buffClass.Name, -1, true, false, false, 99999f);
+        //                            Debug.LogWarning($"{buffClass.Name} Added to player {O.ELP.gameObject.name}");
+        //                            //Logic when the button is clicked
+        //                        }
+        //                        if (_bool)
+        //                        {
+        //                            break;
+        //                        }
+        //                    }
+        //                }
+
+        //            }
+        //            else
+        //            {
+        //                GUILayout.Label("No buffs found.");
+
+        //            }
+
+        //        }
+        //        else
+        //        {
+        //            if (ListOFClass == null)
+        //            {
+        //                //ListOFClass = O.GetAvailableBuffClasses();
+        //            }
+
+
+        //            GUILayout.Label("Not ingame");
+        //        }
+
+        //}
+
+
+
+
+
+
+
+
+
         #endregion
+
+
+        public void OnHud()
+        {
+
+        }
+        //--------------------------------------------------------------------------------------------------------
+        private void Start()
+        {
+            CheckForBoolKey(nameof(_cheatBuff)); //pretty much adds the bool key to the dictionary so we do not get reference error 
+            Debug.LogWarning($"Start: {nameof(Cheat)}");
+        }
+
+        private static bool CheckForBoolKey(string stringBoolKey)
+        {
+            #region DictionaryCheck
+            // Check if the key exists in the dictionary
+            if (!Settings.ContainsKey(stringBoolKey))
+            {
+                // Add the key with a default value of false if it does not exist
+                Settings[stringBoolKey] = false;
+                return true;
+                //NewSettings.AddSetting(boolKey, false);
+            }
+            // Ensure the value associated with the key is a bool
+            if (!(Settings[stringBoolKey] is bool))
+            {
+                Debug.LogError($"Key '{stringBoolKey}' is not a boolean.");
+                return false;
+            }
+            #endregion
+            return true;
+        }
+        //--------------------------------------------------------------------------------------------------------
+        private void Update()
+        {
+            if (NewSettings.GameManager.IsQuitting)
+            {
+                Settings[nameof(_cheatBuff)] = false; //resets variable
+            }
+
+
+
+            if (NewSettings.GameManager.gameStateManager.bGameStarted == true && Player && (bool)Settings[nameof(_cheatBuff)]==false)
+            {
+                Debug.LogWarning($"amount of buffs before load {BuffManager.Buffs.Count}");
+                InitCheatBuff();
+            }
+            
+
+
+            if (NewSettings.GameManager.gameStateManager.bGameStarted == true && Player)
+            {
+
+                //CheatPassiveEffect(RB["_BL_Blockdmg"], PassiveEffects.BlockDamage, SETT._FL_blokdmg, ValueModifierTypes.perc_add);
+                //  
+                //CheatPassiveEffect(RB["_BL_Kill"], PassiveEffects.EntityDamage, SETT._FL_killdmg, ValueModifierTypes.perc_add);
+                //CheatPassiveEffect(RB["_BL_Harvest"], PassiveEffects.HarvestCount, SETT._FL_harvest, ValueModifierTypes.perc_add);
+                //CheatPassiveEffect(RB["_BL_Jmp"], PassiveEffects.JumpStrength, SETT._FL_jmp, ValueModifierTypes.base_set);
+                //CheatPassiveEffect(RB["_BL_APM"], PassiveEffects.AttacksPerMinute, SETT._FL_APM, ValueModifierTypes.base_set);
+                //CheatPassiveEffect(RB["_BL_Run"], PassiveEffects.RunSpeed, SETT._FL_run, ValueModifierTypes.base_set);
+
+                //CheatPassiveEffect(RB["_instantCraft"], PassiveEffects.CraftingTime, 0f, ValueModifierTypes.base_set);
+                //CheatPassiveEffect(RB["_instantSmelt"], PassiveEffects.CraftingSmeltTime, 0f, ValueModifierTypes.base_set);
+                //CheatPassiveEffect(RB["_infDurability"], PassiveEffects.DegradationPerUse, 0f, ValueModifierTypes.base_set);
+
+
+                //CheatPassiveEffect((bool)Settings[nameof(PassiveEffects.ScrappingTime)], PassiveEffects.ScrappingTime, 0f, ValueModifierTypes.base_set);
+    
+                if ((bool)Settings[nameof(Quest.QuestState.Completed)])
+                {
+                    //Loop Rewards!
+                    if (Player.QuestJournal.quests.Count > 0)
+                    {
+                        int lastIndex = Player.QuestJournal.quests.Count - 1;
+
+                        Quest lastQuest = Player.QuestJournal.quests[lastIndex];
+
+                        if (lastQuest.CurrentState == Quest.QuestState.Completed)
+                        {
+                            lastQuest.CurrentState = Quest.QuestState.ReadyForTurnIn;
+                            Debug.LogWarning($" {lastQuest.ID} is ready for turn in");
+                        }
+                    }
+                    else
+                    {
+                        // The list is empty, handle this case accordingly
+                    }
+                };
+
+                if ((bool)Settings[nameof(Quest.QuestState.InProgress)])
+                {
+                    //finish quest!!
+                    foreach (Quest quest in Player.QuestJournal.quests)
+                    {
+
+
+                        //QuestClass.Category == "Challenge"
+                        if ((quest.Tracked == true || quest.Active == true) && quest.CurrentState == Quest.QuestState.InProgress)
+                        {
+                            quest.CurrentState = Quest.QuestState.ReadyForTurnIn;
+                        }
+                    }
+                };
+
+
+                if ((bool)Settings[nameof(EntityTrader)] && Trader!=null)
+                {
+
+                    //disables the open trader incase we leave the grounds!
+                    
+                    Vector3 v3Trader = Trader.traderArea.Position;
+                    Vector3 v3Player = Player.position;
+                    
+                    const float range = 70.0f; //roughly outside of the traderArea. If we reach like way to far we will have trader=null
+                    var distance = Vector3.Distance(v3Player, v3Trader);
+
+
+                    //Debug.LogWarning($"Distance: {distance}");
+
+                    if (distance > range)
+                    {
+                        Debug.LogWarning($"Distance: {distance}");
+                        Debug.LogError($"{distance} is less then {range}, Resetting trader");
+                        Settings[nameof(EntityTrader)] = false;
+                        Trader.IsDancing = false;
+                        Trader.TraderInfo.CloseTime = (ulong)21833;
+                        Trader.TraderInfo.OpenTime = (ulong)4083;
+
+                    }
+                }
+
+
+
+                //if (SETT.noWeaponBob && O.ELP) // When noWeaponBob is active enable 
+                //{
+                //    vp_FPWeapon weapon = O.ELP.vp_FPWeapon;
+
+                //    if (weapon)
+                //    {
+                //        weapon.BobRate = Vector4.zero;
+                //        weapon.ShakeAmplitude = Vector3.zero;
+                //        weapon.RenderingFieldOfView = 120f;
+                //        weapon.StepForceScale = 0f;
+                //    }
+                //}//no weapon bob
+
+                //////if (Input.GetKeyDown(KeyCode.O)) //infinity ammo ???
+                //////{
+                //////    if (!O.ELP)
+                //////    {
+                //////        return;
+                //////    }
+
+                //////    Inventory inventory = O.ELP.inventory;
+
+                //////    if (inventory != null)
+                //////    {
+                //////        ItemActionAttack gun = inventory.GetHoldingGun();
+
+                //////        if (gun != null)
+                //////        {
+                //////            gun.InfiniteAmmo = !gun.InfiniteAmmo;
+
+                //////        }
+                //////    }
+                //////}//infinity ammo
+
+                //////if (Input.GetKeyDown(KeyCode.F9)) //checks if the key is being pressed. if it does execute F9 is empty in game
+                //////{
+                //////    // we can put cheat here
+
+                //////}
+
+
+                ////////if ((bool)Settings["bool_CreativeMode"] || !(bool)Settings["bool_CreativeMode"]) //Toggle for ingame Creative and Debug Working like a sharm
+                ////////{
+                ////////    CmDm((bool)Settings["bool_CreativeMode"]);
+                ////////}
+                ////////if (RB["_isEditmode"] || !RB["_isEditmode"]) //Toggle for ingame Creative and Debug Working like a sharm
+                ////////{
+                ////////    editMode();
+                ////////}
+
+
+
+                //here should i init the cheatbuff!! it can only happen if game and player exists! 
+
+                
+
+
+
+            }
+
+
+            //function that does not work 
+            /*
+            if (SB.Count > 1) 
+            {
+                if (SB["_nameScramble"] || !SB["_nameScramble"])
+                {
+                    //Log.Out($" sett name1 {SETT._nameScramble}");
+                    //Log.Out($" sett name {SETT._nameScramble}");
+                    //if (!SBO.ContainsKey("NSCAMBLE"))
+                    //{
+                    //    SBO["NSCAMBLE"] = false;
+                    //    SBO["NSCAMBLE1"] = false;// Set the initial state to false for the bool toggle
+                    //    //Log.Out($"nsc1 {TogBL["NSCAMBLE"]}");
+                    //    //Log.Out($"nsc2 {TogBL["NSCAMBLE1"]}");
+                    //}
+
+                    if (SB["_nameScramble"] == true)
+                    {
+                        //Log.Out($" sett name2  = {SETT._nameScramble}");
+                        //Log.Out($" nsc1.2 = {TogBL["NSCAMBLE"]}");
+                        if (O._gameManager.persistentLocalPlayer != null && RB["NSCRAM1"] != true)
+                        {
+                            //Log.Out($" sett name3 {SETT._nameScramble} and ");
+                            O._gameManager.persistentLocalPlayer.PlayerName = Extras.ScrambleString(O._gameManager.persistentLocalPlayer.PlayerName);
+                            O._gameManager.persistentLocalPlayer.PlayerName = Extras.ScrambleString(O._gameManager.persistentLocalPlayer.PlayerName);
+                            RB["NSCRAM1"] = true;
+                            //Log.Out($" sett name3 {SETT._nameScramble} and nsc1 {TogBL["NSCAMBLE"]}");
+                        }//
+                        if (O.ELP != null && RB["NSCRAM2"] == false)
+                        {
+                            //Log.Out($" sett name2 {SETT._nameScramble}");
+                            if (O.ELP.EntityName != null)
+                            {
+                                SS["Playername"] = O.ELP.EntityName;
+
+                                O.ELP.EntityName = Extras.ScrambleString(O.ELP.EntityName);
+                            }
+                            RB["NSCRAM2"] = true;
+                            //Log.Out($" sett name3 {SETT._nameScramble} and nsc1 {TogBL["NSCAMBLE1"]}");
+                        }
+
+
+                    }
+                    else if (SB["_nameScramble"] == false && RB["NSCRAM1"] == true && RB["NSCRAM2"] == true)
+                    {
+                        O.ELP.EntityName = SS["Playername"];
+                        O._gameManager.persistentLocalPlayer.PlayerName = SS["Playername"];
+                        RB["NSCRAM1"] = false;
+                        RB["NSCRAM2"] = false;
+                    }
+
+                }
+            }
+            
+            */
+
+
+        }
+
+        //--------------------------------------------------------------------------------------------------------
+        void OnGUI()
+        {
+        }
+        void Awake()
+        {
+            Debug.LogWarning($"Awake: {nameof(Cheat)}");
+        }
+
+
+
+        //--------------------------------------------------------------------------------------------------------
+
+
+        //public static EntityAlive Entity;
+
+
+        //public static void Trader()
+        //{
+        //    if (O.Etrader != null && O.ELP)
+        //    {
+        //        //if (O.Etrader.aiClosestPlayer.ToString().ToLower() == O.ELP.name.ToString().ToLower())
+        //        //{
+        //            O.Etrader.IsDancing = true;
+        //            ulong OCTime = 0;
+        //            O.Etrader.TraderInfo.CloseTime = OCTime;
+        //            O.Etrader.TraderInfo.OpenTime = OCTime;
+
+        //        //}
+
+        //    }
+        //    else if (O.Etrader == null) 
+        //    {
+
+        //        RB["_EtraderOpen"] = false;
+        //    }
+        //}
+        //public static void InstantQuestFinish()
+        //{
+        //    if (RB["_QuestComplete"] == true && O.ELP)
+        //    {
+        //        foreach (Quest quest in O.ELP.QuestJournal.quests)
+        //        {
+
+
+        //            //QuestClass.Category == "Challenge"
+        //            if ((quest.Tracked==true||quest.Active==true) && quest.CurrentState == Quest.QuestState.InProgress) 
+        //            {
+
+        //                quest.CurrentState = Quest.QuestState.ReadyForTurnIn;
+        //            }
+        //        }
+        //    }
+        //}
+        //public static void LoopLASTQuestRewards()
+        //{
+        //    if ((bool)Settings[nameof(Quest.QuestState.Completed)] == true && Player)
+        //    {
+        //        if (Player.QuestJournal.quests.Count > 0)
+        //        {
+        //            int lastIndex = Player.QuestJournal.quests.Count - 1;
+
+        //            Quest lastQuest = Player.QuestJournal.quests[lastIndex];
+
+        //            if (lastQuest.CurrentState == Quest.QuestState.Completed )
+        //            {
+        //                lastQuest.CurrentState = Quest.QuestState.ReadyForTurnIn;
+        //                Debug.LogWarning($" {lastQuest.ID} is ready for turn in");
+        //            }
+        //        }
+        //        else
+        //        {
+        //            // The list is empty, handle this case accordingly
+        //        }
+        //    }
+        //}
+
+
     }
 }
 

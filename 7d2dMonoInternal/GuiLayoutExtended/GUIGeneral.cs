@@ -10,6 +10,8 @@ namespace SevenDTDMono.GuiLayoutExtended
     public partial class NewGUILayout
     {
 
+
+
         private static readonly Color Active = Color.green;
         private static readonly Color Inactive = Color.yellow;
         private static readonly Color Hover = Color.cyan;

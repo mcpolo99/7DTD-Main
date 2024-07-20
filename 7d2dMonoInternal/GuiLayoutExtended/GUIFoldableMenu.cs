@@ -199,6 +199,20 @@ namespace SevenDTDMono.GuiLayoutExtended
             }
             return !toggle;
         }
+
+
+
+
+        /// <summary>
+        /// A foldable menu that will expand on click
+        /// Using a dictionary to keep track of if it is open or not
+        /// </summary>
+        /// <param name="label">Display Label on the button </param>
+        /// <param name="boolKey"> String of bool key for dictionary (SHOULD NEVER BE 2 EQUAL!)</param>
+        /// <param name="onClickAction">Input actions to execute </param>
+        /// <param name="width">The Width of the button?</param>
+        /// <param name="options">GUI Layout Option</param>
+        /// <returns></returns>
         public static bool DictFoldMenuHorizontal(string label, string boolKey, Action onClickAction, float width, params GUILayoutOption[] options)
         {
             #region CheckDictionary
@@ -247,9 +261,9 @@ namespace SevenDTDMono.GuiLayoutExtended
             bool isClicked = GUI.Button(headerRect, label, headerStyle);
             float lineHeight = 10f;
 
-            //draw Enabled line
+            //draw Enabled line 
             Rect lineRect = new Rect(headerRect.x, headerRect.y + (headerRect.height - lineHeight) * 0.5f, 30, lineHeight);
-            DrawLine(lineRect, toggle ? Color.green : Color.yellow);
+            DrawLine(lineRect, toggle ? Color.green : Color.yellow); 
 
             // Handle click event
             if (isClicked)
@@ -269,6 +283,191 @@ namespace SevenDTDMono.GuiLayoutExtended
 
             return toggle; // Return the toggle state
         }
+        /// <summary>
+        /// A foldable menu that will expand on click
+        /// Using a dictionary to keep track of if it is open or not
+        /// </summary>
+        /// <param name="label">Display Label on the button </param>
+        /// <param name="boolKey"> String of bool key for dictionary (SHOULD NEVER BE 2 EQUAL!)</param>
+        /// <param name="onClickAction">Input actions to execute </param>
+        /// <param name="width">The Width of the button?</param>
+        /// <param name="options">GUI Layout Option</param>
+        /// <returns></returns>
+        public static bool DictFoldMenuHorizontalTest(string label, string boolKey, Action onClickAction, float width, params GUILayoutOption[] options)
+        {
+            #region CheckDictionary
+            // Check if the key exists in the dictionary
+            if (!Settings.ContainsKey(boolKey))
+            {
+                // Add the key with a default value of false if it does not exist
+                Settings[boolKey] = false;
+                //NewSettings.AddSetting(boolKey, false);
+            }
+            // Ensure the value associated with the key is a bool
+            if (!(Settings[boolKey] is bool))
+            {
+                Debug.LogError($"Key '{boolKey}' is not a boolean.");
+                return false;
+            }
 
+            #endregion
+            // Retrieve the current value
+            bool toggle = (bool)Settings[boolKey];
+
+            #region Style
+
+
+            GUIStyle boxGuiStyle = new GUIStyle(GUI.skin.box)
+            {
+                //defBoxStyle.border = new RectOffset(-2,-2,-2,-2);
+                padding = new RectOffset(0, 0, 0, 0),
+                contentOffset = Vector2.zero
+            };
+            //boxGuiStyle.border = new RectOffset(0, 0, 0, 0);
+
+
+            // Define header style
+            GUIStyle headerStyle = new GUIStyle(GUI.skin.button);
+            headerStyle.alignment = TextAnchor.MiddleCenter;
+            headerStyle.fontSize = 15;
+            
+
+            // Adjust header style based on toggle state
+            if (toggle)
+            {
+                headerStyle.fontStyle = FontStyle.Bold;
+                headerStyle.normal.textColor = Color.green;
+            }
+            else
+            {
+                headerStyle.fontStyle = FontStyle.Italic;
+                headerStyle.normal.textColor = Color.yellow;
+            }
+
+
+            #endregion
+
+
+            NewGUILayout.BeginVertical(boxGuiStyle, () =>
+            {
+
+                // Draw header button
+                Rect headerRect = GUILayoutUtility.GetRect(width, 20f, headerStyle);
+                bool isClicked = GUI.Button(headerRect, label, headerStyle);
+                float lineHeight = 10f;
+
+                //draw Enabled line 
+                Rect lineRect = new Rect(headerRect.x, headerRect.y + (headerRect.height - lineHeight) * 0.5f, 30, lineHeight);
+                DrawLine(lineRect, toggle ? Color.green : Color.yellow);
+
+                // Handle click event
+                if (isClicked)
+                {
+                    Settings[boolKey] = !toggle; // Toggle the bool value when the button is clicked
+                }
+
+                // If toggled, draw the content
+                if (toggle)
+                {
+                    onClickAction?.Invoke();
+                    //NewGUILayout.BeginVertical(GUI.skin.box, () =>
+                    //{
+                    //    // Invoke the provided content drawing action
+                    //    onClickAction?.Invoke();
+                    //});
+                }
+
+               
+
+            });
+
+
+            return toggle; // Return the toggle state
+
+        }
+        public static bool DictFoldMenuHorizontal(string label, string boolKey, Action onClickAction, params GUILayoutOption[] options)
+        {
+            #region CheckDictionary
+            // Check if the key exists in the dictionary
+            if (!Settings.ContainsKey(boolKey))
+            {
+                // Add the key with a default value of false if it does not exist
+                Settings[boolKey] = false;
+                //NewSettings.AddSetting(boolKey, false);
+            }
+            // Ensure the value associated with the key is a bool
+            if (!(Settings[boolKey] is bool))
+            {
+                Debug.LogError($"Key '{boolKey}' is not a boolean.");
+                return false;
+            }
+
+            #endregion
+            // Retrieve the current value
+            bool toggle = (bool)Settings[boolKey];
+
+            #region Style
+
+            //define the background in which all the controls is being displayed
+            GUIStyle backgroundBoxStyle = new GUIStyle(GUI.skin.box);
+            backgroundBoxStyle.padding = new RectOffset(-0, -0, -0, -0);
+
+
+
+            // Define header style
+            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+            buttonStyle.alignment = TextAnchor.MiddleCenter;
+            buttonStyle.fontSize = 15;
+            buttonStyle.margin = new RectOffset(0, 0, 0, 0);
+
+            // Adjust header style based on toggle state
+            if (toggle)
+            {
+                buttonStyle.fontStyle = FontStyle.Bold;
+                buttonStyle.normal.textColor = Color.green;
+            }
+            else
+            {
+                buttonStyle.fontStyle = FontStyle.Italic;
+                buttonStyle.normal.textColor = Color.yellow;
+            }
+
+
+            #endregion
+
+            NewGUILayout.BeginVertical(backgroundBoxStyle, () =>
+            {
+
+                // Get rect of current location
+                Rect buttonRect = GUILayoutUtility.GetRect(1, 30f, buttonStyle);
+                //draw Button for toggle open 
+                bool isClicked = GUI.Button(buttonRect, label, buttonStyle);
+                float lineHeight = 10f;
+
+                //Draw line to display current toggle state
+                Rect lineRect = new Rect(buttonRect.x, buttonRect.y + (buttonRect.height - lineHeight) * 0.5f, 30, lineHeight);
+                DrawLine(lineRect, toggle ? Color.green : Color.yellow);
+
+                NewGUILayout.BeginVertical(() =>
+                {
+                    // Handle click event
+                    if (isClicked)
+                    {
+                        Settings[boolKey] = !toggle; // Toggle the bool value when the button is clicked
+                    }
+
+                    // If toggled, draw the content
+                    if (toggle)
+                    {
+                        onClickAction?.Invoke();
+                    }
+
+
+                }, options);
+
+            }, options);
+            return toggle; // Return the toggle state
+
+        }
     }
 }

@@ -317,6 +317,7 @@
   <ItemGroup>
     <Compile Include="Features\Aimbot\Aimbot.cs" />
     <Compile Include="Features\Buffs\CBuffs.cs" />
+    <Compile Include="Features\CheatBuff.cs" />
     <Compile Include="Features\Cheat.cs" />
     <Compile Include="Features\Render\ESP.cs" />
     <Compile Include="Features\Render\Visuals.cs" />

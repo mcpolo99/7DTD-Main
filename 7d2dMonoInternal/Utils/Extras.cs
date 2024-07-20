@@ -48,10 +48,11 @@ namespace SevenDTDMono.Utils
 
                 }
 
-                } catch (Exception ex)
+            } catch (Exception ex)
             {
                 Console.WriteLine($"Error occurred while logging buff classes: {ex.Message}");
             }
+
 
 
 

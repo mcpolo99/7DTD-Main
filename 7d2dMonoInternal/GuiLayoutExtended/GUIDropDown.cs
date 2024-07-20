@@ -127,32 +127,40 @@ namespace SevenDTDMono.GuiLayoutExtended
 
         public static void DropDownForMethods(string label, System.Action content, ref bool toggle, params GUILayoutOption[] options)
         {
+            //Background box style
+            GUIStyle backgroundBoxStyle = new GUIStyle(GUI.skin.box);
+            backgroundBoxStyle.padding = new RectOffset(-0, -0, -0, -0);
+            //setup style for button
+            GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+            buttonStyle.alignment = TextAnchor.MiddleRight;
+            buttonStyle.fontSize = 15;
+            buttonStyle.margin = new RectOffset(0, 0, 0, 0);
 
-            GUIStyle headerStyle = new GUIStyle(GUI.skin.button);
-            //GUIStyle headerStyle = new GUIStyle(GUI.skin.box);
-            headerStyle.alignment = TextAnchor.MiddleRight;
-            headerStyle.fontSize = 15;
+
+            //begin collection of items
+            GUILayout.BeginVertical(backgroundBoxStyle);
+
+
+
 
             if (!toggle)
             {
-                headerStyle.fontStyle = FontStyle.Bold;
-                //headerStyle.normal.textColor = Color.green;
+                buttonStyle.fontStyle = FontStyle.Bold;
             }
             else
             {
-                headerStyle.fontStyle = FontStyle.BoldAndItalic;
-                //headerStyle.normal.textColor = Color.yellow;
+                buttonStyle.fontStyle = FontStyle.BoldAndItalic;
             }
-            // GUIContent content1 = new GUIContent(toggle ? "\u25BC" : "\u25BA", "Click to expand/collapse");
 
-            Rect headerRect = GUILayoutUtility.GetRect(300, 30f, headerStyle); // Pass the width value here
 
-            //Rect headerRect = GUILayoutUtility.GetRect(content1, headerStyle); // Pass the width value here
-            //Rect headerRect1 = GUILayoutUtility.GetRect(100, 10); // Pass the width value here
+            Rect headerRect = GUILayoutUtility.GetRect(300, 30f, buttonStyle); // Pass the width value here
+
             float lineHeight = 10f;
             Rect lineRect = new Rect(headerRect.x, headerRect.y + (headerRect.height - lineHeight) * 0.5f, 30, lineHeight);
             DrawLine(lineRect, toggle ? Color.green : Color.yellow);
-            GUI.Box(headerRect, label, headerStyle);
+
+            GUI.Box(headerRect, label, buttonStyle);
+
             if (Event.current.type == EventType.MouseDown && headerRect.Contains(Event.current.mousePosition))
             {
                 toggle = !toggle;
@@ -162,20 +170,18 @@ namespace SevenDTDMono.GuiLayoutExtended
             if (toggle)
             {
 
-                NewGUILayout.BeginVertical(GUI.skin.box, () =>
-                {
+                //NewGUILayout.BeginVertical(GUI.skin.box, () =>
+                //{
 
-                    content?.Invoke();
+                content?.Invoke();
 
-                });
+                //});
 
 
 
             }
+            GUILayout.EndVertical();
         }
-
-
-
 
 
 

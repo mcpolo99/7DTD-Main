@@ -44,11 +44,14 @@ namespace SevenDTDMono
         }
         public static Dictionary<string, object> Settings => NewSettings.Instance.SettingsDictionary;
         private static GameManager GameManager => NewSettings.GameManager;
-
+        private static EntityPlayerLocal Player => NewSettings.EntityLocalPlayer;
 
 
 
         public static EntityPlayerLocal EntityPlayerLocal => _entityPlayerLocal;
+
+
+
         private static EntityPlayerLocal _entityPlayerLocal;
 
         private static List<EntityZombie> _listZombies = new List<EntityZombie>();
@@ -155,10 +158,9 @@ namespace SevenDTDMono
         }
         private void Start() //everything in here is things that need to declared at once on startup and not again. IF injecting ingame more ingame dependet vars can be here
         {
-            //initBools();
-            //GameObject uiRootObj1 = UnityEngine.Object.FindObjectOfType<UIPanel>().gameObject;
-            //on tik = 1 sek
-            //update freq for cahching diffrent classes/objects
+
+          
+
             lastCachePlayer = Time.time + 5f;
             lastCacheZombies = Time.time + 3f;
             lastCacheItems = Time.time + 4f;
@@ -169,9 +171,9 @@ namespace SevenDTDMono
             //_minEC.PassivesIndex = _minEffectController.PassivesIndex;
             //Init();
 
-            Settings.Add(nameof(GameStateManager.bGameStarted), false);
+            //Settings.Add(nameof(GameStateManager.bGameStarted), false);
 
-            Debug.LogWarning("Objects onStart()!!!!");
+            Debug.LogWarning($"Start: {nameof(Objects)}");
         }
 
 
@@ -180,7 +182,7 @@ namespace SevenDTDMono
         {
             updateCount += 1;
 
-            /*
+           /*
             if (SB.Count <= 0 || RB.Count <= 0 || SB1.Count <= 0)
             {
                 //initBools();
@@ -225,7 +227,7 @@ namespace SevenDTDMono
                                 _listBuffClass.Add(buffClass.Value);
                             }
                             _listBuffClass.Sort((buff1, buff2) => string.Compare(buff1.Name, buff2.Name));
-                            Log_listBuffClass(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "_listBuffClass.txt"));
+                            LogListBuffClass(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "_listBuffClass.txt"));
                             VSB["BuffClasses"] = true;
                             Debug.LogWarning($"2 = {VSB["BuffClasses"]}");
 
@@ -301,7 +303,7 @@ namespace SevenDTDMono
 
             if (Time.time >= lastCachePlayer) // i dont remember why we need to use a loop to chach the player but it was from argons source code!
             {
-                ELP = FindObjectOfType<EntityPlayerLocal>(); // FindObjectOfType is a unity function to find the gameobject of desired Class so we assing our variable ELP(of class EntityPlayerLocal) to the games EntityPlayerLocal. Now we can use ELP as EntityPlayerLocal to whatever we want
+                //ELP = FindObjectOfType<EntityPlayerLocal>(); // FindObjectOfType is a unity function to find the gameobject of desired Class so we assing our variable ELP(of class EntityPlayerLocal) to the games EntityPlayerLocal. Now we can use ELP as EntityPlayerLocal to whatever we want
                 //Etrader = FindObjectOfType<EntityTrader>();
                 lastCachePlayer = Time.time + 5f; // cahing player each timn now + 5 sec. so 5 secound ahead
             }
@@ -388,62 +390,54 @@ namespace SevenDTDMono
         }
 
 
-        private static void Log_listBuffClass(string filePath)
-        {
-            try
-            {
-                using (StreamWriter writer = new StreamWriter(filePath))
-                {
-                    writer.WriteLine("Buff Name,Damage Type,Description");
+     
 
-                    foreach (var buffClass in _listBuffClass)
-                    {
-
-                        string str1 = buffClass.DamageSource.ToString();
-                        string str2 = buffClass.Effects.EffectGroups[0].ToString();
-
-
-                        //writer.WriteLine($"{EscapeForCsv(buffClass.Name)},{buffClass.DamageType},{EscapeForCsv(buffClass.NameTag.ToString())}");
-                        writer.WriteLine($"{EscapeForCsv(buffClass.Name)},,");
-                    }
-                }
-
-                Console.WriteLine("Buff classes have been logged to the file.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error occurred while logging buff classes: {ex.Message}");
-            }
-        }
-        public static void LogprogclassClassesToFile(string filePath)
-        {
-            try
-            {
-                using (StreamWriter writer = new StreamWriter(filePath))
-                {
-                    writer.WriteLine("name,type,sortorder");
-
-                    foreach (var prog in _listProgressionValue)
-                    {
-
-                        string str1 = prog.Name;
-                        string str2 = prog.ProgressionClass.Type.ToString();
-                        string str3 = prog.ProgressionClass.ListSortOrder.ToString();
-
-
-                        //writer.WriteLine($"{EscapeForCsv(buffClass.Name)},{buffClass.DamageType},{EscapeForCsv(buffClass.NameTag.ToString())}");
-                        writer.WriteLine($"{EscapeForCsv(str1)},{EscapeForCsv(str2)},{EscapeForCsv(str3)}");
-                    }
-                }
-
-                Console.WriteLine("progressionclasses as been logged");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error occurred while logging buff classes: {ex.Message}");
-            }
-        }
        
+        void OnGUI()
+        {
+            //display update times
+            //GUIStyle fontSize = new GUIStyle(GUI.skin.GetStyle("label"));
+            //fontSize.fontSize = 15;
+            //fontSize.normal.textColor = Color.green;
+            //GUI.Label(new Rect(10, 50, 200, 50), "Counter: " + NewSettings.GameManager.fps.Counter, fontSize);
+            //GUI.Label(new Rect(10, 70, 200, 50), "Frames: " + NewSettings.GameManager.fps.frames, fontSize);
+        }
+        void Awake()
+        {
+
+            // Uncommenting this will cause framerate to drop to 10 frames per second.
+            // This will mean that FixedUpdate is called more often than Update.
+            //Application.targetFrameRate = 10;
+
+            //init our updateloop
+            //StartCoroutine(Loop());
+
+            Debug.LogWarning($"Awake: {nameof(Objects)}");
+        }
+        void OnDisable()
+        {
+
+            Debug.LogWarning($"OnDisable: {nameof(Objects)}");
+        }
+        void OnEnable()
+        {
+
+            Debug.LogWarning($"OnEnable: {nameof(Objects)}");
+        }
+        void OnDestroy()
+        {
+
+            Debug.LogWarning($"OnDestroy: {nameof(Objects)}");
+        }
+        void OnDisconnectedFromServer()
+        {
+
+            Debug.LogWarning($"OnDisconnectedFromServer: {nameof(Objects)}");
+           
+        }
+
+        //*************************Log/dump Related 
+
         private static string EscapeForCsv(string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -459,43 +453,70 @@ namespace SevenDTDMono
 
             return value;
         }
+        public static void LogProgressionClassToFile(string filePath)
+        {
+            if (_listProgressionValue != null && _listProgressionValue.Count > 0)
+            {
+                try
+                {
+                    using (StreamWriter writer = new StreamWriter(filePath))
+                    {
+                        writer.WriteLine("name,type,sortorder");
 
-        void Awake()
-        {
+                        foreach (var prog in _listProgressionValue)
+                        {
 
-            // Uncommenting this will cause framerate to drop to 10 frames per second.
-            // This will mean that FixedUpdate is called more often than Update.
-            //Application.targetFrameRate = 10;
+                            string str1 = prog.Name;
+                            string str2 = prog.ProgressionClass.Type.ToString();
+                            string str3 = prog.ProgressionClass.ListSortOrder.ToString();
 
-            //init our updateloop
-            StartCoroutine(Loop());
-            Debug.LogWarning("THIS IS Awake!!!!");
+
+                            //writer.WriteLine($"{EscapeForCsv(buffClass.Name)},{buffClass.DamageType},{EscapeForCsv(buffClass.NameTag.ToString())}");
+                            writer.WriteLine($"{EscapeForCsv(str1)},{EscapeForCsv(str2)},{EscapeForCsv(str3)}");
+                        }
+                    }
+
+                    Console.WriteLine("progressionclasses as been logged");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error occurred while logging buff classes: {ex.Message}");
+                }
+            }
+
         }
-        void OnGUI()
+        private static void LogListBuffClass(string filePath)
         {
-            //display update times
-            GUIStyle fontSize = new GUIStyle(GUI.skin.GetStyle("label"));
-            fontSize.fontSize = 15;
-            fontSize.normal.textColor = Color.green;
-            //GUI.Label(new Rect(10, 50, 200, 50), "Counter: " + NewSettings.GameManager.fps.Counter, fontSize);
-            //GUI.Label(new Rect(10, 70, 200, 50), "Frames: " + NewSettings.GameManager.fps.frames, fontSize);
-        } 
-        void OnDisable()
-        {
-            Debug.LogWarning("THIS IS ON Disable OBJ!!!!");
+            if (_listBuffClass != null && _listBuffClass.Count > 0)
+            {
+                try
+                {
+                    using (StreamWriter writer = new StreamWriter(filePath))
+                    {
+                        writer.WriteLine("Buff Name,Damage Type,Description");
+
+                        foreach (var buffClass in _listBuffClass)
+                        {
+
+                            string str1 = buffClass.DamageSource.ToString();
+                            string str2 = buffClass.Effects.EffectGroups[0].ToString();
+
+
+                            //writer.WriteLine($"{EscapeForCsv(buffClass.Name)},{buffClass.DamageType},{EscapeForCsv(buffClass.NameTag.ToString())}");
+                            writer.WriteLine($"{EscapeForCsv(buffClass.Name)},,");
+                        }
+                    }
+
+                    Console.WriteLine("Buff classes have been logged to the file.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error occurred while logging buff classes: {ex.Message}");
+                }
+            }
         }
-        void OnEnable()
-        {
-            Debug.LogWarning("THIS IS ON Enable OBJ!!!!");
-        }
-        void OnDestroy()
-        {
-            Debug.LogWarning("THIS IS ON DESTROY OBJ!!!!");
-        }
-        void OnDisconnectedFromServer()
-        {
-            Debug.LogWarning("THIS IS  OnDisconnectedFromServer!!!!");
-        }
+
+
     }
 
 }
