@@ -1,11 +1,20 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SevenDTDMono
+namespace SevenDTDMono.Features.Render
 {
-    static class ESPUtils 
+    static class RenderUtils
     {
-        static ESPUtils() 
+        private static readonly Texture2D drawingTex;
+        private static readonly Texture2D whiteTexture;
+
+        private static Color lastTexColour;
+
+        private static readonly Material drawMaterial;
+
+        private static readonly GUIStyle __style = new GUIStyle();
+        private static readonly GUIStyle __outlineStyle = new GUIStyle();
+        static RenderUtils() 
         {
             whiteTexture = Texture2D.whiteTexture;
             drawingTex = new Texture2D(1, 1);
@@ -176,14 +185,6 @@ namespace SevenDTDMono
             }
         }
 
-        private static readonly Texture2D drawingTex;
-        private static readonly Texture2D whiteTexture;
 
-        private static Color lastTexColour;
-
-        private static readonly Material drawMaterial;
-
-        private static readonly GUIStyle __style = new GUIStyle();
-        private static readonly GUIStyle __outlineStyle = new GUIStyle();
     }
 }

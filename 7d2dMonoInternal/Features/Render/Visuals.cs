@@ -1,12 +1,7 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿
 using UnityEngine;
-using SETT = SevenDTDMono.NewSettings;
-using Eutl = SevenDTDMono.ESPUtils;
-using O = SevenDTDMono.Objects;
 
-
-namespace SevenDTDMono
+namespace SevenDTDMono.Features.Render
 {
     public class Visuals : MonoBehaviour 
     {
@@ -21,8 +16,11 @@ namespace SevenDTDMono
         #endregion
 
 
-        private void Start() 
+        private void Start()
         {
+
+            Debug.LogWarning($"Start: {nameof(Visuals)}");
+
             lastChamTime = Time.time + 10f;
 
             chamsMaterial = new Material(Shader.Find("Hidden/Internal-Colored")) 
@@ -48,7 +46,15 @@ namespace SevenDTDMono
             /*if (!Input.anyKey || !Input.anyKeyDown) {
                 return;
             }*/
-            if (Time.time >= lastChamTime && SETT.chams)
+            if (NewSettings.GameManager.gameStateManager.bGameStarted == false && NewSettings.EntityLocalPlayer == null)
+            {
+                //if game is not started and player is null return
+                return;
+            }
+
+
+
+            if (Time.time >= lastChamTime && NewSettings.Instance.GetBoolValue(nameof(SettingsBools.CHAMS)))
             {
                 foreach (Entity entity in FindObjectsOfType<Entity>())
                 {

@@ -1,71 +1,82 @@
 ﻿using UnityEngine;
-using O = SevenDTDMono.Objects;
-using SETT = SevenDTDMono.NewSettings;
-using Eutl= SevenDTDMono.ESPUtils;
 
-namespace SevenDTDMono
+using System.Collections.Generic;
+
+namespace SevenDTDMono.Features.Render
 {
     internal class Render : MonoBehaviour
     {
 
+
         #region Local settings
-        private Color blackCol;
-        private Color entityBoxCol;
-        private Color crosshairCol;
+        private static Camera _mainCam;
 
-        private readonly float crosshairScale = 14f;
-        private readonly float lineThickness = 1.75f;
 
-        public static Camera mainCam;
+
+        private Color _colorBlack;
+        private Color _entityBoxColor;
+        private Color _crossColor;
+        private readonly float _crossScale = 14f;
+        private readonly float _crossLineThickness = 1.75f;
+        //private static Dictionary<string, object> Settings => NewSettings.Instance.SettingsDictionary; //get instance of SettingsDictionary
+        private static NewSettings SettingsInstance => NewSettings.Instance;
+
+
+
         #endregion
 
 
-        
+
 
         private void Start()
         {
+            Debug.LogWarning($"Start: {nameof(Render)}");
             // Camera.main is a very expensive getter, so we want to do it once and cache the result.
-            mainCam = Camera.main;
+            _mainCam = Camera.main;
 
-            blackCol = new Color(0f, 0f, 0f, 120f);
-            entityBoxCol = new Color(0.42f, 0.36f, 0.90f, 1f);
-            crosshairCol = new Color32(30, 144, 255, 255);
+            _colorBlack = new Color(0f, 0f, 0f, 120f);
+            _entityBoxColor = new Color(0.42f, 0.36f, 0.90f, 1f);
+            _crossColor = new Color32(30, 144, 255, 255);
         }
 
         private void OnGUI()
         {
 
-
+            if (NewSettings.GameManager.gameStateManager.bGameStarted == false && NewSettings.EntityLocalPlayer == null)
+            {
+                //if game is not started and player is null return
+                return;
+            }
             if (Event.current.type != EventType.Repaint)
             {
                 return;
             }
 
-            if (!mainCam)
+            if (!_mainCam)
             {
-                mainCam = Camera.main;
+                _mainCam = Camera.main;
             }
 
 
-            if (SETT.crosshair) //crosshair Function
+            if (SettingsInstance.GetBoolValue(nameof(SettingsBools.CROSS_HAIR))) //crosshair Function
             {
                 // Constantly redefining these vectors so that you can change your resolution and the crosshair will still be in the middle.
-                Vector2 lineHorizontalStart = new Vector2(Screen.width / 2 - crosshairScale, Screen.height / 2);
-                Vector2 lineHorizontalEnd = new Vector2(Screen.width / 2 + crosshairScale, Screen.height / 2);
+                Vector2 lineHorizontalStart = new Vector2(Screen.width / 2 - _crossScale, Screen.height / 2);
+                Vector2 lineHorizontalEnd = new Vector2(Screen.width / 2 + _crossScale, Screen.height / 2);
 
-                Vector2 lineVerticalStart = new Vector2(Screen.width / 2, Screen.height / 2 - crosshairScale);
-                Vector2 lineVerticalEnd = new Vector2(Screen.width / 2, Screen.height / 2 + crosshairScale);
+                Vector2 lineVerticalStart = new Vector2(Screen.width / 2, Screen.height / 2 - _crossScale);
+                Vector2 lineVerticalEnd = new Vector2(Screen.width / 2, Screen.height / 2 + _crossScale);
 
-                Eutl.DrawLine(lineHorizontalStart, lineHorizontalEnd, crosshairCol, lineThickness);
-                Eutl.DrawLine(lineVerticalStart, lineVerticalEnd, crosshairCol, lineThickness);
+                RenderUtils.DrawLine(lineHorizontalStart, lineHorizontalEnd, _crossColor, _crossLineThickness);
+                RenderUtils.DrawLine(lineVerticalStart, lineVerticalEnd, _crossColor, _crossLineThickness);
             }
-            if (SETT.fovCircle)
+            if (SettingsInstance.GetBoolValue(nameof(SettingsBools.FOV_CIRCLE)))
             {
                 // Outline
-                Eutl.DrawCircle(Color.black, new Vector2(Screen.width / 2, Screen.height / 2), 149f);
-                Eutl.DrawCircle(Color.black, new Vector2(Screen.width / 2, Screen.height / 2), 151f);
+                RenderUtils.DrawCircle(Color.black, new Vector2(Screen.width / 2, Screen.height / 2), 149f);
+                RenderUtils.DrawCircle(Color.black, new Vector2(Screen.width / 2, Screen.height / 2), 151f);
 
-                Eutl.DrawCircle(new Color32(30, 144, 255, 255), new Vector2(Screen.width / 2, Screen.height / 2), 150f);
+                RenderUtils.DrawCircle(new Color32(30, 144, 255, 255), new Vector2(Screen.width / 2, Screen.height / 2), 150f);
             }
 
 

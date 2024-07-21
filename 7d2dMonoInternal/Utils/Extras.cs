@@ -82,7 +82,22 @@ namespace SevenDTDMono.Utils
 
 
 
+        private static string EscapeForCsv(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
 
+            // If the value contains a comma or a double quote, enclose it in double quotes and escape any existing double quotes
+            if (value.Contains(',') || value.Contains('"'))
+            {
+                return $"\"{value.Replace("\"", "\"\"")}\"";
+            }
+
+            return value;
+        }
+      
 
         public static string ScrambleString(string input)
         {

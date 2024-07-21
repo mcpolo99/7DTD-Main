@@ -30,14 +30,15 @@ namespace SevenDTDMono
 
 
             gameObject.name = baseName;
-            gameObject.AddComponent<Objects>();
+            //gameObject.AddComponent<Objects>();
+            gameObject.AddComponent<NewSettings>();
             gameObject.AddComponent<NewMenu>();
             gameObject.AddComponent<Features.Cheat>();
-            gameObject.AddComponent<NewSettings>();
-            //gameObject.AddComponent<ESP>();
-            //gameObject.AddComponent<Visuals>();
+            gameObject.AddComponent<Features.Render.ESP>();
+            gameObject.AddComponent<Features.Render.Render>();
+            gameObject.AddComponent<Features.Render.Visuals>();
             //gameObject.AddComponent<Aimbot>();
-            //gameObject.AddComponent<Render>();
+
             //gameObject.AddComponent<SceneDebugger>();
             //gameObject.AddComponent<CBuffs>();
             //gameObject.AddComponent<EasterEggManager>();          

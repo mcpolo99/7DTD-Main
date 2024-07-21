@@ -1,54 +1,28 @@
 ﻿
+using SevenDTDMono.Features;
+using SevenDTDMono.GuiLayoutExtended;
+using SevenDTDMono.Utils;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
-using System;
-using System.IO;
-using O = SevenDTDMono.Objects;
-using static Setting;
-using SevenDTDMono.Utils;
-using SevenDTDMono.GuiLayoutExtended;
-using UnityEngine.UIElements;
-using DynamicMusic;
-using UniLinq;
-using System.Linq;
-//using UnityExplorer;
-using InControl;
-using System.CodeDom;
-using SevenDTDMono;
-using TMPro;
-//using UniverseLib;
 using static PassiveEffect;
-using System.Reflection;
-using System.Xml.Linq;
-using System.Collections.Concurrent;
-using static UnityEngine.GridBrushBase;
-using UnityExplorer;
-using static Twitch.PubSub.PubSubChannelPointMessage;
-using SevenDTDMono.Features;
-using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
+
 
 
 namespace SevenDTDMono
 {
     public class NewMenu : MonoBehaviour
     {
-
-        public static Dictionary<string,object> Settings => NewSettings.Instance.SettingsDictionary;
         private static NewSettings SettingsInstance => NewSettings.Instance;
-        private static EntityPlayerLocal player => NewSettings.EntityLocalPlayer;
+        public static Dictionary<string,object> Settings => NewSettings.Instance.SettingsDictionary;
+        
+        private static Dictionary<string, bool> _boolDict = SettingsInstance.GetChildDictionary<bool>(nameof(Dictionaries.BOOL_DICTIONARY));
+
+        private static EntityPlayerLocal Player => NewSettings.EntityLocalPlayer;
         private static List<string> ResetList => NewSettings.ResetVariableList;
 
-
-        private static Vector2 GetZeroVector2(string key)
-        {
-            if (Settings.TryGetValue(key, out object value) && value is Vector2 vector2)
-            {
-                return vector2;
-            }
-            return Vector2.zero;
-        }
 
 
         #region Private bools
@@ -92,11 +66,6 @@ namespace SevenDTDMono
         #endregion
 
 
-        //public Dictionary<string, bool> ToggleStates = new Dictionary<string, bool>();
-
-
-        //ConcurrentDictionary<object, Boolean> ToggleBools = new ConcurrentDictionary<object, Boolean>();
-
 
         void OnDestroy() 
         {
@@ -111,18 +80,9 @@ namespace SevenDTDMono
         {
             Debug.LogWarning($"Start: {nameof(NewMenu)}");
             windowID = new System.Random(Environment.TickCount).Next(1000, 65535);
-            windowRect = new Rect(10f, 400f, 400f, 500f);
+            windowRect = new Rect(50f, 400f, 400f, 50f);
             GUI.color = Color.white;
 
-           
-
-            //NS.Instance.ListForReset.Add("sda");
-            //NS.Instance.SettingsDictionary.Add("IsGameStarted",false);
-            
-
-
-
-            //Debug.LogWarning($"bool_IsGameStarted = {NewSettings.Get<bool>("bool_IsGameStarted")}");
 
         }
 
@@ -147,9 +107,27 @@ namespace SevenDTDMono
             }
         }
 
+        private void test()
+        {
+            _boolDict["AddTestBOOL"] = true;
+
+
+
+            if (!_boolDict[nameof(SettingsBools.ZOMBIE_BOX)])
+            {
+                Debug.Log($"debug log test for {SettingsBools.ZOMBIE_BOX} and it is {_boolDict[nameof(SettingsBools.ZOMBIE_BOX)]} ");
+
+            }
+
+        }
+
 
         private void OnGUI()
         {
+
+            //NewGUILayout.Button("test add dict", test);
+
+
 
             GUIStyle customStyle = new GUIStyle(GUI.skin.window);
             if (NewSettings.GameManager.gameStateManager.bGameStarted)
@@ -200,8 +178,6 @@ namespace SevenDTDMono
             customBoxStyleGreen.normal.background = MakeTexture(2, 2, new Color(0f, 1f, 0f, 0.5f));
 
 
-
-
             //customBoxStyleGreen.border = new RectOffset(2, 2, 2, 2);
 
 
@@ -230,19 +206,27 @@ namespace SevenDTDMono
         }
         private void Window(int windowID)
         {
-            //if (Settings.Istarted == true|| Settings.Istarted == false)
+            //if (!NewSettings.GameManager.gameStateManager.bGameStarted)
             //{
-            //    windowRect.height = 50;
-            //    GUILayout.Space(10f);
-            //    GUILayout.BeginHorizontal();
-            //    GUILayout.Label("Start a game to load the Menu",centeredLabelStyle);
-            //    GUILayout.EndHorizontal();
-            //    GUILayout.Space(10f);
+                
+                
+            //    NewGUILayout.BeginHorizontal(() =>
+            //    {
+            //        //GUILayout.Space(10f);
+            //        GUILayout.Label("Start a game to load the Menu", centeredLabelStyle);
+            //        NewGUILayout.Button("test add dict", test);
+            //        //GUILayout.Space(10f);
+            //    });
+           
+               
+                
             //    GUI.DragWindow();
             //}
             //else
             {
                 windowRect.height = 500;
+
+                
                 _group = NewGUILayout.Toolbar4(_group, CheatsString, GUI.skin.box); //creating the group for switch comand    
                 switch (_group)
                 {
@@ -271,13 +255,9 @@ namespace SevenDTDMono
 
         private void Tab1() //player
         {
-
-            //CGUILayout.BeginVertical(() => { });
-            //CGUILayout.BeginHorizontal(() => { });
-
             NewGUILayout.BeginHorizontal(() =>
             {
-                NewGUILayout.BeginVertical(GUI.skin.box, () =>
+                NewGUILayout.BeginVertical( () =>
                 {
                     NewGUILayout.BeginScrollView("vector2_ScrollMenu0", () => {
                         NewGUILayout.BeginHorizontal(() =>
@@ -295,14 +275,14 @@ namespace SevenDTDMono
                                 NewGUILayout.Button("Add Skill Points", Cheat.SkillPoints);
                          
                                 NewGUILayout.Button("Kill Self", Cheat.KillSelf);
-                                NewGUILayout.ButtonToggleDictionary("Ignore By AI", nameof(player.isIgnoredByAI), () =>
+                                NewGUILayout.ButtonToggleDictionary("Ignore By AI", nameof(Player.isIgnoredByAI), () =>
                                     {
                                         //this is only working with zombies for some reason.. not with all entites,
-                                        if (player)
+                                        if (Player)
                                         {
-                                            bool bool1 = (bool)Settings[nameof(player.isIgnoredByAI)];
-                                            player.SetIgnoredByAI(bool1);
-                                            NewSettings.AddReset(nameof(player.isIgnoredByAI));
+                                            bool bool1 = _boolDict[nameof(Player.isIgnoredByAI)];
+                                            Player.SetIgnoredByAI(bool1);
+                                            NewSettings.AddReset(nameof(Player.isIgnoredByAI));
                                         }
 
 
@@ -326,16 +306,16 @@ namespace SevenDTDMono
 
 
                                     });
-                                NewGUILayout.ButtonToggleDictionary("DebugMenuShowTasks", nameof(EnumGamePrefs.DebugMenuShowTasks), () =>
+                                NewGUILayout.ButtonToggleDictionary("DebugMenuShowTasks", nameof(EnumGamePrefs.DebugMenuShowTasks), () =>       
                                 {
                                     //this is only working with zombies for some reason.. not with all entites,
-                                    if (player)
+                                    if (Player)
                                     {
                                         //bool bool1 = (bool)Settings[nameof(player.isIgnoredByAI)];
                                         //player.SetIgnoredByAI(bool1);
 
 
-                                        EntityAlive.SetupAllDebugNameHUDs((bool)Settings[nameof(EnumGamePrefs.DebugMenuShowTasks)]);
+                                        EntityAlive.SetupAllDebugNameHUDs(SettingsInstance.GetBoolValue(nameof(EnumGameStats.IsCreativeMenuEnabled)));
 
                                         NewSettings.AddReset(nameof(EnumGamePrefs.DebugMenuShowTasks));
                                     }
@@ -363,9 +343,9 @@ namespace SevenDTDMono
                                 });
                                 NewGUILayout.ButtonToggleDictionary("Debug Menu Enable", nameof(EnumGamePrefs.DebugMenuEnabled), () =>
                                     {
-                                        if (player)
+                                        if (Player)
                                         {
-                                            bool bool1 = (bool)Settings[nameof(EnumGamePrefs.DebugMenuEnabled)];
+                                            bool bool1 = _boolDict[nameof(EnumGamePrefs.DebugMenuEnabled)];
                                             GamePrefs.Set(EnumGamePrefs.DebugMenuEnabled, bool1);
                                             GamePrefs.Set(EnumGamePrefs.DebugPanelsEnabled, bool1);
                                             GamePrefs.Set(EnumGamePrefs.DebugStopEnemiesMoving, bool1);
@@ -374,13 +354,13 @@ namespace SevenDTDMono
                                     });
                                 NewGUILayout.ButtonToggleDictionary("Creative", nameof(EnumGameStats.IsCreativeMenuEnabled), () =>
                                 {
-                                    GameStats.Set(EnumGameStats.IsCreativeMenuEnabled, (bool)Settings[nameof(EnumGameStats.IsCreativeMenuEnabled)]);
+                                    GameStats.Set(EnumGameStats.IsCreativeMenuEnabled,SettingsInstance.GetBoolValue(nameof(EnumGameStats.IsCreativeMenuEnabled)));
                                 });
                                 NewGUILayout.ButtonToggleDictionary("Show All Players On Map", nameof(EnumGameStats.ShowAllPlayersOnMap), () =>
                                 {
-                                    if (player)
+                                    if (Player)
                                     {
-                                        bool bool1 = (bool)Settings[nameof(EnumGameStats.ShowAllPlayersOnMap)];
+                                        bool bool1 = _boolDict[nameof(EnumGameStats.ShowAllPlayersOnMap)];
                                         GameStats.Set(EnumGameStats.ShowAllPlayersOnMap, bool1);
                                         NewSettings.AddReset(nameof(EnumGameStats.ShowAllPlayersOnMap));
                                     }
@@ -393,9 +373,9 @@ namespace SevenDTDMono
                             {
                                 if (NewGUILayout.Button($"Teleport To Marker "))
                                 {
-                                    if (player)
+                                    if (Player)
                                     {
-                                        player.TeleportToPosition(new Vector3(player.markerPosition.ToVector3().x, player.markerPosition.ToVector3().y + 2, player.markerPosition.ToVector3().z));
+                                        Player.TeleportToPosition(new Vector3(Player.markerPosition.ToVector3().x, Player.markerPosition.ToVector3().y + 2, Player.markerPosition.ToVector3().z));
                                     }
                                 }
 
@@ -405,7 +385,7 @@ namespace SevenDTDMono
                                 //NewGUILayout.ButtonToggleDictionary("Instant Smelt", nameof(PassiveEffects.CraftingSmeltTime));
                                 NewGUILayout.ButtonToggleDictionary("Instant Quest", nameof(Quest.QuestState.InProgress)); 
                                 NewGUILayout.ButtonToggleDictionary("Loop LAST Quest Rewards", nameof(Quest.QuestState.Completed));
-                                NewGUILayout.ButtonTriggerAction("Open Trader", nameof(EntityTrader) , Cheat.OpenTrader);
+                                NewGUILayout.ButtonToggleDictionary("Open Trader", nameof(EntityTrader) , Cheat.OpenTrader);
                                 NewGUILayout.ButtonToggleDictionary("Instant Craft", nameof(PassiveEffects.CraftingTime), () =>
                                 {
                                     Cheat.AddPassiveEffectToPlayer(PassiveEffects.CraftingTime, 0f, ValueModifierTypes.base_set);
@@ -418,25 +398,14 @@ namespace SevenDTDMono
                                 {
                                     Cheat.AddPassiveEffectToPlayer(PassiveEffects.ScrappingTime, 0f, ValueModifierTypes.base_set);
                                 });
-                                NewGUILayout.ButtonToggleDictionary("Infinity durability", nameof(PassiveEffects.CraftingSmeltTime), () =>
+                                NewGUILayout.ButtonToggleDictionary("Infinity durability", nameof(PassiveEffects.DegradationPerUse), () =>
                                 {
                                     Cheat.AddPassiveEffectToPlayer(PassiveEffects.DegradationPerUse, 0f, ValueModifierTypes.base_set);
                                 });
-                                NewGUILayout.ButtonToggleDictionary("BlockDamage", nameof(PassiveEffects.BlockDamage), () =>
-                                {
-                                    Cheat.AddPassiveEffectToPlayer(PassiveEffects.BlockDamage, 999999f, ValueModifierTypes.base_set);
-                                });
-
-
-                                //NewGUILayout.Button("Instant Quest", RB, "_QuestComplete");
-                                //NewGUILayout.Button("Instant Craft", RB, "_instantCraft");
-                                //NewGUILayout.Button("Instant scrap", RB, "_instantScrap");
-                                //NewGUILayout.Button("Instant smelt", RB, "_instantSmelt");
-                                //NewGUILayout.Button("Loop LAST Quest Rewards", RB, "_LOQuestRewards");
-                                //NewGUILayout.RButton("Trader Open 24/7", "_EtraderOpen");
-
-
-
+                                //NewGUILayout.ButtonToggleDictionary("BlockDamage", nameof(PassiveEffects.BlockDamage), () =>
+                                //{
+                                //    Cheat.AddPassiveEffectToPlayer(PassiveEffects.BlockDamage, 999999f, ValueModifierTypes.base_set);
+                                //});
 
                                 NewGUILayout.BeginHorizontal(() => {
                                     _itemcount = GUILayout.TextField(_itemcount, 10, GUILayout.MaxWidth(50));
@@ -446,15 +415,15 @@ namespace SevenDTDMono
                                         try
                                         {
                                             int intvalue = int.Parse(_itemcount);
-                                            if (player.inventory.holdingItemStack.count >= 1)
+                                            if (Player.inventory.holdingItemStack.count >= 1)
                                             {
-                                                player.inventory.holdingItemStack.count = intvalue;
+                                                Player.inventory.holdingItemStack.count = intvalue;
                
-                                                Debug.LogWarning($"{player.inventory.holdingItem.Name} set to {intvalue}");
+                                                Debug.LogWarning($"{Player.inventory.holdingItem.Name} set to {intvalue}");
                                             }
                                             else
                                             {
-                                                Debug.LogWarning($"{player.inventory.holdingItem.Name} Could not be set to {intvalue}");
+                                                Debug.LogWarning($"{Player.inventory.holdingItem.Name} Could not be set to {intvalue}");
                                             }
                                         }
                                         catch (Exception e)
@@ -480,284 +449,189 @@ namespace SevenDTDMono
         
         private void Tab2() //Toggles and modifiers
         {
-            NewGUILayout.BeginHorizontal(GUI.skin.box, () => {
-                NewGUILayout.BeginVertical(() => {
- 
-                    NewGUILayout.Toggle("DrawFov", "bool_FOV");
-                    NewGUILayout.Toggle("Cross hair", "bool_CrossHair");
-                    NewGUILayout.Toggle("Player Box", "bool_playerBox");
-                    //SETT.fovCircle = GUILayout.Toggle(SETT.fovCircle, "Draw FOV");
-                    //SETT.playerBox = GUILayout.Toggle(SETT.playerBox, "Player Box");
-                    //SETT.playerName = GUILayout.Toggle(SETT.playerName, "Player Name");
-                    //SETT.playerCornerBox = GUILayout.Toggle(SETT.playerCornerBox, "Player Corner Box");
-                    //SETT.chams = GUILayout.Toggle(SETT.chams, "Chams");
-                    //SETT.playerHealth = GUILayout.Toggle(SETT.playerHealth, "Player Health");
-                });
-                NewGUILayout.BeginVertical(() => {
-                    //SETT.zombieBox = GUILayout.Toggle(SETT.zombieBox, "Zombie Box");
-                    //SETT.zombieName = GUILayout.Toggle(SETT.zombieName, "Zombie Name");
-                    //SETT.zombieHealth = GUILayout.Toggle(SETT.zombieHealth, "Zombie Health");
-                    //SETT.zombieCornerBox = GUILayout.Toggle(SETT.zombieCornerBox, "Zombie Corner Box");
-                    //SETT.noWeaponBob = GUILayout.Toggle(SETT.noWeaponBob, "No Weapon Bob");
+            NewGUILayout.BeginVertical(GUI.skin.box, () => {
+                GUILayout.Label("Render");
+                NewGUILayout.BeginHorizontal(() =>
+                {
+                    NewGUILayout.BeginVertical(() => {
+                        NewGUILayout.ButtonToggleDictionary("Zombie Box", nameof(SettingsBools.ZOMBIE_BOX));
+                        NewGUILayout.ButtonToggleDictionary("Zombie Corner Box", nameof(SettingsBools.ZOMBIE_CORNER_BOX));
+                        NewGUILayout.ButtonToggleDictionary("Zombie Health", nameof(SettingsBools.ZOMBIE_HEALTH));
+                        NewGUILayout.ButtonToggleDictionary("Zombie Name", nameof(SettingsBools.ZOMBIE_NAME));
+                        NewGUILayout.ButtonToggleDictionary("Chams", nameof(SettingsBools.CHAMS));
+                    });
+                    NewGUILayout.BeginVertical(() => {
+                        NewGUILayout.ButtonToggleDictionary("Player Box", nameof(SettingsBools.PLAYER_BOX));
+                        NewGUILayout.ButtonToggleDictionary("Player Corner Box", nameof(SettingsBools.PLAYER_CORNER_BOX));
+                        NewGUILayout.ButtonToggleDictionary("Player Health", nameof(SettingsBools.PLAYER_HEALTH));
+                        NewGUILayout.ButtonToggleDictionary("Player Name", nameof(SettingsBools.PLAYER_NAME));
+                        NewGUILayout.ButtonToggleDictionary("Field Of view", nameof(SettingsBools.FOV_CIRCLE));
+                        NewGUILayout.ButtonToggleDictionary("Cross", nameof(SettingsBools.CROSS_HAIR));
+                        NewGUILayout.ButtonToggleDictionary("NoWeaponBob", nameof(SettingsBools.NO_WEAPON_BOB));
+                    });
                 });
             });
             NewGUILayout.BeginVertical(GUI.skin.box, () =>
             {
-                GUIStyle Labelstyle = new GUIStyle(GUI.skin.label);
-                Labelstyle.alignment = TextAnchor.LowerCenter;
-                Labelstyle.fontSize = 13;
-                Labelstyle.padding = new RectOffset(0, 0, -4, 0);
-
-
-                NewGUILayout.BeginHorizontal(() => { GUILayout.Label("Modifiers"); });
+                GUIStyle LabelStyle = new GUIStyle(GUI.skin.label)
+                {
+                    alignment = TextAnchor.MiddleCenter,
+                    fontSize = 15,
+                    padding = new RectOffset(0, 0, 0, 0),
+                    margin = new RectOffset(0, 0, 0, 10),
+                };
                 NewGUILayout.BeginVertical(() =>
                 {
-                    //GUILayout.Space(10);
-                    //NewGUILayout.HorizontalScrollbarWithLabel("Attacks/minute", "float_apm", 500f);
-                    //NewGUILayout.HorizontalScrollbarWithLabel("Jump Strength", "float_jumpStrength", 5f);
-                    //NewGUILayout.HorizontalScrollbarWithLabel("Harvest Dubbler", "float_harvestDubbler", 20f);
-                    //NewGUILayout.HorizontalScrollbarWithLabel("Sprint Speed", "float_sprintSpeed", 25f);
-                    //NewGUILayout.HorizontalScrollbarWithLabel("Kill DMG xM", "float_KillDamageMultiplier", 1000f);
+                    GUILayout.Label("Modifiers",LabelStyle);
 
-                    NewGUILayout.HorizontalScrollbarWithLabelAndButton1("Block DMG", nameof(PassiveEffects.BlockDamage), ref NewSettings.FloatBlockDamageMultiplier, 1000f, () =>
+                    NewGUILayout.HorizontalScrollbarWithLabelAndButton("Block DMG", nameof(PassiveEffects.BlockDamage), ref NewSettings.FloatBlockDamageMultiplier, 1000f, () =>
                     {
-
-                            Cheat.AddPassiveEffectToPlayer(PassiveEffects.BlockDamage, NewSettings.FloatBlockDamageMultiplier, ValueModifierTypes.base_set);
+                        Cheat.AddPassiveEffectToPlayer(PassiveEffects.BlockDamage, NewSettings.FloatBlockDamageMultiplier, ValueModifierTypes.base_set);
                     });
-                    NewGUILayout.HorizontalScrollbarWithLabelAndButton1("Kill DMG", nameof(PassiveEffects.EntityDamage), ref NewSettings.FloatKillDamageMultiplier, 1000f, () =>
+                    NewGUILayout.HorizontalScrollbarWithLabelAndButton("Kill DMG", nameof(PassiveEffects.EntityDamage), ref NewSettings.FloatKillDamageMultiplier, 1000f, () =>
                     {
 
                         Cheat.AddPassiveEffectToPlayer(PassiveEffects.EntityDamage, NewSettings.FloatKillDamageMultiplier, ValueModifierTypes.base_set);
                     });
-                    NewGUILayout.HorizontalScrollbarWithLabelAndButton1("Jump Strength", nameof(PassiveEffects.JumpStrength), ref NewSettings.FloatJumpStrengthMultiplier, 5f, () =>
+                    NewGUILayout.HorizontalScrollbarWithLabelAndButton("Jump Strength", nameof(PassiveEffects.JumpStrength), ref NewSettings.FloatJumpStrengthMultiplier, 5f, () =>
                     {
 
                         Cheat.AddPassiveEffectToPlayer(PassiveEffects.JumpStrength, NewSettings.FloatJumpStrengthMultiplier, ValueModifierTypes.base_set);
                     });
-                    NewGUILayout.HorizontalScrollbarWithLabelAndButton1("Run Speed", nameof(PassiveEffects.RunSpeed), ref NewSettings.FloatRunSpeedMultiplier, 25f, () =>
+                    NewGUILayout.HorizontalScrollbarWithLabelAndButton("Run Speed", nameof(PassiveEffects.RunSpeed), ref NewSettings.FloatRunSpeedMultiplier, 25f, () =>
                     {
 
                         Cheat.AddPassiveEffectToPlayer(PassiveEffects.RunSpeed, NewSettings.FloatRunSpeedMultiplier, ValueModifierTypes.base_set);
                     });
-                    NewGUILayout.HorizontalScrollbarWithLabelAndButton1("Attacks/minute", nameof(PassiveEffects.AttacksPerMinute), ref NewSettings.FloatAttacksPerMinuteMultiplier, 500f, () =>
+                    NewGUILayout.HorizontalScrollbarWithLabelAndButton("Attacks/minute", nameof(PassiveEffects.AttacksPerMinute), ref NewSettings.FloatAttacksPerMinuteMultiplier, 500f, () =>
                     {
 
                         Cheat.AddPassiveEffectToPlayer(PassiveEffects.AttacksPerMinute, NewSettings.FloatAttacksPerMinuteMultiplier, ValueModifierTypes.base_set);
                     });
-                    NewGUILayout.HorizontalScrollbarWithLabelAndButton1("Harvest multiplier", nameof(PassiveEffects.HarvestCount), ref NewSettings.FloatHarvestCountMultiplier, 20f, () =>
+                    NewGUILayout.HorizontalScrollbarWithLabelAndButton("Harvest multiplier", nameof(PassiveEffects.HarvestCount), ref NewSettings.FloatHarvestCountMultiplier, 20f, () =>
                     {
 
                         Cheat.AddPassiveEffectToPlayer(PassiveEffects.HarvestCount, NewSettings.FloatHarvestCountMultiplier, ValueModifierTypes.base_set);
                     });
 
 
-                    //NewGUILayout.HorizontalScrollbarWithLabel("Block DMG", ref NewSettings.FloatBlockDamageMultiplier, 10000f);
-                    //NewGUILayout.HorizontalScrollbarWithLabel("Kill DMG", ref NewSettings.FloatKillDamageMultiplier, 10000f);
-                    //NewGUILayout.HorizontalScrollbarWithLabel("Jump Strength", ref NewSettings.FloatJumpStrengthMultiplier, 10000f);
-                    //NewGUILayout.HorizontalScrollbarWithLabel("Block DMG", ref NewSettings.FloatBlockDamageMultiplier, 10000f);
-                    //NewGUILayout.HorizontalScrollbarWithLabel("Block DMG", ref NewSettings.FloatBlockDamageMultiplier, 10000f);
-                    //GUILayout.HorizontalScrollbar(0f, 1f, 0f, 500f);
+
+
+
                 });
-
-
-                //NewGUILayout.BeginVertical(GUI.skin.box ,() =>
-                //{
-                //    NewGUILayout.BeginScrollView("vector2_scrollBuffMenu", () => {
-                //        NewGUILayout.BeginHorizontal(() =>
-                //        {
-                //            NewGUILayout.BeginVertical(() =>
-                //            {
-                //                //NewGUILayout.ButtonToggleDictionary("Enable Block DMG", nameof(PassiveEffects.BlockDamage));
-                //                //NewGUILayout.ButtonToggleDictionary("Kill DMG", "bool_KillDamage");
-                //                //NewGUILayout.ButtonToggleDictionary("Harvest Dubbler", "bool_Harvest");
-
-
-                //                NewGUILayout.ButtonToggleDictionary("Enable Block DMG", nameof(PassiveEffects.BlockDamage), () =>
-                //                {
-                //                    Cheat.AddPassiveEffectToPlayer(PassiveEffects.BlockDamage, NewSettings.FloatBlockDamageMultiplier, ValueModifierTypes.perc_add);
-                //                });
-                //                NewGUILayout.ButtonToggleDictionary("Kill DMG", nameof(PassiveEffects.EntityDamage), () =>
-                //                {
-                //                    Cheat.AddPassiveEffectToPlayer(PassiveEffects.EntityDamage, NewSettings.FloatKillDamageMultiplier, ValueModifierTypes.perc_add);
-                //                });
-                //                NewGUILayout.ButtonToggleDictionary("Harvest Dubbler", nameof(PassiveEffects.HarvestCount), () =>
-                //                {
-                //                    Cheat.AddPassiveEffectToPlayer(PassiveEffects.HarvestCount, NewSettings.FloatHarvestCountMultiplier, ValueModifierTypes.perc_add);
-                //                });
-                              
-                //            });
-                //            NewGUILayout.BeginVertical(() =>
-                //            {
-                //                //CheatPassiveEffect(RB["_BL_Run"], PassiveEffects.RunSpeed, SETT._FL_run, ValueModifierTypes.base_set);
-
-                //                //NewGUILayout.ButtonToggleDictionary("Run Speed", "bool_Run");
-                //                //NewGUILayout.ButtonToggleDictionary("Kill DMG", "bool_Jump");
-                //                //NewGUILayout.ButtonToggleDictionary("Attack/min", "bool_AttackPerMin");
-
-                //                NewGUILayout.ButtonToggleDictionary("Run Speed", nameof(PassiveEffects.RunSpeed), () =>
-                //                {
-                //                    Cheat.AddPassiveEffectToPlayer(PassiveEffects.RunSpeed, NewSettings.FloatRunSpeedMultiplier, ValueModifierTypes.base_set);
-                //                });
-                //                NewGUILayout.ButtonToggleDictionary("Jump Strength", nameof(PassiveEffects.EntityDamage), () =>
-                //                {
-                //                    Cheat.AddPassiveEffectToPlayer(PassiveEffects.JumpStrength, NewSettings.FloatJumpStrengthMultiplier, ValueModifierTypes.base_set);
-                //                });
-                //                NewGUILayout.ButtonToggleDictionary("Attack/min", nameof(PassiveEffects.AttacksPerMinute), () =>
-                //                {
-                //                    Cheat.AddPassiveEffectToPlayer(PassiveEffects.JumpStrength, NewSettings.FloatJumpStrengthMultiplier, ValueModifierTypes.base_set);
-                //                });
-                //            });
-                //        },GUILayout.MaxHeight(170));
-
-                //    }, GUILayout.MinHeight(100));
-                //});
-
-
 
             });
             GUI.DragWindow();
         }
         private void Tab3() //Buffs And stuff
         {
-            NewGUILayout.BeginHorizontal(defBoxStyle, () =>
-            {
-                NewGUILayout.BeginScrollView("vector2_scrollMenu2", () => {
-
+            NewGUILayout.BeginScrollView("vector2_ScrollMenuBuffs", () => {
+                GUILayout.Label("Buffs");
+                //NewGUILayout.BeginVertical("Buffs", defBoxStyle, () =>
+                //{
+                    GUILayout.Space(20f);
                     NewGUILayout.BeginHorizontal(() =>
                     {
-                        NewGUILayout.BeginVertical("Buffs", defBoxStyle, () =>
+                        NewGUILayout.BeginVertical(() =>
                         {
-                            GUILayout.Space(20f);
-                            NewGUILayout.BeginVertical(() =>
-                            {
-                                NewGUILayout.BeginVertical(() =>
-                                {
-                                    NewGUILayout.BeginScrollView("scrollBuffMenu", () => {
-                                        NewGUILayout.BeginHorizontal(() =>
-                                        {
-                                            NewGUILayout.BeginVertical(() =>
-                                            {
- 
-                                                NewGUILayout.Button("Remove All Active Buffs", Cheat.RemoveAllBuff);//Cheat.RemoveBadBuff() //OK
-                                                NewGUILayout.Button("Clear CheatBuff", Cheat.ClearCheatBuff);//Cheat.custombuff();
 
-                                            });
-                                            NewGUILayout.BeginVertical(() =>
-                                            {
-                                                NewGUILayout.Button("Add CheatBuff to P", Cheat.AddCheatBuff);//Cheat.custombuff();
-                                                NewGUILayout.Button("Add Effect Group", Cheat.AddEffectGroup);//Cheat.custombuff();
-                                              
-                                            });
+                            NewGUILayout.Button("Remove All Active Buffs", Cheat.RemoveAllBuff);//Cheat.RemoveBadBuff() //OK
+                            NewGUILayout.Button("Clear CheatBuff", Cheat.ClearCheatBuff);//Cheat.custombuff();
 
-                                        });
-                                    }, GUILayout.MinHeight(80));
-                                });
-
-                                NewGUILayout.BeginHorizontal(customBoxStyleGreen); //***************************************************************
-
-                                NewGUILayout.DictFoldMenuHorizontal("Custom Buffs", "bool_foldCBuff", () =>
-                                {
-                                    NewGUILayout.BeginScrollView("vector2_scrollCustomBuff", () => {
-                                        //Cheat.GetListCBuffs(O.ELP, O._listCbuffs);
-                                    }, GUILayout.MinHeight(100));
-                                }, 300f);
-
-                                NewGUILayout.BeginHorizontal(customBoxStyleGreen); //***************************************************************
-
-                                NewGUILayout.BeginVertical(GUI.skin.box, () =>
-                                {
-                                    NewGUILayout.BeginVertical(() =>
-                                    {
-                                        NewGUILayout.DictFoldMenuHorizontal("Passive Effects", "bool_foldPassive", () =>
-                                        {
-                                            NewGUILayout.BeginHorizontal(() => {
-                                                Cheat.inputPassiveEffects = GUILayout.TextField(Cheat.inputPassiveEffects, 50);
-                                                inputPassive = ValueModifierTypesToString(ValueModifierTypesIndex); // Set text field with the button's current value
-                                                inputFloat = GUILayout.TextField(inputFloat, 10, GUILayout.MaxWidth(25));
-                                                if (NewGUILayout.Button("", ref ValueModifierTypesIndex, GUILayout.MaxWidth(100)))
-                                                {
-                                                    ValueModifierTypes selectedType = (ValueModifierTypes)ValueModifierTypesIndex;
-                                                    //Debug.Log("Selected Enum: " + selectedType);
-
-                                                }
-                                                if (NewGUILayout.Button("ADD", GUILayout.MaxWidth(40)))
-                                                {
-                                                    try
-                                                    {
-                                                        float floatValue = float.Parse(inputFloat);
-                                                        if (System.Enum.TryParse(Cheat.inputPassiveEffects, out PassiveEffects passiveEffect))
-                                                        {
-                                                            Cheat.AddPassive(passiveEffect, floatValue, (PassiveEffect.ValueModifierTypes)ValueModifierTypesIndex);
-                                                            Log.Out(inputPassiveEffects);
-                                                            Log.Out($"{passiveEffect} added");
-                                                        }
-                                                        else
-                                                        {
-                                                            Log.Out(inputPassiveEffects);
-                                                            Log.Out($"{passiveEffect} not added");
-                                                            // Handle the case when the inputPassiveEffects cannot be parsed to the enum.
-                                                            // Display an error message, provide a default value, or take appropriate action.
-                                                        }
-                                                    }
-                                                    catch
-                                                    { }
-
-
-
-                                                    //ValueModifierTypes selectedType = (ValueModifierTypes)System.Enum.ToObject(typeof(ValueModifierTypes), currentIndex);
-                                                    //inputPassive = selectedType.ToString();
-                                                }
-                                            });
-
-                                            NewGUILayout.BeginHorizontal(() => {
-                                                GUILayout.Label("Passive Search");
-                                                passiveSearch = GUILayout.TextField(passiveSearch, GUILayout.MaxWidth(225f), GUILayout.Height(20f));
-                                            });
-                                            NewGUILayout.BeginScrollView("vector2_scrollPassive", () => {
-
-                                                Cheat.GetListPassiveEffects(passiveSearch);
-                                            }, GUILayout.MinHeight(100));
-                                        }, 300f);
-                                    });
-                                });
-
-                                NewGUILayout.BeginHorizontal(customBoxStyleGreen); //***************************************************************
-
-
-                                NewGUILayout.DictFoldMenuHorizontal("Scroll All Buffs", "bool_foldAllBuffs", () =>
-                                {
-                                    NewGUILayout.BeginHorizontal(() => {
-                                        GUILayout.Label("Search for buff");
-                                        buffSearch = GUILayout.TextField(buffSearch, GUILayout.MaxWidth(225f), GUILayout.Height(20f));
-                                    });
-                                    NewGUILayout.BeginScrollView("vector2_scrollBuff", () => {
-                                        //Cheat.GetList(lastBuffAdded, O.ELP, O._listBuffClass, buffSearch);
-                                    }, GUILayout.MinHeight(100));
-                                }, 300f);
-
-
-                                NewGUILayout.BeginHorizontal(customBoxStyleGreen); //***************************************************************
-
-
-                                NewGUILayout.DictFoldMenuHorizontal("Perks", "bool_foldPerks", () =>
-                                {
-                                    NewGUILayout.BeginHorizontal(() => {
-                                        GUILayout.Label("Search for Perk");
-                                        PGVSearch = GUILayout.TextField(PGVSearch, GUILayout.MaxWidth(225f), GUILayout.Height(20f));
-                                    });
-
-                                    NewGUILayout.BeginScrollView("vector2_scrollPerks", () => {
-                                        //Cheat.ListPGV(PGVSearch);
-
-                                    }, GUILayout.MinHeight(250f), GUILayout.MaxHeight(450f));
-                                }, 300f, GUILayout.MinHeight(200f));
-
-                                NewGUILayout.BeginHorizontal(customBoxStyleGreen); //***************************************************************
-                            });
                         });
+                        NewGUILayout.BeginVertical(() =>
+                        {
+                            NewGUILayout.Button("Add CheatBuff to P", Cheat.AddCheatBuff);//Cheat.custombuff();
+                            NewGUILayout.Button("Add Effect Group", Cheat.AddEffectGroup);//Cheat.custombuff();
+
+                        });
+
                     });
-                });
-            });
+                    NewGUILayout.DictFoldMenuHorizontal("Custom Buffs", "bool_foldCBuff", () =>
+                    {
+                        NewGUILayout.BeginScrollView("vector2_scrollCustomBuff", () => {
+                            Cheat.GetListCBuffs(Player, NewSettings.ListCheatBuffs);
+                        }, GUILayout.MinHeight(100),GUILayout.ExpandHeight(true));
+                    });
+                    NewGUILayout.DictFoldMenuHorizontal("Passive Effects", "bool_foldPassive", () =>
+                    {
+                        NewGUILayout.BeginHorizontal(() => {
+                            Cheat.inputPassiveEffects = GUILayout.TextField(Cheat.inputPassiveEffects, 50);
+                            inputPassive = ValueModifierTypesToString(ValueModifierTypesIndex); // Set text field with the button's current value
+                            inputFloat = GUILayout.TextField(inputFloat, 10, GUILayout.MaxWidth(25));
+                            if (NewGUILayout.Button("", ref ValueModifierTypesIndex, GUILayout.MaxWidth(100)))
+                            {
+                                ValueModifierTypes selectedType = (ValueModifierTypes)ValueModifierTypesIndex;
+                                //Debug.Log("Selected Enum: " + selectedType);
+
+                            }
+                            if (NewGUILayout.Button("ADD", GUILayout.MaxWidth(40)))
+                            {
+                                try
+                                {
+                                    float floatValue = float.Parse(inputFloat);
+                                    if (System.Enum.TryParse(Cheat.inputPassiveEffects, out PassiveEffects passiveEffect))
+                                    {
+                                        Cheat.AddPassive(passiveEffect, floatValue, (PassiveEffect.ValueModifierTypes)ValueModifierTypesIndex);
+                                        Log.Out(inputPassiveEffects);
+                                        Log.Out($"{passiveEffect} added");
+                                    }
+                                    else
+                                    {
+                                        Log.Out(inputPassiveEffects);
+                                        Log.Out($"{passiveEffect} not added");
+                                        // Handle the case when the inputPassiveEffects cannot be parsed to the enum.
+                                        // Display an error message, provide a default value, or take appropriate action.
+                                    }
+                                }
+                                catch
+                                { }
+
+
+
+                                //ValueModifierTypes selectedType = (ValueModifierTypes)System.Enum.ToObject(typeof(ValueModifierTypes), currentIndex);
+                                //inputPassive = selectedType.ToString();
+                            }
+                        });
+
+                        NewGUILayout.BeginHorizontal(() => {
+                            GUILayout.Label("Passive Search");
+                            passiveSearch = GUILayout.TextField(passiveSearch, GUILayout.MaxWidth(225f), GUILayout.Height(20f));
+                        });
+                        NewGUILayout.BeginScrollView("vector2_scrollPassive", () => {
+
+                            Cheat.GetListPassiveEffects(passiveSearch);
+                        }, GUILayout.MinHeight(100), GUILayout.ExpandHeight(true));
+                    });
+                    NewGUILayout.DictFoldMenuHorizontal("Scroll All Buffs", "bool_foldAllBuffs", () =>
+                    {
+                        NewGUILayout.BeginHorizontal(() => {
+                            GUILayout.Label("Search for buff");
+                            buffSearch = GUILayout.TextField(buffSearch, GUILayout.MaxWidth(225f), GUILayout.Height(20f));
+                        });
+                        NewGUILayout.BeginScrollView("vector2_scrollBuff", () => {
+
+                            Cheat.GetList(lastBuffAdded, Player, NewSettings.ListBuffClasses, buffSearch);
+                        }, GUILayout.MinHeight(100), GUILayout.ExpandHeight(true));
+                    });
+                    NewGUILayout.DictFoldMenuHorizontal("Perks", "bool_foldPerks", () =>
+                    {
+                        NewGUILayout.BeginHorizontal(() => {
+                            GUILayout.Label("Search for Perk");
+                            PGVSearch = GUILayout.TextField(PGVSearch, GUILayout.MaxWidth(225f), GUILayout.Height(20f));
+                        });
+
+                        NewGUILayout.BeginScrollView("vector2_scrollPerks", () => {
+                            Cheat.ListProgressionValues(PGVSearch);
+
+                        }, GUILayout.MinHeight(250f), GUILayout.MaxHeight(450f), GUILayout.ExpandHeight(true));
+                    });
+
+                //});
+
+
+
+            }, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
             GUI.DragWindow();
 
         } //Buffs an  stuff
@@ -778,7 +652,7 @@ namespace SevenDTDMono
 
                     if (NewGUILayout.Button($"Log PGVC To file"))
                     {
-                        O.LogProgressionClassToFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "_listProgressionClass.txt"));
+                        //Cheat.LogProgressionClassToFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "_listProgressionClass.txt"));
                     }
                     if (NewGUILayout.Button("´Log Buffs To file"))
                     {
@@ -829,8 +703,6 @@ namespace SevenDTDMono
 
             },GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
 
-
-
             GUI.DragWindow();
         }
        
@@ -857,7 +729,7 @@ namespace SevenDTDMono
         
         
         
-        
+        /*
         private void Menu9()//some crap
         {
             NewGUILayout.BeginVertical(GUI.skin.box, () =>
@@ -867,26 +739,26 @@ namespace SevenDTDMono
 
                     NewGUILayout.BeginHorizontal(customBoxStyleGreen); //***************************************************************
 
-                    NewGUILayout.DictFoldMenuHorizontalTest("Some Logging Functions", "bool_TestMenu1", () =>
-                    {
-                        if (NewGUILayout.Button("log started"))
-                        {
-                            Debug.LogWarning($"{NewSettings.GameManager.gameStateManager.bGameStarted}");
-                        }
+                    //NewGUILayout.DictFoldMenuHorizontalTest("Some Logging Functions", "bool_TestMenu1", () =>
+                    //{
+                    //    if (NewGUILayout.Button("log started"))
+                    //    {
+                    //        Debug.LogWarning($"{NewSettings.GameManager.gameStateManager.bGameStarted}");
+                    //    }
 
-                        NewGUILayout.Button("Get and log my ID", Cheat.GetPlayerId);
+                    //    NewGUILayout.Button("Get and log my ID", Cheat.GetPlayerId);
 
-                        if (NewGUILayout.Button($"Log PGVC To file"))
-                        {
-                            O.LogProgressionClassToFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "_listProgressionClass.txt"));
-                        }
-                        if (NewGUILayout.Button("´Log Buffs To file"))
-                        {
-                            Extras.LogAvailableBuffNames(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "BuffsList.txt"));
-                        }
+                    //    if (NewGUILayout.Button($"Log PGVC To file"))
+                    //    {
+                    //        O.LogProgressionClassToFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "_listProgressionClass.txt"));
+                    //    }
+                    //    if (NewGUILayout.Button("´Log Buffs To file"))
+                    //    {
+                    //        Extras.LogAvailableBuffNames(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "BuffsList.txt"));
+                    //    }
 
 
-                    }, 300f, GUILayout.MinHeight(200f));
+                    //}, 300f, GUILayout.MinHeight(200f));
 
                     NewGUILayout.BeginHorizontal(customBoxStyleGreen); //***************************************************************
 
@@ -911,7 +783,7 @@ namespace SevenDTDMono
                         NewGUILayout.BeginScrollView("vector2_scrollZombie", () => {
                             NewGUILayout.BeginVertical(GUI.skin.box, () =>
                             {
-                                Cheat.ListEntityZombie();
+                                //Cheat.ListEntityZombie();
                             });
                         }, GUILayout.MinHeight(250f), GUILayout.MaxHeight(350f));
 
@@ -957,7 +829,7 @@ namespace SevenDTDMono
 
                                     if (NewGUILayout.Button($"Log PGVC To file"))
                                     {
-                                        O.LogProgressionClassToFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "_listProgressionClass.txt"));
+                                        //O.LogProgressionClassToFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "_listProgressionClass.txt"));
                                     }
                                     if (NewGUILayout.Button("´Log Buffs To file"))
                                     {
@@ -977,6 +849,9 @@ namespace SevenDTDMono
             });
             GUI.DragWindow();
         }
+        
+        */
+        
         #region
 
         /*

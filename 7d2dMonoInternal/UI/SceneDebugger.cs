@@ -46,11 +46,11 @@ namespace SevenDTDMono
         }
         public void OnGUI() 
         {
-            if (SETT.drawDebug)
-            {
-                HierarchyWindow = GUILayout.Window(HierarchyWindowId, HierarchyWindow, (GUI.WindowFunction)HierarchyWindowMethod, "Hierarchy", new GUILayoutOption[0]);
-                ProjectWindow = GUILayout.Window(ProjectWindowId, ProjectWindow, (GUI.WindowFunction)ProjectWindowMethod, "Project", new GUILayoutOption[0]);
-            }
+            //if (SETT.drawDebug)
+            //{
+            //    HierarchyWindow = GUILayout.Window(HierarchyWindowId, HierarchyWindow, (GUI.WindowFunction)HierarchyWindowMethod, "Hierarchy", new GUILayoutOption[0]);
+            //    ProjectWindow = GUILayout.Window(ProjectWindowId, ProjectWindow, (GUI.WindowFunction)ProjectWindowMethod, "Project", new GUILayoutOption[0]);
+            //}
 
             
         }

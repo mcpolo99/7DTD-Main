@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
-
-using static Setting;
-using Eutl = SevenDTDMono.ESPUtils;
-using O = SevenDTDMono.Objects;
 using System.Collections.Generic;
 using System.Linq;
 using static PassiveEffect;
 using SevenDTDMono.GuiLayoutExtended;
+using  System.IO;
+using SevenDTDMono.Utils;
 
 //using SevenDTDMono.Objects;
 
@@ -96,7 +94,9 @@ namespace SevenDTDMono.Features
         //public static Color _col = Color.blue;
         public  static string inputPassiveEffects = "none";
         public  static string inputFloat = "1";
-        private static Dictionary<string, object> Settings => NewSettings.Instance.SettingsDictionary; //get instance of SettingsDictionary
+        private static NewSettings SettingsInstance => NewSettings.Instance;
+        private static Dictionary<string, object> Settings => NewSettings.Instance.SettingsDictionary;
+        private static Dictionary<string, bool> _boolDict = SettingsInstance.GetChildDictionary<bool>(nameof(Dictionaries.BOOL_DICTIONARY));
         private static Dictionary<string, object> TempSettings => NewSettings.Instance.TempDictionary; //get instance of SettingsDictionary
         private static EntityPlayerLocal Player => NewSettings.EntityLocalPlayer;  //get instance of Player. 
         private static GameManager GameManager => NewSettings.GameManager; //Get instance of GameManager
@@ -158,7 +158,7 @@ namespace SevenDTDMono.Features
                 Trader.TraderInfo.CloseTime = OCTime;
                 Trader.TraderInfo.OpenTime = OCTime;
 
-                Settings[nameof(EntityTrader)] = true;
+                _boolDict[nameof(EntityTrader)] = true;
             }
 
 
@@ -207,15 +207,22 @@ namespace SevenDTDMono.Features
 
         public static void AddPassiveEffectToPlayer(PassiveEffects passiveEffects, float modifier, ValueModifierTypes valueModifierTypes)
         {
-  
-            string str = (bool)Settings[$"{passiveEffects}"] ? "Adding " : "Removing ";
+
+            if (!GameManager.gameStateManager.bGameStarted && !Player)
+            {
+                Debug.LogWarning($"Game Not Started cannot add {passiveEffects}");
+                //if game is not started and player is null return
+                return;
+            }
+
+            string str = _boolDict[$"{passiveEffects}"] ? "Adding " : "Removing ";
 
             Debug.LogWarning($"{str}{passiveEffects}");
-            if ((bool)Settings[$"{passiveEffects}"])
+            if (_boolDict[$"{passiveEffects}"])
             {
                 AddPassive(passiveEffects, modifier, valueModifierTypes);
             }
-            if (!(bool)Settings[$"{passiveEffects}"])
+            if (!_boolDict[$"{passiveEffects}"])
             {
                 RemovePassive(passiveEffects);
 
@@ -291,8 +298,6 @@ namespace SevenDTDMono.Features
             MinEffectController.EffectGroups[0].PassiveEffects.Add(newPassiveEffect);           // MinEffectController.MinEffectGroup.PassivesIndex __ This location just adds buffs on top if added multiple times
         }
 
-
-
         public static void GetListPassiveEffects(string searchText) //should make a chache for this one to lower cpu usage
         {
 
@@ -334,15 +339,15 @@ namespace SevenDTDMono.Features
         private static void DisplayToggleButton(PassiveEffects effect)
         {
             // Get or set the toggle state in the dictionary.
-            if (!PVETState.ContainsKey(effect))
+            if (!TempSettings.ContainsKey(nameof(effect)))
             {
-                PVETState[effect] = false; // Set the initial state to false for new effects.
+                TempSettings[effect.ToString()] = false; // Set the initial state to false for new effects.
             }
-            bool toggleState = PVETState[effect];
+            bool toggleState = (bool)TempSettings[effect.ToString()];
 
             // Display the toggle button and update the toggle state in the dictionary.
             bool buttonPressed = NewGUILayout.Button(effect.ToString(), GUILayout.MaxWidth(150));
-            PVETState[effect] = buttonPressed;
+            TempSettings[effect.ToString()] = buttonPressed;
 
             // If the button is pressed, set the input text field to the same string as the button text
             if (buttonPressed)
@@ -607,6 +612,191 @@ namespace SevenDTDMono.Features
                 }
             }
         }
+        public static void GetListCBuffs(EntityPlayerLocal entityLocalPlayer, List<BuffClass> ListOFClass)
+        {
+            if (ListOFClass != null)
+            {
+                if (entityLocalPlayer != null || ListOFClass != null)
+                {
+                    if (ListOFClass.Count > 0)
+                    {
+                        foreach (BuffClass buffClass in ListOFClass)
+                        {
+                            string buffName = buffClass.Name;
+
+                            // Add the buff name to the _ToggleStates dictionary with a default value of false if it doesn't exist
+                            if (!TempSettings.ContainsKey(buffName))
+                            {
+                                TempSettings[buffName] = false;
+                            }
+
+                            // Use the boolean value from the _ToggleStates dictionary to determine the button's toggle state
+                            bool toggleState = (bool)TempSettings[buffName];
+
+                            // Use GUILayout.Toggle to create a toggle button for each buff name
+                            // The toggle state is controlled by the _ToggleStates dictionary
+
+                            // Use GUILayout.Toggle to create a toggle button for each buff name
+                            // The toggle state is controlled by the _ToggleStates dictionary
+                            bool newToggleState = GUILayout.Toggle(toggleState, buffName);
+
+                            if (newToggleState != toggleState)
+                            {
+                                // If the toggle state changes, update the _ToggleStates dictionary with the new state
+                                TempSettings[buffName] = newToggleState;
+
+                                if (newToggleState)
+                                {
+                                    // If the button is toggled on, add the buff to the player
+                                    entityLocalPlayer.Buffs.AddBuff(buffName);
+                                    //Debug.LogWarning($"{buffName} Added to player {O.ELP.gameObject.name}");
+                                }
+                                else
+                                {
+                                    // If the button is toggled off, remove the buff from the player
+                                    entityLocalPlayer.Buffs.RemoveBuff(buffName);
+                                    //Debug.LogWarning($"{buffName} Removed from player {O.ELP.gameObject.name}");
+                                }
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        GUILayout.Label("No buffs found.");
+
+                    }
+
+                }
+                else
+                {
+                    //if (ListOFClass == null)
+                    //{
+                    //    ListOFClass = O.GetAvailableBuffClasses();
+                    //}
+
+
+                    GUILayout.Label("Not ingame");
+                }
+            }
+
+        }
+        public static void GetList(bool _bool, EntityPlayerLocal entityLocalPlayer, List<BuffClass> ListOFClass, string searchText)
+        {
+            if (ListOFClass != null)
+                if (entityLocalPlayer != null)
+                {
+                    if (ListOFClass.Count > 0)
+                    {
+                        foreach (BuffClass buffClass in ListOFClass)
+                        {
+                            if (searchText == "" || buffClass.Name.Contains(searchText)) //case sensitve  . Possible ignore case buffClass.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0
+                            {
+                                // se GUILayout.Button to create a button for each buff name
+                                if (GUILayout.Button(buffClass.Name))
+                                {
+                                    //entityLocalPlayer.Buffs.AddBuff(buffClass.Name);
+                                    entityLocalPlayer.Buffs.AddBuff(buffClass.Name, new Vector3i(), -1, false, false, 999999f);
+                                    Debug.LogWarning($"{buffClass.Name} Added to player {Player.gameObject.name}");
+                                    //Logic when the button is clicked
+                                }
+                                if (_bool)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        GUILayout.Label("No buffs found.");
+
+                    }
+
+                }
+        }
+        public static void MaxSkill() ///////////////////////////////
+        {
+            if (NewSettings.ListProgressionValues.Count > 0)
+            {
+                foreach (ProgressionValue progressionValue in NewSettings.ListProgressionValues)
+                {
+                    int lvl = progressionValue.Level;
+                    int max = progressionValue.ProgressionClass.MaxLevel;
+
+                    if (lvl < max)
+                    {
+                        progressionValue.Level = max;
+                    }
+                }
+            }
+        }
+        public static void ListProgressionValues(string search) //////////Progression Value/////////////////////
+        {
+            if (NewSettings.ListProgressionValues.Count > 0)
+            {
+
+                var groupedValues = NewSettings.ListProgressionValues.GroupBy(progressionValue => progressionValue.ProgressionClass.Type);
+                Dictionary<ProgressionType, List<ProgressionValue>> groupedValuesDict = groupedValues.ToDictionary(g => g.Key, g => g.ToList());
+
+                foreach (var keyValuePair in groupedValuesDict)
+                {
+                    ProgressionType type = keyValuePair.Key;
+                    List<ProgressionValue> values = keyValuePair.Value;
+
+                    if (!string.IsNullOrEmpty(search))
+                    {
+                        values = values.Where(progressionValue => progressionValue.Name.Contains(search)).ToList();
+                    }
+
+                    string progressionType = type.ToString();
+
+                    if (!TempSettings.ContainsKey(progressionType))
+                    {
+                        TempSettings[progressionType] = false; // Set the initial state to false for the bool toggle
+                    }
+
+
+                    bool state = (bool)TempSettings[progressionType];
+                    NewGUILayout.DropDownForMethods("Progression Type: " + progressionType, () =>
+                    {
+                        foreach (ProgressionValue progressionValue in values)
+                        {
+                            string id = progressionValue.Name;
+
+                            NewGUILayout.BeginHorizontal(() =>
+                            {
+                                GUILayout.Label(id);
+                                if (GUILayout.Button("+1", GUILayout.MaxWidth(50)))
+                                {
+                                    int lvl = progressionValue.Level;
+                                    int max = progressionValue.ProgressionClass.MaxLevel;
+                                    if (lvl < max)
+                                    {
+                                        progressionValue.Level++;
+                                    }
+                                }
+                                if (GUILayout.Button("MAX", GUILayout.MaxWidth(50)))
+                                {
+                                    int max = progressionValue.ProgressionClass.MaxLevel;
+                                    progressionValue.Level = max;
+                                }
+                            });
+
+
+
+                        }
+                    }, ref state);
+                    TempSettings[progressionType] = state;
+                }
+                if (NewGUILayout.Button($"Max Skill"))
+                {
+                    MaxSkill();
+                }
+
+            }
+        }
 
 
 
@@ -685,7 +875,7 @@ namespace SevenDTDMono.Features
                         TempSettings[entityIdentity] = false; // Set the initial state to false for new zombies.
                     }
 
-                    bool toggleState = MenuDropTState[entityIdentity];
+                    bool toggleState = (bool)TempSettings[entityIdentity];
                     NewGUILayout.DropDownForMethods(entityIdentity, () =>
                     {
                         NewGUILayout.BeginHorizontal(() =>
@@ -716,278 +906,60 @@ namespace SevenDTDMono.Features
             }
         }
 
+        //public static void ListZombie1() ///////////////////////////////
+        //{
+        //    if (NewSettings.EntityAlive.Count > 1)
+        //    {
+        //        foreach (EntityEnemy enemy in NewSettings.EntityAlive)
+        //        {
+        //            if (!enemy || enemy == Player || !enemy.IsAlive())
+        //            {
+        //                continue;
+        //            }
 
+        //            //string xm1 = zombie.entityFlags.ToString();
+        //            //string ZM1= zombie.EntityName.ToString();
+        //            string zombieIID = enemy.entityId.ToString();
+        //            string zm = enemy.EntityName;
+        //            string zmIID = zm + zombieIID;
+        //            // Get or set the zombie's toggle state in the dictionary.
+        //            if (!TempSettings.ContainsKey(zmIID))
+        //            {
+        //                TempSettings[zmIID] = false; // Set the initial state to false for new zombies.
+        //            }
 
+        //            bool toggleState = (bool)TempSettings[zmIID];
+        //            NewGUILayout.DropDownForMethods(zmIID, () =>
+        //            {
+        //                NewGUILayout.BeginHorizontal(() =>
+        //                {
+        //                    if (GUILayout.Button(" Teleport "))
+        //                    {
+        //                        // Perform teleport action for the zombie.
+        //                        Player.TeleportToPosition(enemy.GetPosition());
+        //                    }
+        //                    if (GUILayout.Button("Kill"))
+        //                    {
 
-
-
-
-        public static void ListZombie1() ///////////////////////////////
-        {
-            if (O._listEntityEnemy.Count > 1)
-            {
-                foreach (EntityEnemy enemy in O._listEntityEnemy)
-                {
-                    if (!enemy || enemy == Player || !enemy.IsAlive())
-                    {
-                        continue;
-                    }
-
-                    //string xm1 = zombie.entityFlags.ToString();
-                    //string ZM1= zombie.EntityName.ToString();
-                    string zombieIID = enemy.entityId.ToString();
-                    string zm = enemy.EntityName;
-                    string zmIID = zm + zombieIID;
-                    // Get or set the zombie's toggle state in the dictionary.
-                    if (!TempSettings.ContainsKey(zmIID))
-                    {
-                        TempSettings[zmIID] = false; // Set the initial state to false for new zombies.
-                    }
-
-                    bool toggleState = (bool)TempSettings[zmIID];
-                    NewGUILayout.DropDownForMethods(zmIID, () =>
-                    {
-                        NewGUILayout.BeginHorizontal(() =>
-                        {
-                            if (GUILayout.Button(" Teleport "))
-                            {
-                                // Perform teleport action for the zombie.
-                                Player.TeleportToPosition(enemy.GetPosition());
-                            }
-                            if (GUILayout.Button("Kill"))
-                            {
-
-                                // Perform kill action for the zombie.
-                                enemy.DamageEntity(new DamageSource(EnumDamageSource.Internal, EnumDamageTypes.Suicide), 99999, false, 1f);
-                                TempSettings.Remove(zmIID);
-                            }
-                        });
-                    }, ref toggleState);
-                    TempSettings[zmIID] = toggleState;
-                }
-            }
-            else
-            {
-                GUILayout.Label("No zombies found.");
-            }
-        }
+        //                        // Perform kill action for the zombie.
+        //                        enemy.DamageEntity(new DamageSource(EnumDamageSource.Internal, EnumDamageTypes.Suicide), 99999, false, 1f);
+        //                        TempSettings.Remove(zmIID);
+        //                    }
+        //                });
+        //            }, ref toggleState);
+        //            TempSettings[zmIID] = toggleState;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        GUILayout.Label("No zombies found.");
+        //    }
+        //}
         
         //Buffs and Progression 
-        public static void MaxSkill() ///////////////////////////////
-        {
-            if (O._listProgressionValue.Count > 0)
-            {
-                foreach (ProgressionValue PGV in O._listProgressionValue)
-                {
-                    int lvl = PGV.Level;
-                    int max = PGV.ProgressionClass.MaxLevel;
 
-                    if (lvl < max)
-                    {
-                        PGV.Level = max;
-                    }
-                }
-            }
-        }
-        public static void ListPGV(string search) //////////Progression Value/////////////////////
-        {
-            if (O._listProgressionValue.Count > 0) 
-            {
-
-                var groupedValues = O._listProgressionValue.GroupBy(pgv => pgv.ProgressionClass.Type);
-                Dictionary<ProgressionType, List<ProgressionValue>> groupedValuesDict = groupedValues.ToDictionary(g => g.Key, g => g.ToList());
-
-                foreach (var kvp in groupedValuesDict)
-                {
-                    ProgressionType type = kvp.Key;
-                    List<ProgressionValue> values = kvp.Value;
-
-                    if (!string.IsNullOrEmpty(search))
-                    {
-                        values = values.Where(pgv => pgv.Name.Contains(search)).ToList();
-                    }
-
-                    string stype = type.ToString();
-
-                    if (!MenuDropTState.ContainsKey(stype))
-                    {
-                        MenuDropTState[stype] = false; // Set the initial state to false for the bool toggle
-                    }
-
-
-                    bool state = MenuDropTState[stype];
-                    NewGUILayout.DropDownForMethods("Progression Type: " +stype, () =>
-                    {
-                        foreach (ProgressionValue PGV in values)
-                        {
-                            string id = PGV.Name;
-                            //if (!TogBL.ContainsKey(id))
-                            //{
-                            //    TogBL[id] = false; // Set the initial state to false for the bool toggle
-                            //}
-
-                            //bool state = TogBL[id];
-                            //CGUILayout.DropDownForMethods(id, () =>
-                            //{
-                            NewGUILayout.BeginHorizontal(() =>
-                                {
-                                    GUILayout.Label(id);
-                                    if (GUILayout.Button("+1", GUILayout.MaxWidth(50)))
-                                    {
-                                        int lvl = PGV.Level;
-                                        int max = PGV.ProgressionClass.MaxLevel;
-                                        if (lvl < max)
-                                        {
-                                            PGV.Level++;
-                                        }
-                                    }
-                                    if (GUILayout.Button("MAX", GUILayout.MaxWidth(50)))
-                                    {
-                                        int max = PGV.ProgressionClass.MaxLevel;
-                                        PGV.Level = max;
-                                    }
-                                });
-                            //}, ref state);
-
-                            
-                        }
-                    }, ref state);
-                    MenuDropTState[stype] = state;
-                }
-                //if (CGUILayout.Button($"Max Skill"))
-                //{
-                //    MaxSkill();
-                //}
-
-            }
-        }
-        public static void GetListCBuffs(EntityPlayerLocal entityLocalPlayer, List<BuffClass> ListOFClass)
-        {
-            if (ListOFClass != null)
-            {
-                if (entityLocalPlayer != null || ListOFClass != null)
-                {
-                    if (ListOFClass.Count > 0)
-                    {
-                        foreach (BuffClass buffClass in ListOFClass)
-                        {
-                            string buffName = buffClass.Name;
-
-                            // Add the buff name to the _ToggleStates dictionary with a default value of false if it doesn't exist
-                            if (!ButtonTState.ContainsKey(buffName))
-                            {
-                                ButtonTState[buffName] = false;
-                            }
-
-                            // Use the boolean value from the _ToggleStates dictionary to determine the button's toggle state
-                            bool toggleState = ButtonTState[buffName];
-
-                            // Use GUILayout.Toggle to create a toggle button for each buff name
-                            // The toggle state is controlled by the _ToggleStates dictionary
-
-                            // Use GUILayout.Toggle to create a toggle button for each buff name
-                            // The toggle state is controlled by the _ToggleStates dictionary
-                            bool newToggleState = GUILayout.Toggle(toggleState, buffName);
-
-                            if (newToggleState != toggleState)
-                            {
-                                // If the toggle state changes, update the _ToggleStates dictionary with the new state
-                                ButtonTState[buffName] = newToggleState;
-
-                                if (newToggleState)
-                                {
-                                    // If the button is toggled on, add the buff to the player
-                                    entityLocalPlayer.Buffs.AddBuff(buffName);
-                                    //Debug.LogWarning($"{buffName} Added to player {O.ELP.gameObject.name}");
-                                }
-                                else
-                                {
-                                    // If the button is toggled off, remove the buff from the player
-                                    entityLocalPlayer.Buffs.RemoveBuff(buffName);
-                                    //Debug.LogWarning($"{buffName} Removed from player {O.ELP.gameObject.name}");
-                                }
-                            }
-                        }
-
-                    }
-                    else
-                    {
-                        GUILayout.Label("No buffs found.");
-
-                    }
-
-                }
-                else
-                {
-                    //if (ListOFClass == null)
-                    //{
-                    //    ListOFClass = O.GetAvailableBuffClasses();
-                    //}
-
-
-                    GUILayout.Label("Not ingame");
-                }
-            }
-
-        }
         
         
-        
-        
-
-
-        //public static void GetList(bool _bool, EntityPlayerLocal entityLocalPlayer, List<BuffClass> ListOFClass, string searchText)
-        //{
-        //    if (ListOFClass != null)
-        //        if (entityLocalPlayer != null || ListOFClass != null)
-        //        {
-        //            if (ListOFClass.Count > 0)
-        //            {
-        //                foreach (BuffClass buffClass in ListOFClass)
-        //                {
-        //                    if (searchText == "" || buffClass.Name.Contains(searchText)) //case sensitve  . Possible ignore case buffClass.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0
-        //                    {
-        //                        // se GUILayout.Button to create a button for each buff name
-        //                        if (GUILayout.Button(buffClass.Name))
-        //                        {
-        //                            entityLocalPlayer.Buffs.AddBuff(buffClass.Name, -1, true, false, false, 99999f);
-        //                            Debug.LogWarning($"{buffClass.Name} Added to player {O.ELP.gameObject.name}");
-        //                            //Logic when the button is clicked
-        //                        }
-        //                        if (_bool)
-        //                        {
-        //                            break;
-        //                        }
-        //                    }
-        //                }
-
-        //            }
-        //            else
-        //            {
-        //                GUILayout.Label("No buffs found.");
-
-        //            }
-
-        //        }
-        //        else
-        //        {
-        //            if (ListOFClass == null)
-        //            {
-        //                //ListOFClass = O.GetAvailableBuffClasses();
-        //            }
-
-
-        //            GUILayout.Label("Not ingame");
-        //        }
-
-        //}
-
-
-
-
-
-
-
 
 
         #endregion
@@ -1000,7 +972,11 @@ namespace SevenDTDMono.Features
         //--------------------------------------------------------------------------------------------------------
         private void Start()
         {
-            CheckForBoolKey(nameof(_cheatBuff)); //pretty much adds the bool key to the dictionary so we do not get reference error 
+            SettingsInstance.CheckBoolKeyExist(nameof(SettingsBools.CHEAT_BUFF));
+            SettingsInstance.CheckBoolKeyExist(nameof(SettingsBools.BUFF_CLASSES_LOADED));
+
+
+            //CheckForBoolKey(nameof(_cheatBuff)); //pretty much adds the bool key to the dictionary so we do not get reference error 
             Debug.LogWarning($"Start: {nameof(Cheat)}");
         }
 
@@ -1029,38 +1005,94 @@ namespace SevenDTDMono.Features
         {
             if (NewSettings.GameManager.IsQuitting)
             {
-                Settings[nameof(_cheatBuff)] = false; //resets variable
+                _boolDict[nameof(SettingsBools.CHEAT_BUFF)] = false; //resets variable
+                _boolDict[nameof(SettingsBools.BUFF_CLASSES_LOADED)] = false; //resets variable
+                _boolDict[nameof(SettingsBools.CHEAT_BUFFS_LOADED)] = false; //resets variable
+                _boolDict[nameof(SettingsBools.PROGRESSION_VALUE_LOADED)] = false; //resets variable
+
+
             }
 
 
-
-            if (NewSettings.GameManager.gameStateManager.bGameStarted == true && Player && (bool)Settings[nameof(_cheatBuff)]==false)
+            //loading of cheat buffs and caching progression values 
+            if (NewSettings.GameManager.gameStateManager.bGameStarted == true && Player && _boolDict[nameof(SettingsBools.CHEAT_BUFF)]==false)
             {
                 Debug.LogWarning($"amount of buffs before load {BuffManager.Buffs.Count}");
                 InitCheatBuff();
+
+
+                if (!_boolDict[nameof(SettingsBools.BUFF_CLASSES_LOADED)])
+                {
+                    Log.Out("Reloading buffs");
+                    NewSettings.ListBuffClasses.Clear();
+                    foreach (var buffClass in BuffManager.Buffs)
+                    {
+                        NewSettings.ListBuffClasses.Add(buffClass.Value);
+                    }
+                    NewSettings.ListBuffClasses.Sort((buff1, buff2) => string.Compare(buff1.Name, buff2.Name));
+
+                    LogListBuffClass(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "ListBuffClasses.txt"));
+                    _boolDict[nameof(SettingsBools.BUFF_CLASSES_LOADED)] = true;
+                    Debug.LogWarning($"2 = {_boolDict[nameof(SettingsBools.BUFF_CLASSES_LOADED)]}");
+                }
+
+                if (!_boolDict[nameof(SettingsBools.CHEAT_BUFFS_LOADED)])
+                {
+                    string CbuffRssName = "SevenDTDMono.Features.Buffs.Cbuffs.XML";
+
+                    Log.Out($"{CbuffRssName} begin Load....");
+
+                    NewSettings.ListCheatBuffs.Clear();
+                    LoadCustomXml(CbuffRssName);
+                    NewSettings.ListCheatBuffs.Sort((a, b) => string.Compare(a.Name, b.Name));
+                    Debug.LogWarning($"{CbuffRssName} finished load!");
+                    _boolDict[nameof(SettingsBools.CHEAT_BUFFS_LOADED)] = true;
+                    Debug.LogWarning($"3 = {_boolDict[nameof(SettingsBools.CHEAT_BUFFS_LOADED)]}");
+                }
+                if (!_boolDict[nameof(SettingsBools.PROGRESSION_VALUE_LOADED)] && Player)
+                {
+                    if (NewSettings.ListProgressionValues.Count <= 0)
+                    {
+                        Debug.LogWarning("List empty");
+                    }
+                    NewSettings.ListProgressionValues.Clear();
+                    foreach (KeyValuePair<int, ProgressionValue> keyValuePair in Player.Progression.GetDict())
+                    {
+                        ProgressionValue value = keyValuePair.Value;
+                        bool flag;
+                        if (value == null)
+                        {
+                            flag = null != null;
+                        }
+                        else
+                        {
+                            ProgressionClass progressionClass = value.ProgressionClass;
+                            flag = (progressionClass != null ? progressionClass.Name : null) != null;
+                        }
+                        if (flag)
+                        {
+
+                            NewSettings.ListProgressionValues.Add(keyValuePair.Value);
+                        }
+
+                    }
+                    NewSettings.ListProgressionValues.Sort((a, b) => string.Compare(a.Name, b.Name));
+                    _boolDict[nameof(SettingsBools.PROGRESSION_VALUE_LOADED)] = true;
+                    Debug.LogWarning($"4 = {_boolDict[nameof(SettingsBools.PROGRESSION_VALUE_LOADED)]}");
+                }
+
+
+
+
+
+
             }
             
 
 
             if (NewSettings.GameManager.gameStateManager.bGameStarted == true && Player)
             {
-
-                //CheatPassiveEffect(RB["_BL_Blockdmg"], PassiveEffects.BlockDamage, SETT._FL_blokdmg, ValueModifierTypes.perc_add);
-                //  
-                //CheatPassiveEffect(RB["_BL_Kill"], PassiveEffects.EntityDamage, SETT._FL_killdmg, ValueModifierTypes.perc_add);
-                //CheatPassiveEffect(RB["_BL_Harvest"], PassiveEffects.HarvestCount, SETT._FL_harvest, ValueModifierTypes.perc_add);
-                //CheatPassiveEffect(RB["_BL_Jmp"], PassiveEffects.JumpStrength, SETT._FL_jmp, ValueModifierTypes.base_set);
-                //CheatPassiveEffect(RB["_BL_APM"], PassiveEffects.AttacksPerMinute, SETT._FL_APM, ValueModifierTypes.base_set);
-                //CheatPassiveEffect(RB["_BL_Run"], PassiveEffects.RunSpeed, SETT._FL_run, ValueModifierTypes.base_set);
-
-                //CheatPassiveEffect(RB["_instantCraft"], PassiveEffects.CraftingTime, 0f, ValueModifierTypes.base_set);
-                //CheatPassiveEffect(RB["_instantSmelt"], PassiveEffects.CraftingSmeltTime, 0f, ValueModifierTypes.base_set);
-                //CheatPassiveEffect(RB["_infDurability"], PassiveEffects.DegradationPerUse, 0f, ValueModifierTypes.base_set);
-
-
-                //CheatPassiveEffect((bool)Settings[nameof(PassiveEffects.ScrappingTime)], PassiveEffects.ScrappingTime, 0f, ValueModifierTypes.base_set);
-    
-                if ((bool)Settings[nameof(Quest.QuestState.Completed)])
+                if (_boolDict[nameof(Quest.QuestState.Completed)])
                 {
                     //Loop Rewards!
                     if (Player.QuestJournal.quests.Count > 0)
@@ -1080,8 +1112,7 @@ namespace SevenDTDMono.Features
                         // The list is empty, handle this case accordingly
                     }
                 };
-
-                if ((bool)Settings[nameof(Quest.QuestState.InProgress)])
+                if (_boolDict[nameof(Quest.QuestState.InProgress)])
                 {
                     //finish quest!!
                     foreach (Quest quest in Player.QuestJournal.quests)
@@ -1095,9 +1126,7 @@ namespace SevenDTDMono.Features
                         }
                     }
                 };
-
-
-                if ((bool)Settings[nameof(EntityTrader)] && Trader!=null)
+                if (_boolDict[nameof(EntityTrader)] && Trader!=null)
                 {
 
                     //disables the open trader incase we leave the grounds!
@@ -1115,28 +1144,39 @@ namespace SevenDTDMono.Features
                     {
                         Debug.LogWarning($"Distance: {distance}");
                         Debug.LogError($"{distance} is less then {range}, Resetting trader");
-                        Settings[nameof(EntityTrader)] = false;
+                        _boolDict[nameof(EntityTrader)] = false;
                         Trader.IsDancing = false;
                         Trader.TraderInfo.CloseTime = (ulong)21833;
                         Trader.TraderInfo.OpenTime = (ulong)4083;
 
                     }
                 }
+                if (_boolDict[nameof(SettingsBools.NO_WEAPON_BOB)]) // When noWeaponBob is active enable 
+                {
+                    vp_FPWeapon weapon = Player.vp_FPWeapon;
+
+                    if (weapon)
+                    {
+                        weapon.BobRate = Vector4.zero;
+                        weapon.ShakeAmplitude = Vector3.zero;
+                        weapon.RenderingFieldOfView = 120f;
+                        weapon.StepForceScale = 0f;
+                    }
+                }
 
 
+                if (_boolDict[nameof(SettingsBools.NAME_SCRAMBLE)] && Player)
+                {
+                    //Log.Out($" sett name2 {SETT._nameScramble}");
+                    if (Player.EntityName != null)
+                    {
+                        Settings[nameof(Player)] =  Player.EntityName.ToString();
+                        
+                        Player.SetEntityName(Extras.ScrambleString(Player.EntityName));
 
-                //if (SETT.noWeaponBob && O.ELP) // When noWeaponBob is active enable 
-                //{
-                //    vp_FPWeapon weapon = O.ELP.vp_FPWeapon;
+                    }
+                }
 
-                //    if (weapon)
-                //    {
-                //        weapon.BobRate = Vector4.zero;
-                //        weapon.ShakeAmplitude = Vector3.zero;
-                //        weapon.RenderingFieldOfView = 120f;
-                //        weapon.StepForceScale = 0f;
-                //    }
-                //}//no weapon bob
 
                 //////if (Input.GetKeyDown(KeyCode.O)) //infinity ammo ???
                 //////{
@@ -1179,7 +1219,7 @@ namespace SevenDTDMono.Features
 
                 //here should i init the cheatbuff!! it can only happen if game and player exists! 
 
-                
+
 
 
 
@@ -1253,6 +1293,115 @@ namespace SevenDTDMono.Features
         {
             Debug.LogWarning($"Awake: {nameof(Cheat)}");
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        private static string EscapeForCsv(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            // If the value contains a comma or a double quote, enclose it in double quotes and escape any existing double quotes
+            if (value.Contains(',') || value.Contains('"'))
+            {
+                return $"\"{value.Replace("\"", "\"\"")}\"";
+            }
+
+            return value;
+        }
+        //public static void LogProgressionClassToFile(string filePath)
+        //{
+        //    if (_listProgressionValue != null && _listProgressionValue.Count > 0)
+        //    {
+        //        try
+        //        {
+        //            using (StreamWriter writer = new StreamWriter(filePath))
+        //            {
+        //                writer.WriteLine("name,type,sortorder");
+
+        //                foreach (var prog in _listProgressionValue)
+        //                {
+
+        //                    string str1 = prog.Name;
+        //                    string str2 = prog.ProgressionClass.Type.ToString();
+        //                    string str3 = prog.ProgressionClass.ListSortOrder.ToString();
+
+
+        //                    //writer.WriteLine($"{EscapeForCsv(buffClass.Name)},{buffClass.DamageType},{EscapeForCsv(buffClass.NameTag.ToString())}");
+        //                    writer.WriteLine($"{EscapeForCsv(str1)},{EscapeForCsv(str2)},{EscapeForCsv(str3)}");
+        //                }
+        //            }
+
+        //            Console.WriteLine("progressionclasses as been logged");
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            Console.WriteLine($"Error occurred while logging buff classes: {ex.Message}");
+        //        }
+        //    }
+
+        //}
+        private static void LogListBuffClass(string filePath)
+        {
+            if (NewSettings.ListBuffClasses != null && NewSettings.ListBuffClasses.Count > 0)
+            {
+                try
+                {
+                    using (StreamWriter writer = new StreamWriter(filePath))
+                    {
+                        writer.WriteLine("Buff Name,Damage Type,Description");
+
+                        foreach (var buffClass in NewSettings.ListBuffClasses)
+                        {
+
+                            string str1 = buffClass.DamageSource.ToString();
+                            string str2 = buffClass.Effects.EffectGroups[0].ToString();
+
+
+                            //writer.WriteLine($"{EscapeForCsv(buffClass.Name)},{buffClass.DamageType},{EscapeForCsv(buffClass.NameTag.ToString())}");
+                            writer.WriteLine($"{EscapeForCsv(buffClass.Name)},,");
+                        }
+                    }
+
+                    Console.WriteLine("Buff classes have been logged to the file.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error occurred while logging buff classes: {ex.Message}");
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
 
 
 
