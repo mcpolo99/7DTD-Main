@@ -366,7 +366,20 @@ powershell -ExecutionPolicy Bypass -File $(ProjectDir)incBuild.ps1 -path1 $(Proj
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>
-    </PostBuildEvent>
+IF "$(Configuration)"=="Release_NOUE" (
+
+    if not exist "..\rel" mkdir "..\rel"
+    
+copy "$(TargetPath)" "..\rel\$(TargetName)_NOUE$(TargetExt)"
+ 
+)
+IF "$(Configuration)" == "Release_UE" (
+    
+    if not exist "..\rel" mkdir "..\rel"
+
+    copy "$(TargetPath)" "..\rel\$(TargetName)_UE$(TargetExt)"
+) 
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

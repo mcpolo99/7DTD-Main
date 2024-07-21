@@ -264,7 +264,7 @@ namespace SevenDTDMono
                         {
                             NewGUILayout.BeginVertical(() =>
                             {
-                                NewGUILayout.ButtonToggleDictionary("Name Scramble2", "bool_nameScramble");
+                                //NewGUILayout.ButtonToggleDictionary("Name Scramble2", "bool_nameScramble");
 
 
 
@@ -306,52 +306,56 @@ namespace SevenDTDMono
 
 
                                     });
-                                NewGUILayout.ButtonToggleDictionary("DebugMenuShowTasks", nameof(EnumGamePrefs.DebugMenuShowTasks), () =>       
+                                /*
+                                NewGUILayout.ButtonToggleDictionary("DebugMenuShowTasks", nameof(EnumGamePrefs.DebugMenuShowTasks), () =>
                                 {
-                                    //this is only working with zombies for some reason.. not with all entites,
+                                      //this is only working with zombies for some reason.. not with all entites,
+                                      if (Player)
+                                      {
+                                          //bool bool1 = (bool)Settings[nameof(player.isIgnoredByAI)];
+                                          //player.SetIgnoredByAI(bool1);
+
+
+                                          EntityAlive.SetupAllDebugNameHUDs(SettingsInstance.GetBoolValue(nameof(EnumGameStats.IsCreativeMenuEnabled)));
+
+                                          NewSettings.AddReset(nameof(EnumGamePrefs.DebugMenuShowTasks));
+                                      }
+
+
+                                      //public void updateDebugKeys()
+                                      //bool flag4 = !GamePrefs.GetBool(EnumGamePrefs.DebugStopEnemiesMoving);
+                                      //GamePrefs.Set(EnumGamePrefs.DebugStopEnemiesMoving, flag4);
+                                      //if (shiftKeyPressed)
+                                      //{
+                                      //    this.entityPlayerLocal.SetIgnoredByAI(!this.entityPlayerLocal.IsIgnoredByAI());
+                                      //    return;
+                                      //}
+                                      //bool flag4 = !GamePrefs.GetBool(EnumGamePrefs.DebugStopEnemiesMoving);
+                                      //GamePrefs.Set(EnumGamePrefs.DebugStopEnemiesMoving, flag4);
+                                      //if (flag4)
+                                      //{
+                                      //    this.entityPlayerLocal.Buffs.AddBuff("buffShowAIDisabled", -1, true, false, -1f);
+                                      //    return;
+                                      //}
+                                      //this.entityPlayerLocal.Buffs.RemoveBuff("buffShowAIDisabled", true);
+
+
+
+                                });*/
+
+                                NewGUILayout.ButtonToggleDictionary("Debug Menu Enable", nameof(EnumGamePrefs.DebugMenuEnabled), () =>
+                                {
                                     if (Player)
                                     {
-                                        //bool bool1 = (bool)Settings[nameof(player.isIgnoredByAI)];
-                                        //player.SetIgnoredByAI(bool1);
-
-
-                                        EntityAlive.SetupAllDebugNameHUDs(SettingsInstance.GetBoolValue(nameof(EnumGameStats.IsCreativeMenuEnabled)));
-
-                                        NewSettings.AddReset(nameof(EnumGamePrefs.DebugMenuShowTasks));
+                                        bool bool1 = _boolDict[nameof(EnumGamePrefs.DebugMenuEnabled)];
+                                        GamePrefs.Set(EnumGamePrefs.DebugMenuEnabled, bool1);
+                                        GamePrefs.Set(EnumGamePrefs.DebugPanelsEnabled, bool1);
+                                        GamePrefs.Set(EnumGamePrefs.DebugStopEnemiesMoving, bool1);
+                                        NewSettings.AddReset(nameof(EnumGamePrefs.DebugMenuEnabled));
                                     }
-
-
-                                    //public void updateDebugKeys()
-                                    //bool flag4 = !GamePrefs.GetBool(EnumGamePrefs.DebugStopEnemiesMoving);
-                                    //GamePrefs.Set(EnumGamePrefs.DebugStopEnemiesMoving, flag4);
-                                    //if (shiftKeyPressed)
-                                    //{
-                                    //    this.entityPlayerLocal.SetIgnoredByAI(!this.entityPlayerLocal.IsIgnoredByAI());
-                                    //    return;
-                                    //}
-                                    //bool flag4 = !GamePrefs.GetBool(EnumGamePrefs.DebugStopEnemiesMoving);
-                                    //GamePrefs.Set(EnumGamePrefs.DebugStopEnemiesMoving, flag4);
-                                    //if (flag4)
-                                    //{
-                                    //    this.entityPlayerLocal.Buffs.AddBuff("buffShowAIDisabled", -1, true, false, -1f);
-                                    //    return;
-                                    //}
-                                    //this.entityPlayerLocal.Buffs.RemoveBuff("buffShowAIDisabled", true);
-
-
-
                                 });
-                                NewGUILayout.ButtonToggleDictionary("Debug Menu Enable", nameof(EnumGamePrefs.DebugMenuEnabled), () =>
-                                    {
-                                        if (Player)
-                                        {
-                                            bool bool1 = _boolDict[nameof(EnumGamePrefs.DebugMenuEnabled)];
-                                            GamePrefs.Set(EnumGamePrefs.DebugMenuEnabled, bool1);
-                                            GamePrefs.Set(EnumGamePrefs.DebugPanelsEnabled, bool1);
-                                            GamePrefs.Set(EnumGamePrefs.DebugStopEnemiesMoving, bool1);
-                                            NewSettings.AddReset(nameof(EnumGamePrefs.DebugMenuEnabled));
-                                        }
-                                    });
+
+
                                 NewGUILayout.ButtonToggleDictionary("Creative", nameof(EnumGameStats.IsCreativeMenuEnabled), () =>
                                 {
                                     GameStats.Set(EnumGameStats.IsCreativeMenuEnabled,SettingsInstance.GetBoolValue(nameof(EnumGameStats.IsCreativeMenuEnabled)));
