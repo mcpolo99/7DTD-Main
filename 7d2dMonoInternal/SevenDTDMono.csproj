@@ -305,12 +305,12 @@
     </Reference>
     <Reference Include="UnityExplorer.STANDALONE.Mono, Version=4.9.0.0, Culture=neutral, processorArchitecture=MSIL" Condition=" ('$(Configuration)' == 'RELEASE_UE')  OR ('$(Configuration)' == 'DEBUG') ">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>F:\Source\TEMP\UnityExplorer.STANDALONE.Mono.dll</HintPath>
+      <HintPath>X:\VS\Temp\UnityExplorer\UnityExplorer.STANDALONE.Mono.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UniverseLib.Mono, Version=1.5.1.0, Culture=neutral, processorArchitecture=MSIL" Condition=" ('$(Configuration)' == 'RELEASE_UE')  OR  ('$(Configuration)' == 'DEBUG') ">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>F:\Source\TEMP\UniverseLib.Mono.dll</HintPath>
+      <HintPath>X:\VS\Temp\UnityExplorer\UniverseLib.Mono.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

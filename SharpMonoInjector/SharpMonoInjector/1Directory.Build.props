@@ -16,8 +16,8 @@
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>false</Optimize>
-    <OutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
+    <OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
   </PropertyGroup>
 
 
@@ -30,8 +30,8 @@
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>false</Optimize>
-    <OutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
+    <OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_NOUE|AnyCPU' ">
@@ -42,8 +42,8 @@
     <DefineConstants>RELEASE_NOUE</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>false</Optimize>
-    <OutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
+    <OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_UE|AnyCPU' ">
@@ -54,8 +54,8 @@
     <DefineConstants>RELEASE_UE</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>false</Optimize>
-    <OutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
+    <OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
   </PropertyGroup>
 
 

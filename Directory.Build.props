@@ -1,0 +1,69 @@
+<Project>
+	<PropertyGroup>
+		<RootProject>MNO-ProjectABCD</RootProject>
+		<LangVersion>12</LangVersion>
+		<TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+		<WarningLevel>4</WarningLevel>
+		<ErrorReport>prompt</ErrorReport>
+		<IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
+		<OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
+
+	</PropertyGroup>
+
+	<!--https://blog.ndepend.com/directory-build-props/-->
+
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<DefineConstants>TRACE;DEBUG</DefineConstants>
+		<Prefer32Bit>false</Prefer32Bit>
+		<Optimize>false</Optimize>
+		<!--<OutputPath>$(opath)</OutputPath>-->
+		<!--<IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>-->
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<DefineConstants>TRACE;DEBUG</DefineConstants>
+		<Prefer32Bit>false</Prefer32Bit>
+		<Optimize>false</Optimize>
+		<!--<OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>-->
+		<!--<IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>-->
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_NOUE|AnyCPU' ">
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<DebugSymbols>true</DebugSymbols>
+		<NoWarn>1701;1702</NoWarn>
+		<DebugType>pdbonly</DebugType>
+		<DefineConstants>RELEASE_NOUE</DefineConstants>
+		<Prefer32Bit>false</Prefer32Bit>
+		<Optimize>false</Optimize>
+		<!--<OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>-->
+		<!--<IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>-->
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_UE|AnyCPU' ">
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<DebugSymbols>true</DebugSymbols>
+		<NoWarn>1701;1702</NoWarn>
+		<DebugType>pdbonly</DebugType>
+		<DefineConstants>RELEASE_UE</DefineConstants>
+		<Prefer32Bit>false</Prefer32Bit>
+		<Optimize>false</Optimize>
+		<!--<OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>-->
+		<!--<IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>-->
+	</PropertyGroup>
+
+	<!--<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<DebugType>pdbonly</DebugType>
+		<Optimize>true</Optimize>
+		<OutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\Release\</OutputPath>
+		<IntermediateOutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\Intermediate\Release\$(MSBuildProjectName)\</IntermediateOutputPath>
+		<DefineConstants>TRACE</DefineConstants>
+	</PropertyGroup>-->
+</Project>

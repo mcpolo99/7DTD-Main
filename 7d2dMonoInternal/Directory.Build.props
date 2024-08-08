@@ -1,23 +1,26 @@
 ﻿<Project>
-  <PropertyGroup>
+
+	<Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+	<!--<PropertyGroup>
     <RootProject>MNO-ProjectABCD</RootProject>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <WarningLevel>4</WarningLevel>
 	<ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
+  </PropertyGroup>-->
   
   <!--Override or add settings for Project1-->
 
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <!--<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>false</Optimize>
-    <OutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
+    <OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
   </PropertyGroup>
 
 
@@ -30,8 +33,8 @@
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>false</Optimize>
-    <OutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
+    <OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_NOUE|AnyCPU' ">
@@ -42,8 +45,8 @@
     <DefineConstants>RELEASE_NOUE</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>false</Optimize>
-    <OutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
+    <OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_UE|AnyCPU' ">
@@ -54,27 +57,9 @@
     <DefineConstants>RELEASE_UE</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>false</Optimize>
-    <OutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
+    <OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
   </PropertyGroup>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -84,5 +69,9 @@
     <OutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\Release\</OutputPath>
     <IntermediateOutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\Intermediate\Release\$(MSBuildProjectName)\</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
+  </PropertyGroup>-->
+
+
+
+
 </Project>
