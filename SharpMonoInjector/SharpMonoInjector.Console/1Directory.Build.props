@@ -16,8 +16,8 @@
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>false</Optimize>
-    <OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
+    <!--<OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>-->
+    <!--<IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>-->
   </PropertyGroup>
 
 

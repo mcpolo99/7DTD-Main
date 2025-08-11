@@ -34,6 +34,18 @@
   <PropertyGroup>
     <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <IntermediateOutputPath>C:\Users\RandomPenguin\AppData\Local\Temp\vs602C.tmp\Debug\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <IntermediateOutputPath>C:\Users\RandomPenguin\AppData\Local\Temp\vs602C.tmp\Release\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_NOUE|AnyCPU'">
+    <IntermediateOutputPath>C:\Users\RandomPenguin\AppData\Local\Temp\vs602C.tmp\Release_NOUE\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_UE|AnyCPU'">
+    <IntermediateOutputPath>C:\Users\RandomPenguin\AppData\Local\Temp\vs602C.tmp\Release_UE\</IntermediateOutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="System" />

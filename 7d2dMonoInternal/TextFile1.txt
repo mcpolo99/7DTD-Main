@@ -27,3 +27,6 @@ IF "$(Configuration)" == "Release_UE" (
 ) 
 
   <OutputPath>C:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
+
+  		<IntermediateOutputPath>S:\02Development\02VSBuild\$(SolutionName)\obj\$(Configuration)\$(MSBuildProjectName)\</IntermediateOutputPath>
+		<OutputPath>S:\02Development\02VSBuild\$(SolutionName)\bin\$(Configuration)\</OutputPath>

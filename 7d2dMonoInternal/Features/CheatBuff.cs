@@ -27,7 +27,17 @@ namespace SevenDTDMono.Features
                 }
                 return _minEffectController;
             }
+            set
+            {
+                if (_minEffectController != value)
+                {
+                    _minEffectController= value;
+                }
+
+            }
         }
+        
+        
         private void InitCheatBuff()
         {
             if (_boolDict[nameof(SettingsBools.CHEAT_BUFF)] == false)
@@ -50,9 +60,15 @@ namespace SevenDTDMono.Features
 
                 }
 
+                //BuffValue buffValue1 = new BuffValue()
+                //{
+                //    buffName = nameof(_cheatBuff),
+                //    buffFlags = BuffValue.BuffFlags.None,
+                //    BuffClass = _cheatBuff
+                //};
 
 
-                _cheatBuff = new BuffClass()
+                _cheatBuff = new BuffClass(nameof(_cheatBuff))
                 {
                     Name = nameof(_cheatBuff),
                     DamageType = EnumDamageTypes.None,
@@ -65,40 +81,39 @@ namespace SevenDTDMono.Features
                     LocalizedName = "Custom CheatBuff",
                     Description = "This is the buff that manages all modiefer values we add to the player,\n for every passive effect we adding we adding it to thsi Buffclass to avoid crashes and nullreferences \n " +
                                   "Also to avoid not being able to edit future values easier. \n i have not yet figured out how i can make the slider modifers realtime modifers or how to avoid passiveffects stacking  ",
-                    Effects = MinEffectController
-
+                    Effects = MinEffectController,
                 };
+
                 BuffManager.Buffs.Add(_cheatBuff.Name, _cheatBuff);
                 Debug.LogWarning($"Buff {_cheatBuff.Name} has ben added to  "); //{_listBuffClass}
                 Log.Out($"{_cheatBuff.Name} Has been initieted");
 
-                MinEffectController.EffectGroups = new List<MinEffectGroup>
-            {
-                new MinEffectGroup
-                {
-                    OwnerTiered = true,
-                    PassiveEffects = new List<PassiveEffect>
+                MinEffectController.EffectGroups = new List<MinEffectGroup> 
+                {   new MinEffectGroup
                     {
-                        new PassiveEffect
+                        OwnerTiered = true,
+                        PassiveEffects = new List<PassiveEffect>
                         {
-                            MatchAnyTags = true,
-                            Type = PassiveEffects.None,
-                            Modifier = PassiveEffect.ValueModifierTypes.base_add,
-                            Values = new float[] { 20}
-                            //Set other properties of PassiveEffect if needed
-                        }
-                    },
-                    PassivesIndex = new List<PassiveEffects>
-                    {
-                        PassiveEffects.None,
+                            new PassiveEffect
+                            {
+                                MatchAnyTags = true,
+                                Type = PassiveEffects.None,
+                                Modifier = PassiveEffect.ValueModifierTypes.base_add,
+                                Values = new float[] { 20}
+                                //Set other properties of PassiveEffect if needed
+                            }
+                        },
+                        //PassivesIndex = new List<PassiveEffects>
+                        //{
+                        //    PassiveEffects.None,
+                        //}
                     }
-                }
 
-            };
-                MinEffectController.PassivesIndex = new HashSet<PassiveEffects>
-            {
-                PassiveEffects.None,
-            };
+                };
+            //    MinEffectController.PassivesIndex = new HashSet<PassiveEffects>
+            //{
+            //    PassiveEffects.None,
+            //};
 
                 NewSettings.DictionaryBuffClassKeyCollection = BuffManager.Buffs.Keys;
                 NewSettings.DictionaryBuffClassCollection = BuffManager.Buffs;
@@ -163,6 +178,11 @@ namespace SevenDTDMono.Features
             {
                 buffClass.Name = _element.GetAttribute("name").ToLower();
                 buffClass.NameTag = FastTags<TagGroup.Global>.Parse(_element.GetAttribute("name"));
+
+                //buffClass.LocalizedName = Localization.Get(
+                //    _element.HasAttribute("name_key") ? _element.GetAttribute("name_key") : buffClass.Name
+                //);
+
                 if (_element.HasAttribute("name_key"))
                 {
                     buffClass.LocalizedName = Localization.Get(_element.GetAttribute("name_key"));
@@ -181,10 +201,13 @@ namespace SevenDTDMono.Features
                     buffClass.TooltipKey = _element.GetAttribute("tooltip_key");
                     buffClass.Tooltip = Localization.Get(buffClass.TooltipKey);
                 }
+
                 if (_element.HasAttribute("icon"))
                 {
                     buffClass.Icon = _element.GetAttribute("icon");
                 }
+                //buffClass.Icon = _element.HasAttribute("icon") ? _element.GetAttribute("icon") : buffClass.Icon;
+
                 if (_element.HasAttribute("hidden"))
                 {
                     buffClass.Hidden = StringParsers.ParseBool(_element.GetAttribute("hidden"), 0, -1, true);
@@ -193,6 +216,9 @@ namespace SevenDTDMono.Features
                 {
                     buffClass.Hidden = false;
                 }
+                //buffClass.Hidden = _element.HasAttribute("hidden") 
+                //&& StringParsers.ParseBool(_element.GetAttribute("hidden"), 0, -1, true);
+
                 if (_element.HasAttribute("showonhud"))
                 {
                     buffClass.ShowOnHUD = StringParsers.ParseBool(_element.GetAttribute("showonhud"), 0, -1, true);
@@ -201,6 +227,11 @@ namespace SevenDTDMono.Features
                 {
                     buffClass.ShowOnHUD = true;
                 }
+
+                //buffClass.ShowOnHUD = _element.HasAttribute("showonhud") 
+                //                      && StringParsers.ParseBool(_element.GetAttribute("showonhud"), 0, -1, true);
+
+
                 if (_element.HasAttribute("update_rate"))
                 {
                     buffClass.UpdateRate = StringParsers.ParseFloat(_element.GetAttribute("update_rate"), 0, -1, NumberStyles.Any);
@@ -209,10 +240,18 @@ namespace SevenDTDMono.Features
                 {
                     buffClass.UpdateRate = 1f;
                 }
+                //buffClass.UpdateRate = _element.HasAttribute("update_rate") 
+                //    ? StringParsers.ParseFloat(_element.GetAttribute("update_rate"), 0, -1, NumberStyles.Any)
+                //    : 1f;
+
+
                 if (_element.HasAttribute("remove_on_death"))
                 {
                     buffClass.RemoveOnDeath = StringParsers.ParseBool(_element.GetAttribute("remove_on_death"), 0, -1, true);
                 }
+                //buffClass.RemoveOnDeath = _element.HasAttribute("remove_on_death") &&
+                //                          StringParsers.ParseBool(_element.GetAttribute("remove_on_death"), 0, -1, true);
+
                 if (_element.HasAttribute("display_type"))
                 {
                     buffClass.DisplayType = EnumUtils.Parse<EnumEntityUINotificationDisplayMode>(_element.GetAttribute("display_type"), false);
@@ -221,18 +260,33 @@ namespace SevenDTDMono.Features
                 {
                     buffClass.DisplayType = EnumEntityUINotificationDisplayMode.IconOnly;
                 }
-                if (_element.HasAttribute("icon_color"))
-                {
-                    buffClass.IconColor = StringParsers.ParseColor32(_element.GetAttribute("icon_color"));
-                }
-                else
-                {
-                    buffClass.IconColor = Color.white;
-                }
-                if (_element.HasAttribute("icon_blink"))
-                {
-                    buffClass.IconBlink = StringParsers.ParseBool(_element.GetAttribute("icon_blink"), 0, -1, true);
-                }
+
+                //buffClass.DisplayType = _element.HasAttribute("display_type")
+                //    ? EnumUtils.Parse<EnumEntityUINotificationDisplayMode>(_element.GetAttribute("display_type"), false)
+                //    : EnumEntityUINotificationDisplayMode.IconOnly;
+
+
+                //if (_element.HasAttribute("icon_color"))
+                //{
+                //    buffClass.IconColor = StringParsers.ParseColor32(_element.GetAttribute("icon_color"));
+                //}
+                //else
+                //{
+                //    buffClass.IconColor = Color.white;
+                //}
+
+                buffClass.IconColor = _element.HasAttribute("icon_color")
+                    ? StringParsers.ParseColor32(_element.GetAttribute("icon_color"))
+                    : Color.white;
+
+                //if (_element.HasAttribute("icon_blink"))
+                //{
+                //    buffClass.IconBlink = StringParsers.ParseBool(_element.GetAttribute("icon_blink"), 0, -1, true);
+                //}
+
+                buffClass.IconBlink = _element.HasAttribute("icon_blink") 
+                                      && StringParsers.ParseBool(_element.GetAttribute("icon_blink"), 0, -1, true);
+
                 buffClass.DamageSource = EnumDamageSource.Internal;
                 buffClass.DamageType = EnumDamageTypes.None;
                 buffClass.StackType = BuffEffectStackTypes.Replace;

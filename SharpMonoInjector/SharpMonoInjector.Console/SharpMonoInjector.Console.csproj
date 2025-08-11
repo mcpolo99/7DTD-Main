@@ -16,15 +16,19 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
+    <IntermediateOutputPath>C:\Users\RandomPenguin\AppData\Local\Temp\vs5CC0.tmp\Debug\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_NOUE|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
+    <IntermediateOutputPath>C:\Users\RandomPenguin\AppData\Local\Temp\vs5CC0.tmp\Release_NOUE\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release_UE|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
+    <IntermediateOutputPath>C:\Users\RandomPenguin\AppData\Local\Temp\vs5CC0.tmp\Release_UE\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
+    <IntermediateOutputPath>C:\Users\RandomPenguin\AppData\Local\Temp\vs5CC0.tmp\Release\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

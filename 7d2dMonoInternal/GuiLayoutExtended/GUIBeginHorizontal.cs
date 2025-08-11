@@ -9,8 +9,6 @@ namespace SevenDTDMono.GuiLayoutExtended
 {
     public partial class NewGUILayout
     {
-
-
         #region BeginHorizontal
         public static void BeginHorizontal(GUIContent content, GUIStyle style, System.Action contentActions, params GUILayoutOption[] options)
         {
@@ -43,9 +41,5 @@ namespace SevenDTDMono.GuiLayoutExtended
             GUILayout.EndHorizontal();
         }
         #endregion
-
-
-
-
     }
 }

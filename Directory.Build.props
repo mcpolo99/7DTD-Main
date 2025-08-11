@@ -1,12 +1,17 @@
 <Project>
 	<PropertyGroup>
-		<RootProject>MNO-ProjectABCD</RootProject>
+		<RootProject>7DTD-Main</RootProject>
 		<LangVersion>12</LangVersion>
 		<TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
 		<WarningLevel>4</WarningLevel>
 		<ErrorReport>prompt</ErrorReport>
-		<IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>
-		<OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>
+		<IntermediateOutputPath>S:\02Development\02VSBuild\$(SolutionName)\obj\$(Configuration)\$(MSBuildProjectName)\</IntermediateOutputPath>
+		<OutputPath>S:\02Development\02VSBuild\$(SolutionName)\bin\$(Configuration)\</OutputPath>
+		<BaseOutputPath>bin\</BaseOutputPath>
+
+
+		<!--<IntermediateOutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\Intermediate\$(MSBuildProjectName)\</IntermediateOutputPath>-->
+		<!--<OutputPath>T:\Temp\vsBuild\SingelBuild\$(SolutionName)\$(Platform)\$(Configuration)\</OutputPath>-->
 
 	</PropertyGroup>
 

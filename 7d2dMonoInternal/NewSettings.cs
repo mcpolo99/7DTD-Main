@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using UnityEngine;
 using UnityEngine.UI;
+using static XUiC_CustomCharacterWindowGroup;
 using Logger = UnityEngine.Logger;
 
 
@@ -278,93 +279,18 @@ namespace SevenDTDMono
 
         }
 
+        private void OnDestroy()
+        {
+            Debug.LogWarning($"OnDestroy: {nameof(NewSettings)}");
+            Cleanup();
+            // Other cleanup logic if needed
+        }
+        public void Cleanup()
+        {
 
-
-
-     
+            
+            // Unsubscribe events, clear references, etc.
+        }
 
     }
 }
-
-
-/*
- 
-    //************************************ STUFF THATS NOT ÙSED!!
-
-
-        private void AddSetting<T>(string key, T value)
-        {
-
-            if (!Instance.SettingsDictionary.ContainsKey(key))
-            {
-                //Instance.SettingsDictionary[key] = value;
-                SettingsDictionary.Add(key, value);
-
-            }
-            else
-            {
-                Debug.LogWarning($"Key '{key}' already exists in SettingsDictionary.");
-            }
-        }
-        public bool GetBoolSetting(string key)
-        {
-            if (SettingsDictionary.TryGetValue(key, out object value) && value is bool boolValue)
-            {
-                return boolValue;
-            }
-            return false; // Return default value or handle as needed
-        }
-
-
-
-        //public static Dictionary<string, bool> BD = new Dictionary<string, bool>();
-        //public static GUIStyle BgStyle, OnStyle, OffStyle, LabelStyle, BtnStyle, BtnStyle1, BtnStyle2, BtnStyle3, ToggStyle1, ToggStyle2;
-        //public static Dictionary<string, bool> BoolDictionary = new Dictionary<string, bool>();  //Dictionary that contains bool
-        //public static Dictionary<string, float> FloatDictionary = new Dictionary<string, float>(); //Dictionary that contains floats
-        //public Dictionary<string, bool> CustomBools { get; private set; } = new Dictionary<string, bool>();
-
-        public static T Get<T>(string key)// Get the value from the dictionary with the specified key
-        {
-
-            if (Instance.SettingsDictionary.ContainsKey(key) && Instance.SettingsDictionary[key] is T value)
-            {
-                return value;
-            }
-            Debug.LogError($"Key '{key}' is not of type {typeof(T)}.");
-            return default;
-        }
-
-
-        public static void CheckDictionaryForKey<T>(string key, T defaultValue = default) // Check and initialize the dictionary key with a default value if it does not exist
-        {
-            // Check if the key exists in the dictionary
-            if (!Instance.SettingsDictionary.ContainsKey(key))
-            {
-                // Add the key with a default value if it does not exist
-                Instance.SettingsDictionary[key] = defaultValue;
-            }
-
-            // Ensure the value associated with the key is of type T
-            if (!(Instance.SettingsDictionary[key] is T))
-            {
-                Debug.LogError($"Key '{key}' is not of type {typeof(T)}.");
-            }
-        }
-
-        public static void GetKey(string key)
-        {
-            //CheckDictionaryForKey(key, false);
-        }
-
-        public static bool GetBool(string key)
-        {
-            if (!Instance.SettingsDictionary.ContainsKey(key))
-            {
-                // Add the key with a default value if it does not exist
-                Instance.SettingsDictionary[key] = false;
-                return (bool)Instance.SettingsDictionary[key];
-            }
-            return (bool)Instance.SettingsDictionary[key];
-        }
-
- */

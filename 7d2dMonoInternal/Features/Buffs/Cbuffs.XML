@@ -1,14 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <buffs>
-  <buff name="testBuff1" icon="server_favorite" icon_color="132,0,155" icon_blink="true">
-    <display_value_key value="Test"/>
-    <display_value value="xxx"/>
-    <duration value="9999"/>
-    <stack_type value="ignore"/>
+  <buff name="testBuff1" icon="server_favorite" icon_color="132,0,155" icon_blink="true" remove_on_death="false">
+	<display_value_key value="testBuff1"/>
+	<display_value value=".testBuff1DurationDisplay"/>
+	<display_value_format value="time"/>
+	<duration value="0"/>
+	<stack_type value="replace"/>
 
-    <effect_group>
-      <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="keystone_destroyed"/>
-    </effect_group>
+	<effect_group>
+	  <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="keystone_destroyed"/>
+	</effect_group>
+
+
+
+	<effect_group name="DisplayDuration">
+		<!-- Handlers for the display -->
+		<triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".testBuff1DurationDisplay" operation="set" value="@$testBuff1Counter"/>
+		<triggered_effect trigger="onSelfBuffUpdate" action="ModifyCVar" cvar=".testBuff1DurationDisplay" operation="divide" value="@$critHitNaturalHealingRate"/>
+		<triggered_effect trigger="onSelfBuffRemove" action="RemoveCVar" cvar=".testBuff1DurationDisplay"/>
+	</effect_group>
+
   </buff>
   
 
@@ -45,123 +56,125 @@
 	</buff>
   
   <buff name="HPSTARegen" icon="ui_game_symbol_twitch_regen" icon_color="0,250,0" >
-    <!--icon_blink="true"-->
-    <display_value_key value="healthnstaminaRegen"/>
-    <display_value value="xxx"/>
-    <!--<duration value="9999999"/>-->
-    <stack_type value="ignore"/>
+	<!--icon_blink="true"-->
+	<display_value_key value="healthnstaminaRegen"/>
+	<display_value value="xxx"/>
+	<!--<duration value="9999999"/>-->
+	<stack_type value="ignore"/>
 
-    
-    <effect_group>
-      <passive_effect name="HealthMax" operation="perc_set" value="10"/>
-      <passive_effect name="StaminaMax" operation="perc_set" value="10"/>
-       <passive_effect name="HealthChangeOT" operation="perc_set" value="300"/>
-       <passive_effect name="StaminaChangeOT" operation="perc_set" value="300"/>
-       <passive_effect name="FoodLossPerHealthPointGained" operation="base_set" value="0"/>  <!--Food loos set to 0 to not lose food wen regen health -->
-       <passive_effect name="FoodLossPerStaminaPointGained" operation="base_set" value="0"/>  <!--Food loos set to 0 to not lose food wen regen stami´na  -->
-       <passive_effect name="WaterLossPerHealthPointGained" operation="base_set" value="0"/>  <!--Food loos set to 0 to not lose food wen regen stami´na -->
-       <passive_effect name="WaterLossPerStaminaPointGained" operation="base_set" value="0"/>  <!--Food loos set to 0 to not lose food wen regen stami´na -->
-      <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="set" value="25000"/>
-      <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Stamina" operation="set" value="25000"/>
-      <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="keystone_destroyed"/>
-    </effect_group>
+	
+	<effect_group>
+	  <passive_effect name="HealthMax" operation="perc_set" value="10"/>
+	  <passive_effect name="StaminaMax" operation="perc_set" value="10"/>
+	   <passive_effect name="HealthChangeOT" operation="perc_set" value="300"/>
+	   <passive_effect name="StaminaChangeOT" operation="perc_set" value="300"/>
+	   <passive_effect name="FoodLossPerHealthPointGained" operation="base_set" value="0"/>  <!--Food loos set to 0 to not lose food wen regen health -->
+	   <passive_effect name="FoodLossPerStaminaPointGained" operation="base_set" value="0"/>  <!--Food loos set to 0 to not lose food wen regen stami´na  -->
+	   <passive_effect name="WaterLossPerHealthPointGained" operation="base_set" value="0"/>  <!--Food loos set to 0 to not lose food wen regen stami´na -->
+	   <passive_effect name="WaterLossPerStaminaPointGained" operation="base_set" value="0"/>  <!--Food loos set to 0 to not lose food wen regen stami´na -->
+	  <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="set" value="25000"/>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Stamina" operation="set" value="25000"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="PlaySound" sound="keystone_destroyed"/>
+	</effect_group>
   </buff>
 
   <buff name="DamageResistNoBadBuff" name_key="DamageResistNoBadBuff" description_key="DamageResistNoBadBuff" tooltip_key="buffGodModeTooltip1" icon="ui_game_symbol_add" icon_color="132,0,155">
-    <stack_type value="ignore"/>
-    <display_value_key value="DamageResistNoBadBuff"/>
-    <display_value value="xxx"/>
+	<stack_type value="ignore"/>
+	<display_value_key value="DamageResistNoBadBuff"/>
+	<display_value value="xxx"/>
 
-    <effect_group>
-      <passive_effect name="GeneralDamageResist" operation="base_add" value="1"/>
-      <passive_effect name="CarryCapacity" operation="base_set" value="45"/>
-      <passive_effect name="ElementalDamageResist" operation="base_add" value="200" tags="cold,heat,electrical"/>
-      <passive_effect name="PhysicalDamageResist" operation="base_add" value="200"/>
-      <passive_effect name="PhysicalDamageResist" operation="base_add" value="200" tags="coredamageresist"/>
-      <passive_effect name="ElementalDamageResist" operation="base_add" value="200" tags="heat,electrical"/>
-      <triggered_effect trigger="onSelfBuffUpdate" action="RemoveAllNegativeBuffs"/>
-      <triggered_effect trigger="onSelfBuffUpdate" action="AddBuff" buff="buffPerkAbilityUpdate"/>
-      <triggered_effect trigger="onSelfBuffRemove" action="AddBuff" buff="buffPerkAbilityUpdate"/>
-      <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="set" value="25000"/>
-      <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Food" operation="set" value="25000"/>
-      <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Water" operation="set" value="25000"/>
-      <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Stamina" operation="set" value="25000"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$armHurtCounter" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$legHurtCounter" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="healAbrasionMult" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="medicalRegHealthAmount" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="foodHealthAmount" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$abrasionHealthMaxBlockage" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$abrasionCounter" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="abrasionZombieHit" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugPainkillersDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugVitaminsDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="buffFoodStaminaBonus"/>
+	<effect_group>
+	  <passive_effect name="GeneralDamageResist" operation="base_add" value="1"/>
+	  <passive_effect name="CarryCapacity" operation="base_set" value="45"/>
+	  <passive_effect name="ElementalDamageResist" operation="base_add" value="200" tags="cold,heat,electrical"/>
+	  <passive_effect name="PhysicalDamageResist" operation="base_add" value="200"/>
+	  <passive_effect name="PhysicalDamageResist" operation="base_add" value="200" tags="coredamageresist"/>
+	  <passive_effect name="ElementalDamageResist" operation="base_add" value="200" tags="heat,electrical"/>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="RemoveAllNegativeBuffs"/>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="AddBuff" buff="buffPerkAbilityUpdate"/>
+	  <triggered_effect trigger="onSelfBuffRemove" action="AddBuff" buff="buffPerkAbilityUpdate"/>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Health" operation="set" value="25000"/>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Food" operation="set" value="25000"/>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Water" operation="set" value="25000"/>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Stamina" operation="set" value="25000"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$armHurtCounter" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$legHurtCounter" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="healAbrasionMult" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="medicalRegHealthAmount" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="foodHealthAmount" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$abrasionHealthMaxBlockage" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$abrasionCounter" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="abrasionZombieHit" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugPainkillersDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugVitaminsDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="RemoveBuff" buff="buffFoodStaminaBonus"/>
 
-      <triggered_effect trigger="onSelfBuffUpdate" action="GiveExp" exp="10000">
-        <requirement name="CVarCompare" cvar="_expdeficit" operation="GTE" value="10000"/>
-      </triggered_effect>
-      <triggered_effect trigger="onSelfBuffUpdate" action="GiveExp" exp="2500">
-        <requirement name="CVarCompare" cvar="_expdeficit" operation="GTE" value="2500"/>
-      </triggered_effect>
-      <triggered_effect trigger="onSelfBuffUpdate" action="GiveExp" exp="600">
-        <requirement name="CVarCompare" cvar="_expdeficit" operation="GTE" value="600"/>
-      </triggered_effect>
-      <triggered_effect trigger="onSelfBuffUpdate" action="GiveExp" exp="150">
-        <requirement name="CVarCompare" cvar="_expdeficit" operation="GTE" value="150"/>
-      </triggered_effect>
-      <triggered_effect trigger="onSelfBuffUpdate" action="GiveExp" exp="40">
-        <requirement name="CVarCompare" cvar="_expdeficit" operation="GTE" value="40"/>
-      </triggered_effect>
-      <triggered_effect trigger="onSelfBuffUpdate" action="GiveExp" exp="10">
-        <requirement name="CVarCompare" cvar="_expdeficit" operation="GT" value="0"/>
-      </triggered_effect>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="GiveExp" exp="10000">
+		<requirement name="CVarCompare" cvar="_expdeficit" operation="GTE" value="10000"/>
+	  </triggered_effect>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="GiveExp" exp="2500">
+		<requirement name="CVarCompare" cvar="_expdeficit" operation="GTE" value="2500"/>
+	  </triggered_effect>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="GiveExp" exp="600">
+		<requirement name="CVarCompare" cvar="_expdeficit" operation="GTE" value="600"/>
+	  </triggered_effect>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="GiveExp" exp="150">
+		<requirement name="CVarCompare" cvar="_expdeficit" operation="GTE" value="150"/>
+	  </triggered_effect>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="GiveExp" exp="40">
+		<requirement name="CVarCompare" cvar="_expdeficit" operation="GTE" value="40"/>
+	  </triggered_effect>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="GiveExp" exp="10">
+		<requirement name="CVarCompare" cvar="_expdeficit" operation="GT" value="0"/>
+	  </triggered_effect>
 
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugVitaminsDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugPainkillersDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugSteroidsDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugRecogDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugFortBitesDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugAtomJunkiesDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugCovertCatsDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugEyeKandyDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugHackersDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugHealthBarDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugJailBreakersDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugNerdTatsDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugOhShitzDropsDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugRockBustersDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugSkullCrushersDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugSugarButtsDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffShamChowderDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffPumpkinCheesecakeDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffRedTeaDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffYuccaJuiceSmoothieDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffMegaCrushDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffCoffeeDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffCoffeeBSDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffBeerDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffGrandpasMoonshineDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffGrandpasAwesomeSauceDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffGrandpasLearningElixirDuration" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$foodAmountAdd" operation="set" value="0"/>
-      <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$waterAmountAdd" operation="set" value="0"/>
-    </effect_group>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugVitaminsDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugPainkillersDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugSteroidsDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugRecogDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugFortBitesDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugAtomJunkiesDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugCovertCatsDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugEyeKandyDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugHackersDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugHealthBarDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugJailBreakersDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugNerdTatsDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugOhShitzDropsDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugRockBustersDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugSkullCrushersDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffDrugSugarButtsDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffShamChowderDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffPumpkinCheesecakeDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffRedTeaDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffYuccaJuiceSmoothieDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffMegaCrushDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffCoffeeDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffCoffeeBSDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffBeerDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffGrandpasMoonshineDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffGrandpasAwesomeSauceDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$buffGrandpasLearningElixirDuration" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$foodAmountAdd" operation="set" value="0"/>
+	  <triggered_effect trigger="onSelfBuffStart" action="ModifyCVar" cvar="$waterAmountAdd" operation="set" value="0"/>
+	</effect_group>
   </buff>
   
   <buff name="FoodWater" icon="ui_game_symbol_hunger" icon_color="0,250,0" name_key="FoodWater" description_key="FoodWater" >
-    <stack_type value="replace"/>
-    <display_value value=".buffFoodStaminaBonusDisplay"/>
+	<stack_type value="replace"/>
+	<display_value value=".buffFoodStaminaBonusDisplay"/>
 
-    <effect_group>
-      <passive_effect name="WaterMax" operation="perc_set" value="10"/>
-      <passive_effect name="FoodMax" operation="perc_set" value="10"/>
-      <passive_effect name="WaterChangeOT" operation="base_add" value="300"/>
-      <passive_effect name="FoodChangeOT" operation="base_add" value="300"/>
-      <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Food" operation="set" value="25000"/>
-      <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Water" operation="set" value="25000"/>
-    </effect_group>
+	<effect_group>
+	  <passive_effect name="WaterMax" operation="perc_set" value="10"/>
+	  <passive_effect name="FoodMax" operation="perc_set" value="10"/>
+	  <passive_effect name="WaterChangeOT" operation="base_add" value="300"/>
+	  <passive_effect name="FoodChangeOT" operation="base_add" value="300"/>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Food" operation="set" value="25000"/>
+	  <triggered_effect trigger="onSelfBuffUpdate" action="ModifyStats" stat="Water" operation="set" value="25000"/>
+	</effect_group>
   </buff>
   
+
+
   
 </buffs>

@@ -100,10 +100,12 @@ namespace SevenDTDMono
             }
             if (Input.GetKeyDown(KeyCode.Delete))
             {
+                //UnityEngine.Object.Destroy(gameObject.GetComponent<NewSettings>());
+                //UnityEngine.Object.Destroy(gameObject.GetComponent<NewSettings>());
                 //SETT.selfDestruct = false; //set bool to false so we can inject again
-                Destroy(Loader.gameObject); // destroys our game object we injected
+                //Destroy(Loader.GameObject); // destroys our game object we injected
                 //ObjectDestroyer.DestroyObjectByName("ExplorerBehaviour");
-                ObjectDestroyer.DestroyObjectByName("7DTD----MENU");
+                //ObjectDestroyer.DestroyObjectByName("7DTD----MENU");
             }
         }
 
@@ -206,27 +208,8 @@ namespace SevenDTDMono
         }
         private void Window(int windowID)
         {
-            //if (!NewSettings.GameManager.gameStateManager.bGameStarted)
-            //{
-                
-                
-            //    NewGUILayout.BeginHorizontal(() =>
-            //    {
-            //        //GUILayout.Space(10f);
-            //        GUILayout.Label("Start a game to load the Menu", centeredLabelStyle);
-            //        NewGUILayout.Button("test add dict", test);
-            //        //GUILayout.Space(10f);
-            //    });
-           
-               
-                
-            //    GUI.DragWindow();
-            //}
-            //else
             {
                 windowRect.height = 500;
-
-                
                 _group = NewGUILayout.Toolbar4(_group, CheatsString, GUI.skin.box); //creating the group for switch comand    
                 switch (_group)
                 {
@@ -271,10 +254,15 @@ namespace SevenDTDMono
 
 
                                 //********************* FINISHED REMAKE***************************
+                                // OK 2025-07-11
                                 NewGUILayout.Button("Level Up", Cheat.LevelUp);
+                                // OK 2025-07-11
                                 NewGUILayout.Button("Add Skill Points", Cheat.SkillPoints);
-                         
+
+                                // OK 2025-07-11
                                 NewGUILayout.Button("Kill Self", Cheat.KillSelf);
+
+
                                 NewGUILayout.ButtonToggleDictionary("Ignore By AI", nameof(Player.isIgnoredByAI), () =>
                                     {
                                         //this is only working with zombies for some reason.. not with all entites,
@@ -306,44 +294,9 @@ namespace SevenDTDMono
 
 
                                     });
-                                /*
-                                NewGUILayout.ButtonToggleDictionary("DebugMenuShowTasks", nameof(EnumGamePrefs.DebugMenuShowTasks), () =>
-                                {
-                                      //this is only working with zombies for some reason.. not with all entites,
-                                      if (Player)
-                                      {
-                                          //bool bool1 = (bool)Settings[nameof(player.isIgnoredByAI)];
-                                          //player.SetIgnoredByAI(bool1);
 
-
-                                          EntityAlive.SetupAllDebugNameHUDs(SettingsInstance.GetBoolValue(nameof(EnumGameStats.IsCreativeMenuEnabled)));
-
-                                          NewSettings.AddReset(nameof(EnumGamePrefs.DebugMenuShowTasks));
-                                      }
-
-
-                                      //public void updateDebugKeys()
-                                      //bool flag4 = !GamePrefs.GetBool(EnumGamePrefs.DebugStopEnemiesMoving);
-                                      //GamePrefs.Set(EnumGamePrefs.DebugStopEnemiesMoving, flag4);
-                                      //if (shiftKeyPressed)
-                                      //{
-                                      //    this.entityPlayerLocal.SetIgnoredByAI(!this.entityPlayerLocal.IsIgnoredByAI());
-                                      //    return;
-                                      //}
-                                      //bool flag4 = !GamePrefs.GetBool(EnumGamePrefs.DebugStopEnemiesMoving);
-                                      //GamePrefs.Set(EnumGamePrefs.DebugStopEnemiesMoving, flag4);
-                                      //if (flag4)
-                                      //{
-                                      //    this.entityPlayerLocal.Buffs.AddBuff("buffShowAIDisabled", -1, true, false, -1f);
-                                      //    return;
-                                      //}
-                                      //this.entityPlayerLocal.Buffs.RemoveBuff("buffShowAIDisabled", true);
-
-
-
-                                });*/
-
-                                NewGUILayout.ButtonToggleDictionary("Debug Menu Enable", nameof(EnumGamePrefs.DebugMenuEnabled), () =>
+                                // OK 2025-07-11
+                                 NewGUILayout.ButtonToggleDictionary("Debug Menu Enable", nameof(EnumGamePrefs.DebugMenuEnabled), () =>
                                 {
                                     if (Player)
                                     {
@@ -355,7 +308,7 @@ namespace SevenDTDMono
                                     }
                                 });
 
-
+                                // OK 2025-07-11
                                 NewGUILayout.ButtonToggleDictionary("Creative", nameof(EnumGameStats.IsCreativeMenuEnabled), () =>
                                 {
                                     GameStats.Set(EnumGameStats.IsCreativeMenuEnabled,SettingsInstance.GetBoolValue(nameof(EnumGameStats.IsCreativeMenuEnabled)));
@@ -375,6 +328,7 @@ namespace SevenDTDMono
                             });
                             NewGUILayout.BeginVertical(() =>
                             {
+                                // OK 2025-07-11
                                 if (NewGUILayout.Button($"Teleport To Marker "))
                                 {
                                     if (Player)
@@ -398,10 +352,12 @@ namespace SevenDTDMono
                                 {
                                     Cheat.AddPassiveEffectToPlayer(PassiveEffects.CraftingSmeltTime, 0f, ValueModifierTypes.base_set);
                                 });
+                                // TODO 2025 - 07 - 11
                                 NewGUILayout.ButtonToggleDictionary("Instant Scrap", nameof(PassiveEffects.ScrappingTime), () =>
                                 {
                                     Cheat.AddPassiveEffectToPlayer(PassiveEffects.ScrappingTime, 0f, ValueModifierTypes.base_set);
                                 });
+                                // TODO 2025 - 07 - 11
                                 NewGUILayout.ButtonToggleDictionary("Infinity durability", nameof(PassiveEffects.DegradationPerUse), () =>
                                 {
                                     Cheat.AddPassiveEffectToPlayer(PassiveEffects.DegradationPerUse, 0f, ValueModifierTypes.base_set);
@@ -450,7 +406,8 @@ namespace SevenDTDMono
         }
 
 
-        
+        private static Dictionary<string, object> TempSettings => NewSettings.Instance.TempDictionary; //get instance of SettingsDictionary
+
         private void Tab2() //Toggles and modifiers
         {
             NewGUILayout.BeginVertical(GUI.skin.box, () => {
@@ -474,57 +431,7 @@ namespace SevenDTDMono
                         NewGUILayout.ButtonToggleDictionary("NoWeaponBob", nameof(SettingsBools.NO_WEAPON_BOB));
                     });
                 });
-            });
-            NewGUILayout.BeginVertical(GUI.skin.box, () =>
-            {
-                GUIStyle LabelStyle = new GUIStyle(GUI.skin.label)
-                {
-                    alignment = TextAnchor.MiddleCenter,
-                    fontSize = 15,
-                    padding = new RectOffset(0, 0, 0, 0),
-                    margin = new RectOffset(0, 0, 0, 10),
-                };
-                NewGUILayout.BeginVertical(() =>
-                {
-                    GUILayout.Label("Modifiers",LabelStyle);
-
-                    NewGUILayout.HorizontalScrollbarWithLabelAndButton("Block DMG", nameof(PassiveEffects.BlockDamage), ref NewSettings.FloatBlockDamageMultiplier, 1000f, () =>
-                    {
-                        Cheat.AddPassiveEffectToPlayer(PassiveEffects.BlockDamage, NewSettings.FloatBlockDamageMultiplier, ValueModifierTypes.base_set);
-                    });
-                    NewGUILayout.HorizontalScrollbarWithLabelAndButton("Kill DMG", nameof(PassiveEffects.EntityDamage), ref NewSettings.FloatKillDamageMultiplier, 1000f, () =>
-                    {
-
-                        Cheat.AddPassiveEffectToPlayer(PassiveEffects.EntityDamage, NewSettings.FloatKillDamageMultiplier, ValueModifierTypes.base_set);
-                    });
-                    NewGUILayout.HorizontalScrollbarWithLabelAndButton("Jump Strength", nameof(PassiveEffects.JumpStrength), ref NewSettings.FloatJumpStrengthMultiplier, 5f, () =>
-                    {
-
-                        Cheat.AddPassiveEffectToPlayer(PassiveEffects.JumpStrength, NewSettings.FloatJumpStrengthMultiplier, ValueModifierTypes.base_set);
-                    });
-                    NewGUILayout.HorizontalScrollbarWithLabelAndButton("Run Speed", nameof(PassiveEffects.RunSpeed), ref NewSettings.FloatRunSpeedMultiplier, 25f, () =>
-                    {
-
-                        Cheat.AddPassiveEffectToPlayer(PassiveEffects.RunSpeed, NewSettings.FloatRunSpeedMultiplier, ValueModifierTypes.base_set);
-                    });
-                    NewGUILayout.HorizontalScrollbarWithLabelAndButton("Attacks/minute", nameof(PassiveEffects.AttacksPerMinute), ref NewSettings.FloatAttacksPerMinuteMultiplier, 500f, () =>
-                    {
-
-                        Cheat.AddPassiveEffectToPlayer(PassiveEffects.AttacksPerMinute, NewSettings.FloatAttacksPerMinuteMultiplier, ValueModifierTypes.base_set);
-                    });
-                    NewGUILayout.HorizontalScrollbarWithLabelAndButton("Harvest multiplier", nameof(PassiveEffects.HarvestCount), ref NewSettings.FloatHarvestCountMultiplier, 20f, () =>
-                    {
-
-                        Cheat.AddPassiveEffectToPlayer(PassiveEffects.HarvestCount, NewSettings.FloatHarvestCountMultiplier, ValueModifierTypes.base_set);
-                    });
-
-
-
-
-
-                });
-
-            });
+            }); 
             GUI.DragWindow();
         }
         private void Tab3() //Buffs And stuff
@@ -533,29 +440,82 @@ namespace SevenDTDMono
                 GUILayout.Label("Buffs");
                 //NewGUILayout.BeginVertical("Buffs", defBoxStyle, () =>
                 //{
-                    GUILayout.Space(20f);
-                    NewGUILayout.BeginHorizontal(() =>
+                GUILayout.Space(20f);
+                NewGUILayout.BeginHorizontal(() =>
                     {
                         NewGUILayout.BeginVertical(() =>
                         {
 
                             NewGUILayout.Button("Remove All Active Buffs", Cheat.RemoveAllBuff);//Cheat.RemoveBadBuff() //OK
                             NewGUILayout.Button("Clear CheatBuff", Cheat.ClearCheatBuff);//Cheat.custombuff();
-
                         });
                         NewGUILayout.BeginVertical(() =>
                         {
                             NewGUILayout.Button("Add CheatBuff to P", Cheat.AddCheatBuff);//Cheat.custombuff();
-                            NewGUILayout.Button("Add Effect Group", Cheat.AddEffectGroup);//Cheat.custombuff();
+                            //NewGUILayout.Button("Add Effect Group", Cheat.AddEffectGroup);//Cheat.custombuff();
 
                         });
 
                     });
+
+                if (NewSettings.GameManager.gameStateManager.bGameStarted && Player.Buffs.HasBuff("testBuff1"))
+                {
+                    NewGUILayout.BeginVertical(GUI.skin.box, () =>
+                    {
+                        GUIStyle LabelStyle = new GUIStyle(GUI.skin.label)
+                        {
+                            alignment = TextAnchor.MiddleCenter,
+                            fontSize = 15,
+                            padding = new RectOffset(0, 0, 0, 0),
+                            margin = new RectOffset(0, 0, 0, 10),
+                        };
+                        NewGUILayout.BeginVertical(() =>
+                        {
+                            GUILayout.Label("Modifiers", LabelStyle);
+
+                            NewGUILayout.HorizontalScrollbarWithLabelAndButton("Block DMG", nameof(PassiveEffects.BlockDamage), ref NewSettings.FloatBlockDamageMultiplier, 1000f, () =>
+                            {
+                                Cheat.AddPassiveEffectToPlayer(PassiveEffects.BlockDamage, NewSettings.FloatBlockDamageMultiplier, ValueModifierTypes.base_set);
+                            });
+                            NewGUILayout.HorizontalScrollbarWithLabelAndButton("Kill DMG", nameof(PassiveEffects.EntityDamage), ref NewSettings.FloatKillDamageMultiplier, 1000f, () =>
+                            {
+
+                                Cheat.AddPassiveEffectToPlayer(PassiveEffects.EntityDamage, NewSettings.FloatKillDamageMultiplier, ValueModifierTypes.base_set);
+                            });
+                            NewGUILayout.HorizontalScrollbarWithLabelAndButton("Jump Strength", nameof(PassiveEffects.JumpStrength), ref NewSettings.FloatJumpStrengthMultiplier, 5f, () =>
+                            {
+
+                                Cheat.AddPassiveEffectToPlayer(PassiveEffects.JumpStrength, NewSettings.FloatJumpStrengthMultiplier, ValueModifierTypes.base_set);
+                            });
+                            NewGUILayout.HorizontalScrollbarWithLabelAndButton("Run Speed", nameof(PassiveEffects.RunSpeed), ref NewSettings.FloatRunSpeedMultiplier, 25f, () =>
+                            {
+
+                                Cheat.AddPassiveEffectToPlayer(PassiveEffects.RunSpeed, NewSettings.FloatRunSpeedMultiplier, ValueModifierTypes.base_set);
+                            });
+                            NewGUILayout.HorizontalScrollbarWithLabelAndButton("Attacks/minute", nameof(PassiveEffects.AttacksPerMinute), ref NewSettings.FloatAttacksPerMinuteMultiplier, 500f, () =>
+                            {
+
+                                Cheat.AddPassiveEffectToPlayer(PassiveEffects.AttacksPerMinute, NewSettings.FloatAttacksPerMinuteMultiplier, ValueModifierTypes.base_set);
+                            });
+                            NewGUILayout.HorizontalScrollbarWithLabelAndButton("Harvest multiplier", nameof(PassiveEffects.HarvestCount), ref NewSettings.FloatHarvestCountMultiplier, 20f, () =>
+                            {
+
+                                Cheat.AddPassiveEffectToPlayer(PassiveEffects.HarvestCount, NewSettings.FloatHarvestCountMultiplier, ValueModifierTypes.base_set);
+                            });
+
+
+
+
+
+                        });
+
+                    });
+
                     NewGUILayout.DictFoldMenuHorizontal("Custom Buffs", "bool_foldCBuff", () =>
                     {
                         NewGUILayout.BeginScrollView("vector2_scrollCustomBuff", () => {
                             Cheat.GetListCBuffs(Player, NewSettings.ListCheatBuffs);
-                        }, GUILayout.MinHeight(100),GUILayout.ExpandHeight(true));
+                        }, GUILayout.MinHeight(100), GUILayout.ExpandHeight(true));
                     });
                     NewGUILayout.DictFoldMenuHorizontal("Passive Effects", "bool_foldPassive", () =>
                     {
@@ -631,11 +591,16 @@ namespace SevenDTDMono
                         }, GUILayout.MinHeight(250f), GUILayout.MaxHeight(450f), GUILayout.ExpandHeight(true));
                     });
 
+                }
+
                 //});
 
 
 
             }, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
+            
+            
+            
             GUI.DragWindow();
 
         } //Buffs an  stuff
@@ -658,7 +623,7 @@ namespace SevenDTDMono
                     {
                         //Cheat.LogProgressionClassToFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "_listProgressionClass.txt"));
                     }
-                    if (NewGUILayout.Button("´Log Buffs To file"))
+                    if (NewGUILayout.Button("Log Buffs To file"))
                     {
                         Extras.LogAvailableBuffNames(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "load", "BuffsList.txt"));
                     }

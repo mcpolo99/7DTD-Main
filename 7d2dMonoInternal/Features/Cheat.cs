@@ -218,6 +218,7 @@ namespace SevenDTDMono.Features
             string str = _boolDict[$"{passiveEffects}"] ? "Adding " : "Removing ";
 
             Debug.LogWarning($"{str}{passiveEffects}");
+
             if (_boolDict[$"{passiveEffects}"])
             {
                 AddPassive(passiveEffects, modifier, valueModifierTypes);
@@ -225,11 +226,11 @@ namespace SevenDTDMono.Features
             if (!_boolDict[$"{passiveEffects}"])
             {
                 RemovePassive(passiveEffects);
-
             }
         }
         private static void RemovePassive(PassiveEffects passiveEffects)
         {
+
             var passiveEffectsList = MinEffectController.EffectGroups[0].PassiveEffects;
             for (int i = passiveEffectsList.Count - 1; i >= 0; i--)
             {
@@ -244,7 +245,11 @@ namespace SevenDTDMono.Features
         public static void AddPassive(PassiveEffects passiveEffects, float value, ValueModifierTypes valueModifierTypes)
         {
 
-            /*valueModifierTypes
+
+            /*
+
+            # valueModifierTypes: 
+
             Base_set - Sets to valu w eshoose
             Base_add - adds ontop of defalut base
             base_subtract - subtract from base valu
@@ -254,19 +259,30 @@ namespace SevenDTDMono.Features
             count - No clue
             */
 
-            if (Player.Buffs.HasBuff(nameof(_cheatBuff)) == false)
+            //if ( Player.Buffs != null  && Player.Buffs.HasBuff(nameof(_cheatBuff)) == false)
+            Log.Out($"{Player.Buffs != null}");
+            Log.Out($"{Player.Buffs.HasBuff("testBuff1")}");
+            if ( Player.Buffs != null  && !Player.Buffs.HasBuff("testBuff1"))
             {
                 try 
-                {
-                    Log.Out($"{_cheatBuff.Name} was not active, try adding");
-                   Player.Buffs.AddBuff(nameof(_cheatBuff));
+                { 
+                    Log.Out($"{_cheatBuff.Name} was not active, try adding"); 
+                    //Player.Buffs.AddBuff(nameof(_cheatBuff));
+                    Player.Buffs.AddBuff("testBuff1");
                 } catch
                 { 
+
                 }
             }
+            
 
             List<PassiveEffect> pE1 = new List<PassiveEffect>();
-            MinEffectGroup effectGroup = MinEffectController.EffectGroups[0];
+
+            SevenDTDMono.Features.Cheat.MinEffectController = Player.Buffs.GetBuff("testBuff1").BuffClass.Effects;
+
+            //MinEffectGroup effectGroup = MinEffectController.EffectGroups[0];
+            MinEffectGroup effectGroup = Player.Buffs.GetBuff("testBuff1").BuffClass.Effects.EffectGroups[0];
+
 
             PassiveEffect newPassiveEffect = new PassiveEffect
             {
@@ -296,6 +312,8 @@ namespace SevenDTDMono.Features
             MinEffectController.PassivesIndex.Add(passiveEffects); // adds to MinEffectController.PassivesIndex MUST DO OTHERWISE NULL REFERENCE ERROR
             //effectGroup.PassiveEffects.Add(newPassiveEffect);           // MinEffectController.MinEffectGroup.PassivesIndex __ This location just adds buffs on top if added multiple times
             MinEffectController.EffectGroups[0].PassiveEffects.Add(newPassiveEffect);           // MinEffectController.MinEffectGroup.PassivesIndex __ This location just adds buffs on top if added multiple times
+
+            Player.Buffs.GetBuff("testBuff1").BuffClass.Effects = MinEffectController;
         }
 
         public static void GetListPassiveEffects(string searchText) //should make a chache for this one to lower cpu usage
@@ -362,239 +380,49 @@ namespace SevenDTDMono.Features
         //BUFF RELATED
         public static void AddCheatBuff()
         {
-            /*
-            float WalkSlider = SETT._run;  //set 1 to 5
-            float RunSlider = SETT._run;  //set 1 to 5
-            float BlockDMGSlider = SETT._dmg;   //set 1 to 50
-
-            //BuffValue buff;
-
-
-            
-            BuffClass test = BuffManager.GetBuff("testbuff");
-            test.DamageType = EnumDamageTypes.None; // Set the appropriate damage type if applicable
-            test.Description = "This is a custom buff.";
-            test.DurationMax = 99999999f;
-            //test.Icon = "ui_game_symbol_agility";
-            test.ShowOnHUD = true;
-            //test.Hidden = false;
-            test.IconColor = new Color(0.22f, 0.4f, 1f, 100f);
-            test.DisplayType = EnumEntityUINotificationDisplayMode.IconPlusDetail;
-            
-
-            
-            O._minEffectController.EffectGroups = new List<MinEffectGroup>
-            {
-                new MinEffectGroup
-                {
-                    OwnerTiered = true,
-                    PassiveEffects = new List<PassiveEffect> 
-                    {
-                          new PassiveEffect
-                             {
-                                 MatchAnyTags = true,
-                                 Type = PassiveEffects.WalkSpeed,
-                                 Modifier = PassiveEffect.ValueModifierTypes.base_add,
-                                 Values = new float[] { RunSlider }
-                                 //Set other properties of PassiveEffect if needed
-                             },
-                            new PassiveEffect
-                            {
-                                // Set the properties of the PassiveEffect instance accordingly
-                                 MatchAnyTags = true,
-                                 Modifier = PassiveEffect.ValueModifierTypes.base_add,
-                                 Type = PassiveEffects.RunSpeed,
-                                 Values = new float[] { WalkSlider },
-
-                                 //Set other properties if needed
-                            },
-                            new PassiveEffect
-                            {
-                                // Set the properties of the PassiveEffect instance accordingly
-                                 MatchAnyTags = true,
-                                 Modifier = PassiveEffect.ValueModifierTypes.base_add,
-                                 Type = PassiveEffects.BlockDamage,
-                                 Values = new float[] { BlockDMGSlider },
-                                 //Set other properties if needed
-                            },
-                            new PassiveEffect
-                            {
-                                // Set the properties of the PassiveEffect instance accordingly
-                                 MatchAnyTags = true,
-                                 Modifier = PassiveEffect.ValueModifierTypes.base_add,
-                                 Type = PassiveEffects.CraftingTime,
-                                 Values = new float[] { 0 },
-                                 //Set other properties if needed
-                            },
-                            new PassiveEffect
-                            {
-                                // Set the properties of the PassiveEffect instance accordingly
-                                 MatchAnyTags = true,
-                                 Modifier = PassiveEffect.ValueModifierTypes.base_add,
-                                 Type = PassiveEffects.FoodGain,
-                                 Values = new float[] { 9999 },
-                                 //Set other properties if needed
-                            }
-                    },
-                    PassivesIndex = new List<PassiveEffects>
-                        {
-                             PassiveEffects.WalkSpeed,
-                             PassiveEffects.BlockDamage,
-                             PassiveEffects.CraftingTime,
-                             PassiveEffects.FoodGain,
-                        }
-                }
-
-            };
-            O._minEffectController.PassivesIndex = new HashSet<PassiveEffects> 
-            {
-                
-                    PassiveEffects.WalkSpeed,
-                    PassiveEffects.RunSpeed,
-                    PassiveEffects.BlockDamage,
-                    PassiveEffects.CraftingTime,
-                    PassiveEffects.None
-            };
-            /*
-            // Set the properties of the custom buff
-
-
-
-            /*
-
-
-            MinEffectController effectController = new MinEffectController 
-            { 
-                EffectGroups = new List<MinEffectGroup>
-                {
-                    new MinEffectGroup
-                    {
-                        OwnerTiered = true,
-                        PassiveEffects = new List<PassiveEffect>
-                        {
-                             new PassiveEffect
-                             {
-                                 MatchAnyTags = true,
-                                 Type = PassiveEffects.WalkSpeed,
-                                 Modifier = PassiveEffect.ValueModifierTypes.base_add,
-                                 Values = new float[] { RunSlider }
-                                 //Set other properties of PassiveEffect if needed
-                             },
-                            new PassiveEffect
-                            {
-                                // Set the properties of the PassiveEffect instance accordingly
-                                 MatchAnyTags = true,
-                                 Modifier = PassiveEffect.ValueModifierTypes.base_add,
-                                 Type = PassiveEffects.RunSpeed,
-                                 Values = new float[] { WalkSlider },
-
-                                 //Set other properties if needed
-                            },
-                            new PassiveEffect
-                            {
-                                // Set the properties of the PassiveEffect instance accordingly
-                                 MatchAnyTags = true,
-                                 Modifier = PassiveEffect.ValueModifierTypes.base_add,
-                                 Type = PassiveEffects.BlockDamage,
-                                 Values = new float[] { BlockDMGSlider },
-                                 //Set other properties if needed
-                            },
-                            new PassiveEffect
-                            {
-                                // Set the properties of the PassiveEffect instance accordingly
-                                 MatchAnyTags = true,
-                                 Modifier = PassiveEffect.ValueModifierTypes.base_add,
-                                 Type = PassiveEffects.CraftingTime,
-                                 Values = new float[] { 0 },
-                                 //Set other properties if needed
-                            },
-                            new PassiveEffect
-                            {
-                                // Set the properties of the PassiveEffect instance accordingly
-                                 MatchAnyTags = true,
-                                 Modifier = PassiveEffect.ValueModifierTypes.base_add,
-                                 Type = PassiveEffects.FoodGain,
-                                 Values = new float[] { 9999 },
-                                 //Set other properties if needed
-                            }
-                        },
-     
-                        PassivesIndex = new List<PassiveEffects>
-                        {
-                             PassiveEffects.WalkSpeed,
-                             PassiveEffects.BlockDamage,
-                             PassiveEffects.CraftingTime,
-                             PassiveEffects.FoodGain,
-                        }
-
-                    }
-                },
-                PassivesIndex = new HashSet<PassiveEffects>
-                {
-                    PassiveEffects.WalkSpeed,
-                    PassiveEffects.RunSpeed,
-                    PassiveEffects.BlockDamage,
-                    PassiveEffects.CraftingTime,
-                    PassiveEffects.FoodGain,
-                }
-            };
-
-            
-            //customBuff.Name = "customBuff";
-            //customBuff.DamageType = EnumDamageTypes.None; // Set the appropriate damage type if applicable
-            //customBuff.Description = "This is a custom buff.";
-            //customBuff.DurationMax = 99999999f;
-            //customBuff.Icon = "ui_game_symbol_agility";
-            //customBuff.ShowOnHUD = true;
-            //customBuff.Hidden = false;
-            //customBuff.IconColor = new Color(0.22f, 0.4f, 1f, 100f);
-            //customBuff.DisplayType = EnumEntityUINotificationDisplayMode.IconOnly;
-            //customBuff.LocalizedName = "This is name in inventory";
-            //customBuff.Effects = O._minEffectController;
-          
-            //O.ELP.Buffs.AddBuff("testbuff");
-            */
-            if (BuffManager.GetBuff(_cheatBuff.Name) == null)
+            if (BuffManager.GetBuff("testBuff1") == null)
             {
 
-                Log.Out($"Buff {_cheatBuff} has ben added");
+                //Log.Out($"Buff {_cheatBuff} has ben added");
 
-                Player.Buffs.AddBuff(_cheatBuff.Name);
-                Log.Out($"Buff {_cheatBuff.Name} has ben added to{Player.Buffs.ActiveBuffs.GetInternalArray()} ");
+                Player.Buffs.AddBuff("testBuff1");
+                //Log.Out($"Buff {_cheatBuff.Name} has ben added to{Player.Buffs.ActiveBuffs.GetInternalArray()} ");
             }
             else
             {
-                Debug.LogWarning($"Buff {_cheatBuff.Name} was already added to the system");
-                if (Player.Buffs.GetBuff(_cheatBuff.Name) == null)
+                //Debug.LogWarning($"Buff {_cheatBuff.Name} was already added to the system");
+                if (Player.Buffs.GetBuff("testBuff1") == null)
                 {
 
-                    Player.Buffs.AddBuff(_cheatBuff.Name);
-                    Log.Out($"Buff {_cheatBuff.Name} was Added to to Player again");
+                    Player.Buffs.AddBuff("testBuff1");
+                    //Log.Out($"Buff {_cheatBuff.Name} was Added to to Player again");
                 }
             }
         }
         public static void AddEffectGroup()
         {
-            Debug.LogWarning("adding effectGroup");
-            MinEffectController.EffectGroups = new List<MinEffectGroup>
-            {
-
-                new MinEffectGroup
-               {
-                   OwnerTiered = true,
-                   PassiveEffects = new List<PassiveEffect>
-                   {
-                   },
-                   PassivesIndex = new List<PassiveEffects>
-                       {
-                       }
-               }
-            };
+            Debug.LogWarning("adding effectGroup??");
+            //MinEffectController.EffectGroups = new List<MinEffectGroup>
+            //{
+            //    //TODO: FIX THIS 
+            //   // new MinEffectGroup
+            //   //{
+            //   //    OwnerTiered = true,
+            //   //    PassiveEffects = new List<PassiveEffect>
+            //   //    {
+            //   //    },
+            //   //    PassivesIndex = new List<PassiveEffects>
+            //   //        {
+            //   //        }
+            //   //}
+            //};
             //O._minEffectController.PassivesIndex = new HashSet<PassiveEffects>();
         }
         public static void ClearCheatBuff()
         {
-            Debug.LogWarning("Clearing CheatBuff");
+            Debug.LogWarning("Clearing TestBuff1");
+
+            SevenDTDMono.Features.Cheat.MinEffectController = Player.Buffs.GetBuff("testBuff1").BuffClass.Effects;
 
             MinEffectController.EffectGroups[0].PassiveEffects.Clear();
             MinEffectController.PassivesIndex.Clear();
@@ -1018,7 +846,8 @@ namespace SevenDTDMono.Features
             if (NewSettings.GameManager.gameStateManager.bGameStarted == true && Player && _boolDict[nameof(SettingsBools.CHEAT_BUFF)]==false)
             {
                 Debug.LogWarning($"amount of buffs before load {BuffManager.Buffs.Count}");
-                InitCheatBuff();
+                //InitCheatBuff();
+                _boolDict[nameof(SettingsBools.CHEAT_BUFF)] = true;
 
 
                 if (!_boolDict[nameof(SettingsBools.BUFF_CLASSES_LOADED)])
@@ -1293,26 +1122,6 @@ namespace SevenDTDMono.Features
         {
             Debug.LogWarning($"Awake: {nameof(Cheat)}");
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         private static string EscapeForCsv(string value)
